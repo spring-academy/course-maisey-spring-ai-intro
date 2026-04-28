@@ -1,14 +1,9 @@
----
-title: AI Fundamentals
----
-
-# AI Fundamentals for Java Developers
-
 Before diving into code, let's understand the key AI concepts you'll encounter throughout this workshop.
 
 ## The AI Hierarchy
 
-![AI](ai.png)
+<!-- TODO adjust to have images pushed to assets on releases and link to them -->
+![AI](https://github.com/spring-academy/course-spring-ai-intro/blob/main/labs/spring-ai-intro/metadata/lms/01-fundamentals/assets/ai.png?raw=true)
 
 **Artificial Intelligence (AI):** The broad field of creating machines capable of performing cognitive functions typically associated with human minds.
 
@@ -19,8 +14,8 @@ Before diving into code, let's understand the key AI concepts you'll encounter t
 **Generative AI:** AI capable of generating new content (text, images, code) by learning patterns from training data.
 
 ## Large Language Models (LLMs)
-
-![How LLMs work](how-llms-work.png)
+<!-- TODO adjust to have images pushed to assets on releases and link to them -->
+![How LLMs work](https://github.com/spring-academy/course-spring-ai-intro/blob/main/labs/spring-ai-intro/metadata/lms/01-fundamentals/assets/how-llms-work.png?raw=true)
 
 **LLMs** are AI models specifically designed to understand and generate human language. They work by:
 
@@ -71,8 +66,8 @@ Connecting models to external systems:
 - Results are incorporated into responses
 
 ### Retrieval-Augmented Generation (RAG)
-
-![RAG](rag.png)
+<!-- TODO adjust to have images pushed to assets on releases and link to them -->
+![RAG](https://github.com/spring-academy/course-spring-ai-intro/blob/main/labs/spring-ai-intro/metadata/lms/01-fundamentals/assets/rag.png?raw=true)
 
 RAG enhances model outputs by incorporating external knowledge:
 

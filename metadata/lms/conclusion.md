@@ -1,14 +1,8 @@
----
-title: Workshop Summary
----
-
-# Workshop Summary
-
-Congratulations on completing the **Spring AI Advanced Workshop**!
+Congratulations on completing the **Spring AI Introduction Course**
 
 ## What You Built
 
-Throughout this workshop, you built the **Support Assistant** - a comprehensive AI-powered application:
+Throughout this course, you built the **Support Assistant** - a comprehensive AI-powered application:
 
 ```
 com.example.supportassistant/
@@ -22,27 +16,27 @@ com.example.supportassistant/
 
 ## Key Concepts Covered
 
-### Module 03: ChatClient Basics
+### ChatClient Basics
 - Fluent API for LLM interaction
 - Blocking vs. streaming responses
 - Response metadata and usage tracking
 
-### Module 04: Prompt Engineering
+### Prompt Engineering
 - System prompts for behavior control
 - Template files with placeholders
 - Few-shot prompting for classification
 
-### Module 05: Structured Output
+### Structured Output
 - `BeanOutputConverter` for JSON parsing
 - Java records as output schemas
 - `@JsonPropertyDescription` for field hints
 
-### Module 06: Embeddings & RAG
+### Embeddings & RAG
 - Text embeddings for similarity search
 - Vector stores for document indexing
 - Context retrieval and augmentation
 
-### Module 07: Tool Calling
+### Tool Calling
 - `@Tool` annotation for functions
 - Parameter descriptions with `@ToolParam`
 - AI-driven tool selection
@@ -96,13 +90,6 @@ Add monitoring for:
 - Response latency
 - Error rates and types
 
-## Continue Learning
-
-### Optional Modules
-- **08: MCP Integration** - Model Context Protocol
-- **09: Observability** - Metrics and monitoring
-- **10: Testing** - AI application testing
-
 ### Resources
 
 **Documentation:**
@@ -116,13 +103,3 @@ Add monitoring for:
 **Community:**
 - [Spring AI GitHub](https://github.com/spring-projects/spring-ai)
 - [Spring Community Discord](https://discord.gg/spring)
-
-## Thank You!
-
-Thank you for participating in this workshop. We hope you're now equipped to build AI-powered applications with Spring AI!
-
-{{< note >}}
-🏆 *Congratulations* 🏆
-
-👍 **You have completed the Spring AI Advanced Workshop!** 👍
-{{< /note >}}
