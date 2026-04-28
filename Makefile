@@ -16,7 +16,7 @@ add-files-to-archive:
 	mkdir -p build/educates-resources
 	cp -r resources/* build/educates-resources
 	for f in build/educates-resources/apply/*; do \
-	  VERSION=${version} envsubst '$${VERSION} $${CONTAINER_REGISTRY} $${CONTAINER_REPOSITORY}' < $$f > $$f.resolved; \
+	  VERSION=${version} CONTAINER_REGISTRY=${CONTAINER_REGISTRY} CONTAINER_REPOSITORY=${CONTAINER_REPOSITORY} envsubst '$${VERSION} $${CONTAINER_REGISTRY} $${CONTAINER_REPOSITORY}' < $$f > $$f.resolved; \
 	  mv $$f.resolved $$f; \
 	done
 
