@@ -1,0 +1,20 @@
+pathways:
+  default: workshop
+
+  paths:
+    workshop:
+      title: "Introduction to Spring AI"
+
+      steps:
+      # Required Core Modules
+      - 02-environment-setup
+      - 03-simple-chat
+      - 04-prompt-engineering
+      - 05-structured-output
+      - 06-embeddings-rag
+      - 07-tool-calling
+
+      # Optional Advanced Modules
+      - 08-mcp-integration
+      - 09-observability
+      - 10-testing

@@ -1,0 +1,14 @@
+{
+    "id": "spring-maisey-lab",
+    "slug": "lab",
+    "title": "Spring AI Lab",
+    "status": "live",
+    "type": "lab",
+    "entitlements": ["auth"],
+    "duration": 180,
+    "instructors": [ ],
+    "settings": {
+        "educates": "spring-maisey",
+        "manualCompletion": true
+    }
+  }

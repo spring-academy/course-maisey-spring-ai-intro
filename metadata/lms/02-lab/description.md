@@ -1,0 +1,1 @@
+The hands-on lab portion of the course where you’ll incrementally build a fully functional AI-powered support assistant.

@@ -1,0 +1,18 @@
+{
+  "id": "spring-maisey",
+  "slug": "spring-ai-intro",
+  "title": "Spring AI Introduction",
+  "status": "unlisted",
+  "level": "beginner",
+  "entitlements": ["auth"],
+  "instructors": [],
+  "topics": ["ai"],
+  "settings": {
+    "thumbnail": "https://raw.githubusercontent.com/vmware-tanzu-learning/spring-academy-assets/main/courses/course-spring-professional/thumbnails/course-springFrameworkEssentials-thumbnail-large.svg",
+    "debug.version": "${GITHUB_REF_NAME}",
+    "debug.commit": "${GITHUB_SHA}",
+    "debug.updated": "${DEBUG_DATE}",
+    "debug.who": "${GITHUB_ACTOR}",
+    "debug.github-workflow": "${GITHUB_WORKFLOW}"
+  }
+}
