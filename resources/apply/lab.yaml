@@ -13,7 +13,7 @@ spec:
     files:
       - http:
           # the name of the tar.gz here should make the workshop name
-          url: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)/spring-course-spring-ai-intro.tar.gz"
+          url: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)/spring-maisey.tar.gz"
   request:
     parameters:
     - name: USER_DOMAIN
@@ -44,22 +44,6 @@ spec:
       editor:
         enabled: true
   environment:
-    objects:
-    - apiVersion: secrets.educates.dev/v1beta1
-      kind: SecretCopier
-      metadata:
-        name: $(workshop_namespace)-spring-enterprise-guides-gcp
-      spec:
-        rules:
-        - sourceSecret: 
-            name: gcp
-            namespace: spring-academy
-          targetSecret:
-            name: gcp
-          targetNamespaces:
-            nameSelector:
-              matchNames:
-              - spring-enterprise-guides-*
     - apiVersion: v1
       kind: Service
       metadata:
