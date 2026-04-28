@@ -1,5 +1,3 @@
-Before diving into code, let's understand the key AI concepts you'll encounter throughout this workshop.
-
 ## The AI Hierarchy
 
 <!-- TODO adjust to have images pushed to assets on releases and link to them -->

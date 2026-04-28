@@ -1,0 +1,1 @@
+Understand the key AI concepts you’ll encounter throughout the course and hands-on labs.
