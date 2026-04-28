@@ -1,0 +1,25 @@
+pathways:
+  default: workshop
+
+  paths:
+    workshop:
+      title: "Spring AI Advanced Workshop"
+
+      steps:
+      # Required Core Modules
+      - 00-workshop-overview
+      - 01-ai-fundamentals
+      - 02-environment-setup
+      - 03-simple-chat
+      - 04-prompt-engineering
+      - 05-structured-output
+      - 06-embeddings-rag
+      - 07-tool-calling
+
+      # Optional Advanced Modules
+      - 08-mcp-integration
+      - 09-observability
+      - 10-testing
+
+      # Summary
+      - 99-workshop-summary
