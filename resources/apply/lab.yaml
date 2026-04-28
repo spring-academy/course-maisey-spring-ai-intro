@@ -114,4 +114,4 @@ spec:
           spec:
             containers:
             - name: files
-              image: ghcr.io/spring-academy/spring-enterprise-guides:${VERSION}
+              image: ${CONTAINER_REGISTRY}${CONTAINER_REPOSITORY}:${VERSION}

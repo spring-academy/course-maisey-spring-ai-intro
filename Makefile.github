@@ -1,0 +1,9 @@
+DIR_LAB               = lab
+NAME                  = course-spring-ai-intro
+IMAGE_SOURCE          = https://github.com/spring-academy/course-maisey-spring-ai-intro
+CONTAINER_REGISTRY    = ghcr.io/spring-academy/
+CONTAINER_REPOSITORY  = course-maisey-spring-ai-intro
+version               = latest
+
+env                   = local
+ARTIFACT_NAME         = course-maisey-${version}
