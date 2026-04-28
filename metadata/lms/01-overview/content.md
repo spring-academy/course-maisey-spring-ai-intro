@@ -1,7 +1,7 @@
 ## The AI Hierarchy
 
 <!-- TODO adjust to have images pushed to assets on releases and link to them -->
-![AI](https://github.com/spring-academy/course-spring-ai-intro/blob/main/labs/spring-ai-intro/metadata/lms/01-fundamentals/assets/ai.png?raw=true)
+![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/01-overview/assets/ai.png)
 
 **Artificial Intelligence (AI):** The broad field of creating machines capable of performing cognitive functions typically associated with human minds.
 
@@ -13,7 +13,7 @@
 
 ## Large Language Models (LLMs)
 <!-- TODO adjust to have images pushed to assets on releases and link to them -->
-![How LLMs work](https://github.com/spring-academy/course-spring-ai-intro/blob/main/labs/spring-ai-intro/metadata/lms/01-fundamentals/assets/how-llms-work.png?raw=true)
+![How LLMs work](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/01-overview/assets/how-llms-work.png)
 
 **LLMs** are AI models specifically designed to understand and generate human language. They work by:
 
@@ -65,7 +65,7 @@ Connecting models to external systems:
 
 ### Retrieval-Augmented Generation (RAG)
 <!-- TODO adjust to have images pushed to assets on releases and link to them -->
-![RAG](https://github.com/spring-academy/course-spring-ai-intro/blob/main/labs/spring-ai-intro/metadata/lms/01-fundamentals/assets/rag.png?raw=true)
+![RAG](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/01-overview/assets/rag.png)
 
 RAG enhances model outputs by incorporating external knowledge:
 
