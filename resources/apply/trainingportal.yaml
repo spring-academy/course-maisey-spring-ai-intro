@@ -1,7 +1,7 @@
 apiVersion: training.educates.dev/v1beta1
 kind: TrainingPortal
 metadata:
-  name: spring-course-spring-ai-intro
+  name: spring-maisey
 spec:
   portal:
     title: Spring Academy / Introduction to Spring AI
@@ -28,7 +28,7 @@ spec:
     clarity:
       trackingId: "${ANALYTICS_CLARITY_ID}"
   workshops:
-    - name: spring-course-spring-ai-intro-lab
+    - name: spring-maisey-lab
       expires: 30m      # set the default time allocated for the user's session
       orphaned: 10m     # if there is no activity after certain amount of time, delete the session
       deadline: 60m     # the maximum amount of time the learner could extend the session to
