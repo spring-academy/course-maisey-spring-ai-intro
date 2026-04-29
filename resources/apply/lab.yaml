@@ -44,6 +44,7 @@ spec:
       editor:
         enabled: true
   environment:
+    objects:
     - apiVersion: v1
       kind: Service
       metadata:
