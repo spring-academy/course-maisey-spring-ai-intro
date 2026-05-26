@@ -1,0 +1,16 @@
+{
+    "id": "spring-maisey-lab-tool-calling",
+    "slug": "lab-tool-calling",
+    "title": "Tool Calling",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "duration": 30,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-tool-calling",
+        "manualCompletion": true
+    }
+}

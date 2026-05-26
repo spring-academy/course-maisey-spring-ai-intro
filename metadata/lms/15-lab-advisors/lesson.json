@@ -1,0 +1,16 @@
+{
+    "id": "spring-maisey-lab-advisors",
+    "slug": "lab-advisors",
+    "title": "Advisors & Agentic Patterns",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "duration": 30,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-advisors",
+        "manualCompletion": true
+    }
+}

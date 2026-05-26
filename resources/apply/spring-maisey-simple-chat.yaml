@@ -1,0 +1,96 @@
+apiVersion: training.educates.dev/v1beta1
+kind: Workshop
+metadata:
+  name: spring-maisey-simple-chat
+spec:
+  title: Spring Academy - Spring AI - Simple Chat
+  description: "Build your first Spring AI integration using the ChatClient API"
+  difficulty: beginner
+  duration: 30m
+  vendor: Broadcom
+  workshop:
+    image: jdk21-environment:*
+    files:
+      - http:
+          url: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)/spring-maisey-simple-chat.tar.gz"
+  request:
+    parameters:
+    - name: USER_DOMAIN
+      value: "unknown.domain"
+    - name: USER_EMAIL
+      value: "somebody@unknown.domain"
+  session:
+    namespaces:
+      security:
+        token:
+          enabled: false
+    env:
+    - name: WEBSERVER
+      value: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)"
+    - name: BOOTSTRAP_COMMAND
+      value: ":"
+    resources:
+      memory: 4Gi
+    applications:
+      terminal:
+        enabled: true
+        layout: split
+      editor:
+        enabled: true
+  environment:
+    objects:
+    - apiVersion: v1
+      kind: Service
+      metadata:
+        name: $(workshop_namespace)-files
+        namespace: $(workshop_namespace)
+      spec:
+        type: ClusterIP
+        ports:
+        - port: 80
+          protocol: TCP
+          targetPort: 8080
+        selector:
+          deployment: files
+    - apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: $(workshop_namespace)-files
+        namespace: $(workshop_namespace)
+      spec:
+        tls:
+        - hosts:
+            - $(workshop_namespace)-files.$(ingress_domain)
+          secretName: $(ingress_secret)
+        rules:
+        - host: $(workshop_namespace)-files.$(ingress_domain)
+          http:
+            paths:
+            - backend:
+                service:
+                  name: $(workshop_namespace)-files
+                  port:
+                    number: 80
+              pathType: Prefix
+              path: /
+    - apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: $(workshop_namespace)-files
+        namespace: $(workshop_namespace)
+      spec:
+        serviceAccountName: $(service_account)
+        replicas: 1
+        selector:
+          matchLabels:
+            deployment: files
+        strategy:
+          type: Recreate
+        template:
+          metadata:
+            labels:
+              deployment: files
+          spec:
+            containers:
+            - name: files
+              image: ${CONTAINER_REGISTRY}${CONTAINER_REPOSITORY}:${VERSION}

@@ -1,0 +1,16 @@
+{
+    "id": "spring-maisey-lab-simple-chat",
+    "slug": "lab-simple-chat",
+    "title": "Simple Chat",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "duration": 30,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-simple-chat",
+        "manualCompletion": true
+    }
+}

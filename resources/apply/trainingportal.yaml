@@ -28,10 +28,58 @@ spec:
     clarity:
       trackingId: "${ANALYTICS_CLARITY_ID}"
   workshops:
-    - name: spring-maisey
-      expires: 30m      # set the default time allocated for the user's session
-      orphaned: 10m     # if there is no activity after certain amount of time, delete the session
-      deadline: 60m     # the maximum amount of time the learner could extend the session to
-      overdue: 2m       # if the session startup takes longer than this time, let's have the session be deleted
+    - name: spring-maisey-simple-chat
+      expires: 45m
+      orphaned: 10m
+      deadline: 90m
+      overdue: 2m
+      reserved: ${TRAINING_PORTAL_RESERVED}
+    - name: spring-maisey-prompt-engineering
+      expires: 30m
+      orphaned: 10m
+      deadline: 60m
+      overdue: 2m
+      reserved: ${TRAINING_PORTAL_RESERVED}
+    - name: spring-maisey-structured-output
+      expires: 30m
+      orphaned: 10m
+      deadline: 60m
+      overdue: 2m
+      reserved: ${TRAINING_PORTAL_RESERVED}
+    - name: spring-maisey-embeddings-rag
+      expires: 45m
+      orphaned: 10m
+      deadline: 90m
+      overdue: 2m
+      reserved: ${TRAINING_PORTAL_RESERVED}
+    - name: spring-maisey-tool-calling
+      expires: 40m
+      orphaned: 10m
+      deadline: 80m
+      overdue: 2m
+      reserved: ${TRAINING_PORTAL_RESERVED}
+    - name: spring-maisey-mcp-integration
+      expires: 30m
+      orphaned: 10m
+      deadline: 60m
+      overdue: 2m
+      reserved: ${TRAINING_PORTAL_RESERVED}
+    - name: spring-maisey-advisors
+      expires: 40m
+      orphaned: 10m
+      deadline: 80m
+      overdue: 2m
+      reserved: ${TRAINING_PORTAL_RESERVED}
+    - name: spring-maisey-observability
+      expires: 30m
+      orphaned: 10m
+      deadline: 60m
+      overdue: 2m
+      reserved: ${TRAINING_PORTAL_RESERVED}
+    - name: spring-maisey-testing
+      expires: 30m
+      orphaned: 10m
+      deadline: 60m
+      overdue: 2m
       reserved: ${TRAINING_PORTAL_RESERVED}
 

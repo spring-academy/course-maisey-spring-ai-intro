@@ -1,0 +1,12 @@
+{
+    "id": "spring-maisey-simple-chat",
+    "slug": "simple-chat",
+    "title": "Simple Chat with Spring AI",
+    "status": "live",
+    "type": "article",
+    "duration": 30,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "id": "spring-maisey-lab-embeddings-rag",
+    "slug": "lab-embeddings-rag",
+    "title": "Embeddings & RAG",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "duration": 30,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-embeddings-rag",
+        "manualCompletion": true
+    }
+}

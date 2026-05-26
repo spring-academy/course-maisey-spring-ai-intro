@@ -1,0 +1,12 @@
+{
+    "id": "spring-maisey-tool-calling",
+    "slug": "tool-calling",
+    "title": "Tool Calling",
+    "status": "live",
+    "type": "article",
+    "duration": 25,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}
