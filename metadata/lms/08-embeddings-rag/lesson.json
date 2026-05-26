@@ -1,0 +1,12 @@
+{
+    "id": "spring-maisey-embeddings-rag",
+    "slug": "embeddings-rag",
+    "title": "Embeddings & RAG",
+    "status": "live",
+    "type": "article",
+    "duration": 30,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

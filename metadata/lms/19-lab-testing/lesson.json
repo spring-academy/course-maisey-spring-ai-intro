@@ -1,0 +1,16 @@
+{
+    "id": "spring-maisey-lab-testing",
+    "slug": "lab-testing",
+    "title": "Testing",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "duration": 30,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-testing",
+        "manualCompletion": true
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "id": "spring-maisey-testing",
+    "slug": "testing",
+    "title": "Testing AI Applications",
+    "status": "live",
+    "type": "article",
+    "duration": 20,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

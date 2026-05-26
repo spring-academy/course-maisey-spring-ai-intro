@@ -1,0 +1,9 @@
+pathways:
+  default: workshop
+
+  paths:
+    workshop:
+      title: "Spring AI - Advisors & Agentic Patterns"
+
+      steps:
+      - 09-advisors

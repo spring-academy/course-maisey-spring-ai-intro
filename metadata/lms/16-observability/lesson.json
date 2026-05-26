@@ -1,0 +1,12 @@
+{
+    "id": "spring-maisey-observability",
+    "slug": "observability",
+    "title": "Observability",
+    "status": "live",
+    "type": "article",
+    "duration": 20,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

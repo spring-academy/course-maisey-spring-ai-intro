@@ -1,0 +1,9 @@
+pathways:
+  default: workshop
+
+  paths:
+    workshop:
+      title: "Spring AI - Tool Calling"
+
+      steps:
+      - 07-tool-calling

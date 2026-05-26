@@ -1,0 +1,16 @@
+{
+    "id": "spring-maisey-lab-prompt-engineering",
+    "slug": "lab-prompt-engineering",
+    "title": "Prompt Engineering",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "duration": 30,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-prompt-engineering",
+        "manualCompletion": true
+    }
+}

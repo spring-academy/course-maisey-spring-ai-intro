@@ -1,0 +1,16 @@
+{
+    "id": "spring-maisey-lab-observability",
+    "slug": "lab-observability",
+    "title": "Observability",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "duration": 30,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-observability",
+        "manualCompletion": true
+    }
+}
