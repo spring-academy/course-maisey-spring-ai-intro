@@ -1,49 +1,25 @@
+Artificial intelligence (AI) is becoming increasingly essential to modern applications. While AI encompasses many different techniques, the current industry focuses on Generative AI (GenAI) due to the latest advancements in large language models (LLMs).
+
+Traditionally, Python has been the dominant language for integrating AI capabilities into applications. However, for Java developers adopting Generative AI, the Spring AI project offers an attractive solution that enables the seamless development of enterprise-grade applications while keeping pace with the rapidly evolving AI landscape.
+
 ## What is Spring AI?
+
+Spring AI abstracts complex interactions with various AI providers providing REST APIs, such as OpenAI, Anthropic, Microsoft, Google, Amazon, and even local LLMs. Its model-agnostic nature allows for easy switching between models, and, as usual in Spring, you still have access to functionalities and configurations unique to a particular model.
+The framework automatically converts AI model output into Java objects, ensuring type safety across your application and provides other fundamental features like multimodality, AI-related observability, and model response evaluation testing.
+
+Additionally, Spring AI covers more advanced AI patterns, such as Tool Calling, Retrieval-Augmented Generation (RAG), and the Model Context Protocol (MCP), to provide context to LLMs.
+
+Spring AI also addresses **agentic AI patterns**, in which models reason, plan, and act over multiple steps rather than producing a single response. The project continuously adds support for emerging patterns such as LLM-as-judge evaluation (using a model to assess the quality of another model's output) and the Tool Search pattern (where the model discovers available tools on-demand rather than receiving all definitions upfront, keeping the context window lean). These patterns reflect the rapidly evolving state of applied AI, and Spring AI's active development ensures Java developers stay at the cutting edge.
+
+Spring AI is built upon the core building blocks of the Spring Framework and other Spring projects like Spring Data for integrating vector databases. Spring Boot simplifies and speeds up the development of AI-powered features through autoconfiguration.
+
 
 Spring AI is a framework that brings AI capabilities to the Java and Spring ecosystem. It provides a **consistent, portable programming model** across AI providers — the same code works with OpenAI, Anthropic, Google Gemini, Ollama, and others.
 
-Key features:
+## What You Will Learn
 
-| Feature | What it gives you |
-|---------|------------------|
-| **Portable `ChatClient` API** | Swap AI providers without rewriting application code |
-| **Spring Boot auto-configuration** | Zero-boilerplate setup for any supported model |
-| **Structured output** | Map AI responses directly to Java records and objects |
-| **RAG support** | Built-in ETL pipeline and vector store integrations |
-| **Tool calling** | Connect the model to your own services with `@Tool` annotations |
-| **MCP server** | Expose your tools as a Model Context Protocol server |
-| **Advisors** | Intercept and enrich the chat pipeline (memory, logging, safety) |
-| **Observability** | Micrometer metrics for token usage, latency, and error rates |
-| **Testing support** | Mock providers and LLM-as-judge evaluators |
+This course gives you everything you need to build your first AI-enabled application or agent. You will start with Generative AI fundamentals and key concepts, then see how Spring AI puts those concepts into practice, so you have a solid foundation before writing a single line of code.
 
-## What You'll Build
+In the **hands-on labs**, you will incrementally build a support assistant for VMware Tanzu Spring. You will apply each concept to a realistic application that can answer questions from documentation, create support tickets, and maintain conversation history across turns.
 
-Throughout this course you'll incrementally build a **Tanzu Spring Support Assistant** — an AI-powered application that can:
-
-- Answer questions about Spring support offerings using a `ChatClient`
-- Classify and format responses as typed Java objects
-- Answer from documentation using Retrieval-Augmented Generation (RAG)
-- Create and list support tickets via tool calling
-- Expose its tools over the Model Context Protocol (MCP)
-- Maintain conversation history across multiple turns using Advisors
-
-## Course Structure
-
-The course alternates between short **theory articles** and **hands-on labs**:
-
-1. **AI Fundamentals** — LLMs, tokens, and the core techniques (RAG, tool calling, prompt engineering)
-2. **Simple Chat** → lab: build a blocking and streaming `ChatClient` endpoint
-3. **Prompt Engineering** → lab: add system prompts and few-shot classification
-4. **Structured Output** → lab: map responses to Java records with `.entity()`
-5. **Embeddings & RAG** → lab: load documents into a vector store and answer questions from them
-6. **Tool Calling** → lab: connect the AI to a live database via `@Tool` methods
-7. **MCP Integration** → lab: expose your tools as an MCP server
-8. **Advisors & Agentic Patterns** → lab: add conversation memory and debug logging
-9. **Observability** → lab: instrument token usage and latency with Micrometer
-10. **Testing** → lab: validate response quality with the Spring AI Evaluator framework
-
-## Prerequisites
-
-- Java 21 and Maven (provided in the lab environment)
-- Familiarity with Spring Boot (dependency injection, REST controllers, `@Bean`)
-- No prior AI or ML experience required — the AI Fundamentals article covers everything you need
+The following section starts with the core fundamentals of Generative AI that everything else builds on.

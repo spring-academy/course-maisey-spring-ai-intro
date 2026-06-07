@@ -1,5 +1,6 @@
 # IDEs
 .idea
+.vscode
 
 ##
 *.swp
@@ -18,7 +19,6 @@
 .webdav
 .yarn
 .envrc*
-.vscode
 build
 spring-repo-mirror
 spring-recipes-offline.tar
