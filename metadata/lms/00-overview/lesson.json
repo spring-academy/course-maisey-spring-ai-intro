@@ -1,10 +1,10 @@
 {
     "id": "spring-maisey-overview",
     "slug": "overview",
-    "title": "Introduction to Spring AI",
+    "title": "Introduction",
     "status": "live",
     "type": "article",
-    "duration": 10,
+    "duration": 5,
     "instructors": [ ],
     "settings": {
       "manualCompletion": true

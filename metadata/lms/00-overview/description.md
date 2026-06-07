@@ -1,1 +1,1 @@
-A tour of Spring AI, what you'll build, and how the course is structured.
+An overview of what Spring AI offers, how the course is structured, and the support assistant you will build in the hands-on labs.
