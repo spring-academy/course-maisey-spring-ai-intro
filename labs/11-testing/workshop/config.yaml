@@ -1,0 +1,11 @@
+pathways:
+  default: workshop
+
+  paths:
+    workshop:
+      title: "Spring AI - Testing"
+
+      steps:
+      - 01-getting-started
+      - 02-response-quality
+      - 03-rag-evaluation

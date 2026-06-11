@@ -1,0 +1,11 @@
+pathways:
+  default: workshop
+
+  paths:
+    workshop:
+      title: "Spring AI - Embeddings & RAG"
+
+      steps:
+      - 01-getting-started
+      - 02-etl-pipeline
+      - 03-rag-advisor

@@ -1,0 +1,16 @@
+{
+    "id": "spring-maisey-lab-agentic-patterns",
+    "slug": "lab-agentic-patterns",
+    "title": "Agentic Patterns",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "duration": 30,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-agentic-patterns",
+        "manualCompletion": true
+    }
+}

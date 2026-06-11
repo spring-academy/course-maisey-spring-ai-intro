@@ -1,9 +1,0 @@
-pathways:
-  default: workshop
-
-  paths:
-    workshop:
-      title: "Spring AI - Structured Output"
-
-      steps:
-      - 05-structured-output

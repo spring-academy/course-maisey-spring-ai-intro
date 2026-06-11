@@ -1,9 +1,0 @@
-pathways:
-  default: workshop
-
-  paths:
-    workshop:
-      title: "Spring AI - Testing"
-
-      steps:
-      - 10-testing
