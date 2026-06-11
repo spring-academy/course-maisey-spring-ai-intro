@@ -1,0 +1,12 @@
+{
+    "id": "spring-maisey-ai-fundamentals",
+    "slug": "ai-fundamentals",
+    "title": "AI Fundamentals for Java Developers",
+    "status": "live",
+    "type": "article",
+    "duration": 15,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

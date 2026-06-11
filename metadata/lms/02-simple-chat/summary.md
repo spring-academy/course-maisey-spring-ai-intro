@@ -1,0 +1,1 @@
+You now understand the fundamentals of Generative AI and are equipped for the course.

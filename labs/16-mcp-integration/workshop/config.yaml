@@ -1,0 +1,10 @@
+pathways:
+  default: workshop
+
+  paths:
+    workshop:
+      title: "Spring AI - MCP Integration"
+
+      steps:
+      - 01-mcp-server
+      - 02-mcp-client

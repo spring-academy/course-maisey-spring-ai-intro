@@ -1,0 +1,9 @@
+pathways:
+  default: workshop
+
+  paths:
+    workshop:
+      title: "Spring AI - Agentic Patterns"
+
+      steps:
+      - 17-agentic-patterns

@@ -1,0 +1,12 @@
+pathways:
+  default: workshop
+
+  paths:
+    workshop:
+      title: "Spring AI - Simple Chat"
+
+      steps:
+      - 01-getting-started
+      - 02-chat-model
+      - 03-chat-client
+      - 04-structured-output

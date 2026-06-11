@@ -1,9 +1,0 @@
-pathways:
-  default: workshop
-
-  paths:
-    workshop:
-      title: "Spring AI - Embeddings & RAG"
-
-      steps:
-      - 06-embeddings-rag

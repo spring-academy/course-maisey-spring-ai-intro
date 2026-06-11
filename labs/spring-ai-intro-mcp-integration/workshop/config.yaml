@@ -1,9 +1,0 @@
-pathways:
-  default: workshop
-
-  paths:
-    workshop:
-      title: "Spring AI - MCP Integration"
-
-      steps:
-      - 08-mcp-integration
