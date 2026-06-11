@@ -1,0 +1,1 @@
+You now know what to test in an AI application despite non-deterministic outputs, using Spring AI's evaluators and integration testing strategies.

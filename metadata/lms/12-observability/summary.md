@@ -1,0 +1,1 @@
+You now understand the observability Spring AI ships out of the box — Micrometer metrics and traces for model calls, token usage tracking, and cost monitoring.

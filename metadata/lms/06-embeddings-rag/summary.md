@@ -1,0 +1,1 @@
+You now understand how embeddings and vector stores power RAG, and how Spring AI implements it with the ETL pipeline and the QuestionAnswerAdvisor.

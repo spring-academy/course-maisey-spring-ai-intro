@@ -1,1 +1,1 @@
-The key AI and LLM concepts you need to understand before working with Spring AI.
+The key concepts behind agentic AI — how LLM applications move from answering questions to autonomously planning and acting with tools.

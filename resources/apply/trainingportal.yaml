@@ -34,18 +34,6 @@ spec:
       deadline: 90m
       overdue: 2m
       reserved: ${TRAINING_PORTAL_RESERVED}
-    - name: spring-maisey-prompt-engineering
-      expires: 30m
-      orphaned: 10m
-      deadline: 60m
-      overdue: 2m
-      reserved: ${TRAINING_PORTAL_RESERVED}
-    - name: spring-maisey-structured-output
-      expires: 30m
-      orphaned: 10m
-      deadline: 60m
-      overdue: 2m
-      reserved: ${TRAINING_PORTAL_RESERVED}
     - name: spring-maisey-embeddings-rag
       expires: 45m
       orphaned: 10m
@@ -64,7 +52,7 @@ spec:
       deadline: 60m
       overdue: 2m
       reserved: ${TRAINING_PORTAL_RESERVED}
-    - name: spring-maisey-advisors
+    - name: spring-maisey-agentic-patterns
       expires: 40m
       orphaned: 10m
       deadline: 80m

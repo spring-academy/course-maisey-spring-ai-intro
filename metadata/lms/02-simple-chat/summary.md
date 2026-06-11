@@ -1,1 +1,1 @@
-You now understand the fundamentals of Generative AI and are equipped for the course.
+You now understand Spring AI's core chat abstractions — ChatModel as the portable contract over provider APIs and ChatClient as the fluent API for everyday use.
