@@ -1,1 +1,1 @@
-You now know what Spring AI is, what the support assistant application will do, and how the theory articles and hands-on labs fit together across the course.
+You now know what Spring AI is and why it's a great fit for Java developers building GenAI applications, and you've seen how the course is structured: each section's concepts are put into practice in hands-on labs, in which you build an AI-powered support assistant step by step.
