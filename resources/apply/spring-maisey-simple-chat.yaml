@@ -9,7 +9,7 @@ spec:
   duration: 30m
   vendor: Broadcom
   workshop:
-    image: jdk25-environment:*
+    image: jdk21-environment:*
     files:
       - http:
           url: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)/spring-maisey-simple-chat.tar.gz"
