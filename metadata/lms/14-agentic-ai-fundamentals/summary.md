@@ -1,1 +1,1 @@
-You now understand the fundamentals of Generative AI and are equipped for the course.
+You now understand what makes an AI system agentic and are prepared for the MCP and agentic patterns sections of the course.

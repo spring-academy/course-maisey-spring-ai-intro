@@ -1,0 +1,1 @@
+You now understand how Spring AI turns annotated methods into tools the model can call, and how the agentic loop feeds their results back into the conversation.
