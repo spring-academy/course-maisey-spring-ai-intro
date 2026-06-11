@@ -1,7 +1,7 @@
 {
     "id": "spring-maisey-simple-chat",
     "slug": "simple-chat",
-    "title": "Simple Chat with Spring AI",
+    "title": "Spring AI Fundamentals: ChatModel and ChatClient",
     "status": "live",
     "type": "article",
     "duration": 30,

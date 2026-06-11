@@ -135,7 +135,7 @@ ChatResponse response = chatModel.call(new Prompt(
 
 The `ChatResponse` that comes back wraps one or more **`Generation`** objects. A `Generation` is a single candidate completion, the assistant's message together with metadata such as its finish reason. Most requests return exactly one, which is why the `getResult()` shortcut above is so common, but a model can be asked to produce several alternatives.
 
-Beyond the generated text, the `ChatResponse` also exposes metadata about the call via `getMetadata()`. This includes details such as the model that served the request and, importantly, `getUsage()` — the **token counts** for both the prompt and the completion. Tracking usage matters because providers bill per token, so surfacing these counts is the foundation for cost monitoring and budgeting.
+Beyond the generated text, the `ChatResponse` also exposes metadata about the call via `getMetadata()`. This includes details such as the model that served the request and, importantly, `getUsage()`, which provides the **token counts** for both the prompt and the completion. Tracking usage matters because providers bill per token, so surfacing these counts is the foundation for cost monitoring and budgeting.
 
 The `call()` method shown so far is blocking: it waits for the entire completion before returning. Because models generate text token by token, you can also consume the response as a stream, displaying each piece the moment it is produced rather than waiting for the whole answer. This is what powers the "typewriter" effect in chatbots, where words appear progressively, dramatically improving perceived responsiveness for longer answers. For this, Spring AI provides a companion `StreamingChatModel` interface whose `stream()` method returns a reactive `Flux<ChatResponse>` of partial responses.
 
@@ -195,10 +195,39 @@ ChatResponse response = chatClient.prompt()
     .chatResponse();
 ```
 
-The response handling goes further still. Instead of working with raw text, `.call()` can map the model's output directly onto a Java type via `.entity(...)`:
+## Structured Output: From Text to Java Objects
+
+So far, every response has come back as plain text. That's fine for a chatbot, but in an enterprise application you usually want to *do* something with the model's answer: store it, validate it, render it in a UI, or pass it to other business logic. Free-form prose is a poor fit for that, which is why structured output is one of Spring AI's most important features, and one you'll likely use in almost every real application.
+
+### A short excursus: Prompt Engineering
+
+How would you get structured data out of a model without framework support? Since the only way to influence a model is through the prompt, the answer lies in **Prompt Engineering**. It's the practice of phrasing and structuring prompts to steer the model toward the output you want.
+
+One of the most effective techniques is **Few-Shot Prompting**. Instead of only describing the desired output, you show the model a few examples of it. Models are excellent at continuing patterns, so given a few sample question/answer pairs in the right format, they will follow that format for the real question. You can use this to instruct the model into responding with JSON:
 
 ```java
-record SupportAnswer(String summary, List<String> keyPoints, List<String> docLinks) {}
+String json = chatClient.prompt()
+    .system("""
+        You answer support questions. Respond only with a JSON object and no other text.
+        Examples:
+        Question: What is Spring Boot?
+        Answer: {"category": "TECHNICAL", "summary": "Spring Boot is ..."}
+        Question: How can I update my payment details?
+        Answer: {"category": "BILLING", "summary": "You can update your payment details ..."}
+        """)
+    .user("Tell me about Spring AI")
+    .call()
+    .content();
+```
+
+This works, and few-shot prompting remains a valuable technique for steering model behavior far beyond formatting. But for structured data it leaves the tedious parts to you: you hand-craft the format instructions, you have to keep the examples in sync with your Java types, and you still get back a raw `String` you must deserialize yourself, with no guarantee the model didn't deviate from the format.
+
+### Letting Spring AI handle it with `.entity(...)`
+
+This is exactly the boilerplate that Spring AI's structured output support abstracts away. Instead of returning raw text, `.call()` can map the model's output directly onto a Java type via `.entity(...)`:
+
+```java
+record SupportAnswer(String category, String summary) {}
 
 SupportAnswer answer = chatClient.prompt()
     .user("Tell me about Spring AI")
@@ -206,9 +235,10 @@ SupportAnswer answer = chatClient.prompt()
     .entity(SupportAnswer.class);
 ```
 
-This is one of Spring AI's most powerful features: it lets the model return structured, type-safe data your application can use directly, rather than free-form prose you'd have to parse yourself. Behind the scenes Spring AI instructs the model to respond in a matching format and deserializes the result for you. We'll dedicate the **Structured Output** section to it later in the course.
+Behind the scenes, Spring AI does the same thing you just did by hand: it appends format instructions to your prompt that tell the model to respond as JSON matching your type's structure, except that these instructions are generated from the Java type itself, and then deserializes the result into the object for you. You get structured, type-safe data your application can use directly, with no manual parsing and no brittle string handling. The boundary between "AI code" and the rest of your Spring application disappears: the model becomes just another collaborator that returns domain objects.
 
+The `.entity(...)` method isn't limited to flat records. It handles nested types, and collections such as a `List` of your domain objects, too.
 
 ## What's Next
 
-You now have the core mental model: models are REST APIs, `ChatModel` is the portable contract over them, and `ChatClient` is the fluent, batteries-included API you'll reach for in everyday application code. In the next section it's time to put it into practice in a hands-on lab.
+You now have the core mental model: models are REST APIs, `ChatModel` is the portable contract over them, `ChatClient` is the fluent, batteries-included API you'll reach for in everyday application code, and structured output turns model responses into type-safe domain objects. In the next section it's time to put it into practice in a hands-on lab.
