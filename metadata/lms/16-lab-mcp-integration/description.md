@@ -1,1 +1,1 @@
-Expose your Spring AI tools as a Model Context Protocol (MCP) server so any MCP-compatible client can use them.
+In this hands-on lab you'll build an MCP server that provides live information about Spring project releases, and connect the support assistant to it as an MCP client so the model can answer release questions from live data.

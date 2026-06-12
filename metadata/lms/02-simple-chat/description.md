@@ -1,1 +1,1 @@
-How Spring AI talks to LLMs: provider starters and configuration, the low-level ChatModel API, and the fluent ChatClient with prompts, streaming, and structured output.
+Learn the fundamentals of Spring AI and how to interact with LLMs from your Spring Boot application. You'll see how Spring AI abstracts away provider-specific APIs and get to know its core abstractions for chatting with models, crafting prompts, and turning model responses into Java objects.

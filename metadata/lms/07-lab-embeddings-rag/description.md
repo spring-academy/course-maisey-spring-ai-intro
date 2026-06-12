@@ -1,1 +1,1 @@
-Build a Retrieval-Augmented Generation (RAG) pipeline to answer questions from your own documents using a vector store.
+In this hands-on lab you'll apply what you've learned about Retrieval Augmented Generation and enable the support assistant to answer questions from your own documents. You'll ingest them into a vector store and let Spring AI provide relevant content to the model as context.

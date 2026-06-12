@@ -1,1 +1,1 @@
-How tool calling lets the model act instead of just answer: Spring AI's @Tool and @ToolParam annotations, the agentic loop, and best practices for designing tools.
+Learn how tool calling lets a model do more than just answer with text. You'll understand how models can request information and trigger actions in your application and how Spring AI makes it easy to expose your own Java methods as tools to the model.

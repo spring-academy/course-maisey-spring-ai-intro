@@ -1,7 +1,7 @@
 {
     "id": "spring-maisey-embeddings-rag",
     "slug": "embeddings-rag",
-    "title": "Embeddings & RAG",
+    "title": "Retrieval-Augmented Generation (RAG)",
     "status": "live",
     "type": "article",
     "duration": 30,

@@ -1,1 +1,1 @@
-You configured your Spring AI application as an MCP server, making your tools accessible to any MCP-compatible AI client.
+You learned how to share tools across applications with the Model Context Protocol, building an MCP server that provides live Spring release information and consuming it from the support assistant as an MCP client.
