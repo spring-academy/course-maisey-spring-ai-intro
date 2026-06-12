@@ -1,1 +1,1 @@
-How Retrieval Augmented Generation grounds model answers in your own data using Spring AI's embeddings support, vector stores, the ETL pipeline, and the QuestionAnswerAdvisor.
+Learn how Retrieval Augmented Generation grounds model answers in your own data. You'll understand how embeddings and vector stores enable semantic search and how Spring AI helps you ingest your documents and provide them to the model as context.

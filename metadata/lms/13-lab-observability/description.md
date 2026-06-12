@@ -1,1 +1,1 @@
-Add tracing and metrics to your Spring AI application using Micrometer and the built-in Spring AI observability support.
+In this hands-on lab you'll discover the observability Spring AI provides out of the box through its integration with Micrometer. You'll enable prompt and completion logging, then explore the metrics it emits for chat calls and vector store operations — including token usage — via the Spring Boot Actuator endpoints.

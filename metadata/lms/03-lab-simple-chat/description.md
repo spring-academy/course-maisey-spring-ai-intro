@@ -1,1 +1,1 @@
-Build your first Spring AI integration using the ChatClient API to create a working chat endpoint.
+Put the fundamentals of Spring AI into practice. In this hands-on lab you'll start building the support assistant and interact with an LLM from a Spring Boot application, using Spring AI's core abstractions.

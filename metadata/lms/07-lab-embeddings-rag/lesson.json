@@ -1,7 +1,7 @@
 {
     "id": "spring-maisey-lab-embeddings-rag",
     "slug": "lab-embeddings-rag",
-    "title": "Embeddings & RAG",
+    "title": "Lab - Retrieval-Augmented Generation (RAG) ",
     "status": "live",
     "type": "lab",
     "entitlements": [

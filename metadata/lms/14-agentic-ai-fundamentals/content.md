@@ -1,57 +1,30 @@
-Artificial intelligence is a broad field that covers any technique enabling machines to perform tasks that normally require human intelligence. It ranges from rule based systems and classic machine learning to computer vision and robotics.
+## From Single Calls to Systems That Decide
 
-<!-- TODO adjust to have images pushed to assets on releases and link to them -->
-![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/01-overview/assets/ai.png)
+Every technique so far has been a single step. You send a prompt and get an answer. RAG enriched that step with context, and tools let it reach outside, but it was still one model call wrapped in your code. Real problems are rarely one step. "Triage this support ticket, research the customer's history, draft a reply, and check it's accurate before sending" is a sequence of decisions, and the system should make some of them on its own.
 
-Within that broad field sit several nested layers. **Machine Learning (ML)** is the subset of AI where algorithms learn from data to make predictions instead of being explicitly programmed. **Deep Learning** is a further subset of ML that uses neural networks, loosely inspired by how neurons in the brain work, to learn complex patterns. And **Generative AI** is the part of deep learning that does not just analyze or classify existing data but creates new content such as text, images, audio, and code.
+Systems that use a model to do multi-step work are called **agentic**. The word covers a wide range of designs, and the most important skill in this space is not building the most advanced agent. It is knowing how much agency a task actually needs. Spring AI follows the advice from Anthropic's "Building Effective Agents" guide. Start simple, and add autonomy only when it provides clear value.
 
-Generative AI is one specific subset of artificial intelligence, yet it is the part that has captured the world's attention. When people talk about "AI" today, they almost always mean Generative AI, and most often the **Large Language Models (LLMs)** that power it.
+## Workflows vs. Agents
 
-## Why Is This Happening Now?
+This advice is based on an important distinction.
 
-The ideas behind neural networks have existed for decades, so it is fair to ask why Generative AI suddenly feels like it is everywhere. Three forces came together at the same time.
+- **Workflows** are systems where "LLMs and tools are orchestrated through predefined code paths." You decide the steps, and the model provides the intelligence at each one. The control flow lives in your Java code, so it is predictable, testable, and repeatable.
+- **Agents** are systems where "LLMs dynamically direct their own processes and tool usage." The model decides what to do next, which tool to call, and whether it is finished. This is more flexible, but less predictable.
 
-The first was a breakthrough in architecture. In 2017, researchers at Google published the paper "Attention Is All You Need", which introduced the **transformer** architecture. Its core idea, the **attention mechanism**, lets a model weigh how strongly each word in a sequence relates to every other word. This captures context far better than earlier approaches, and just as importantly it does so in a way that scales well on modern hardware.
+Many developers want to start with a fully autonomous agent. The documentation explains why you usually should not. "While fully autonomous agents might seem appealing, workflows often provide better predictability and consistency for well-defined tasks. This aligns perfectly with enterprise requirements where reliability and maintainability are crucial." For most enterprise problems, a workflow you can reason about is better than an agent you can only hope works.
 
-The second force was scale. Researchers found that making these models dramatically larger, and training them on more data with more computing power, kept producing better results. Capability grew with size in a way few people expected.
+Spring AI does not give you a heavy "agent framework" for any of this. Everything agentic is built from the building blocks you already know, such as the `ChatClient`, structured output, tools, and advisors. An agentic system is therefore just ordinary Spring code that you can debug.
 
-The third force was accessibility. The public release of capable chat based assistants showed everyone, not just researchers, what these systems could do. That moment triggered the current wave of investment, tooling, and adoption that we are living through now.
+## The Autonomous Agent You've Already Built
 
-## How LLMs Work
+You may not have noticed it, but you have already run an autonomous agent. The tool-calling loop from the tool calling section is the minimal agent. The model is given tools, calls them, sees the results, and decides what to do next, until it judges the task complete. Give that loop RAG and a handful of tools, and it becomes a capable assistant that plans its own path through a request.
 
-<!-- TODO adjust to have images pushed to assets on releases and link to them -->
-![How LLMs work](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/01-overview/assets/how-llms-work.png)
+Two things turn this minimal agent into one that is ready for production. It needs to reach capabilities outside your application, and it needs to combine model calls in the right way for the task. The next sections cover both.
 
-Despite their sophistication, LLMs do something conceptually simple. Given a piece of text, they predict the most likely next piece of text, and then they repeat that step over and over. Scaled up across billions of examples, this prediction produces responses that are coherent, contextually relevant, and often surprisingly creative.
+## Reaching External Systems With the Model Context Protocol
 
-A handful of terms describe how this works in practice and will appear throughout the course.
+So far, every tool the assistant can call lives inside its own codebase. The **Model Context Protocol (MCP)** is an open standard that changes this. It allows an application to expose tools and other capabilities as a server that any MCP-compatible client can discover and call. It also allows your agent to use tools from servers built by others, in any programming language. MCP is quickly becoming the standard way for agents to connect to the outside world. The next section covers MCP in detail, and in its lab you will build an MCP server and connect the support assistant to it.
 
-The text you send to a model is called the **prompt**. It is your instruction and context combined, and its quality has a large effect on the quality of the response. The text the model sends back is the **completion**.
+## Common Agentic Patterns
 
-Models do not read characters or whole words directly. They first break text into **tokens**, which are small chunks that can be a whole word, part of a word, or a piece of punctuation. Tokens are used because they strike a balance between characters, which would make sequences far too long, and whole words, of which there are too many across languages, so subword tokens let a model cover any text efficiently with a manageable vocabulary. As a rough guide, a short request like "Tell me about Spring AI" is around five tokens, while a hundred word answer is around one hundred and thirty tokens. You can see how text is split for yourself with the [OpenAI Tokenizer](https://platform.openai.com/tokenizer). Tokens matter for two practical reasons. They define how much a model can handle at once, and they are the currency of AI. When you use a hosted provider, you pay per token for both what you send and what you receive, so the number of tokens directly drives your cost. When you run a model on-premises, you no longer pay per token, but the cost does not disappear. It shifts to the compute you have to provide, since longer inputs and outputs mean more processing on your own hardware.
-
-That capacity is the **context window**, the maximum amount of text, measured in tokens, that a model can consider in a single request. It includes both your prompt and the model's completion, so a larger context window lets the model take more information into account, although it also costs more.
-
-Modern context windows are often hundreds of thousands of tokens, which sounds enormous compared to the small examples above. In practice, though, a good portion of that space is already reserved before your own input arrives. AI providers fill part of the window with system instructions that guide the model's behavior and with guardrails that keep it safe, and in real applications you will add your own instructions, conversation history, and retrieved context on top. 
-
-The model's underlying capability comes from its **parameters**, the internal values it learns during training. Modern models have billions of them, and more parameters generally mean a more capable, but more expensive, model.
-
-## Limitations of LLMs
-
-For all their power, LLMs have real limitations, and understanding them is essential before you build anything serious.
-
-They can **hallucinate**, which means producing confident answers that are simply wrong, because they predict plausible text rather than retrieve verified facts.
-
-Their knowledge is **frozen at training time**. A model is unaware of anything that happened after its training cutoff, and it has no knowledge of your private or company specific data.
-
-They are also **stateless**. A model has no memory of previous interactions unless you resend that history with every request, and how much history you can resend is limited by the context window.
-
-On their own, LLMs **cannot take actions** in the outside world. They cannot query a database, call an API, or send an email without help.
-
-And because they are **probabilistic**, the same prompt can produce different answers on different runs, which makes consistency and testing harder than in traditional software.
-
-## Where Spring AI Fits In
-
-Much of the recent progress in applied AI is about mitigating exactly these limitations, and the patterns involved are maturing quickly. 
-
-Spring AI's capabilities are built around making these patterns practical for Java developers. By the end of this course, you can build applications that go well beyond what a raw LLM can do on its own.
+For the multi-step work itself, a small set of common patterns has emerged. On the workflow side these are **chain**, **parallelization**, **routing**, **orchestrator-workers**, and **evaluator-optimizer**. For agents that grow to many tools, there are techniques such as on-demand **tool search**. Each pattern is a small amount of code around the `ChatClient`, not a product. The skill is to pick the least autonomous pattern that solves the task. The agentic patterns section explains each of them and when to use it.

@@ -1,1 +1,1 @@
-You now understand Spring AI's core chat abstractions — ChatModel as the portable contract over provider APIs and ChatClient as the fluent API for everyday use.
+You now understand Spring AI's core chat abstractions, with ChatModel as the portable contract over provider APIs and ChatClient as the fluent API for everyday use.

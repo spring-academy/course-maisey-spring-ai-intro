@@ -1,1 +1,1 @@
-You defined tools using the @Tool annotation and wired them into the ChatClient so the AI can call external services.
+You learned how to extend an AI model's capabilities with tool calling, defining tools with the @Tool annotation and registering them with the ChatClient so the assistant can create support tickets on behalf of the user.

@@ -1,1 +1,1 @@
-Expose your Spring AI tools as a Model Context Protocol (MCP) server so any MCP-compatible client can use them.
+Agentic patterns in Spring AI, focusing on the Tool Search Tool for scaling agents to large tool catalogs, plus a look at community agent patterns.

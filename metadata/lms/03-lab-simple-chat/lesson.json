@@ -1,7 +1,7 @@
 {
     "id": "spring-maisey-lab-simple-chat",
     "slug": "lab-simple-chat",
-    "title": "Lab: Spring AI Fundamentals: ChatModel and ChatClient",
+    "title": "Lab - Spring AI Fundamentals: ChatModel and ChatClient",
     "status": "live",
     "type": "lab",
     "entitlements": [
