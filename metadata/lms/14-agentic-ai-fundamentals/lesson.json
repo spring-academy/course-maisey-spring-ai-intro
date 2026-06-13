@@ -1,10 +1,11 @@
 {
-    "id": "spring-maisey-ai-fundamentals",
-    "slug": "ai-fundamentals",
-    "title": "AI Fundamentals for Java Developers",
+    "id": "spring-maisey-agentic-ai-fundamentals",
+    "slug": "agentic-ai-fundamentals",
+    "title": "Agentic AI Fundamentals",
     "status": "live",
     "type": "article",
     "duration": 15,
+    "order": 13,
     "instructors": [],
     "settings": {
         "manualCompletion": true

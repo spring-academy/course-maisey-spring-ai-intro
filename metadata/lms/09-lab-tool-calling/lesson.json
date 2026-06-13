@@ -7,6 +7,7 @@
     "entitlements": [
         "auth"
     ],
+    "order": 8,
     "duration": 30,
     "instructors": [],
     "settings": {
