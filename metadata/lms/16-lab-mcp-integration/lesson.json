@@ -1,13 +1,14 @@
 {
     "id": "spring-maisey-lab-mcp-integration",
     "slug": "lab-mcp-integration",
-    "title": "MCP Integration",
+    "title": "Lab - MCP Integration",
     "status": "live",
     "type": "lab",
     "entitlements": [
         "auth"
     ],
     "duration": 30,
+    "order": 15,
     "instructors": [],
     "settings": {
         "educates": "spring-maisey-mcp-integration",

@@ -6,6 +6,7 @@
     "type": "article",
     "duration": 20,
     "instructors": [],
+    "order": 11,
     "settings": {
         "manualCompletion": true
     }
