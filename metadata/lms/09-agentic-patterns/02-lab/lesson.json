@@ -1,17 +1,17 @@
 {
-    "id": "spring-maisey-lab-observability",
-    "slug": "lab-observability",
-    "title": "Lab - Observability",
+    "id": "spring-maisey-agentic-patterns-lab",
+    "slug": "agentic-patterns-lab",
+    "title": "Agentic Patterns",
     "status": "live",
     "type": "lab",
     "entitlements": [
         "auth"
     ],
     "duration": 30,
+    "order": 17,
     "instructors": [],
-    "order": 12,
     "settings": {
-        "educates": "spring-maisey-observability",
+        "educates": "spring-maisey-agentic-patterns",
         "manualCompletion": true
     }
 }

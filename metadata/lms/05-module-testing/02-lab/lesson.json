@@ -1,17 +1,17 @@
 {
-    "id": "spring-maisey-lab-tool-calling",
-    "slug": "lab-tool-calling",
-    "title": "Lab - Tool Calling",
+    "id": "spring-maisey-testing-lab",
+    "slug": "testing-lab",
+    "title": "Lab - Testing",
     "status": "live",
     "type": "lab",
     "entitlements": [
         "auth"
     ],
-    "order": 8,
     "duration": 30,
+    "order": 10,
     "instructors": [],
     "settings": {
-        "educates": "spring-maisey-tool-calling",
+        "educates": "spring-maisey-testing",
         "manualCompletion": true
     }
 }

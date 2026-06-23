@@ -1,12 +1,12 @@
 {
-    "id": "spring-maisey-observability",
-    "slug": "observability",
-    "title": "Observability",
+    "id": "spring-maisey-testing-article",
+    "slug": "testing",
+    "title": "Testing AI Applications",
     "status": "live",
     "type": "article",
     "duration": 20,
+    "order": 9,
     "instructors": [],
-    "order": 11,
     "settings": {
         "manualCompletion": true
     }

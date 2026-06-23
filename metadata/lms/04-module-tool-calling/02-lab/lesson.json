@@ -1,17 +1,17 @@
 {
-    "id": "spring-maisey-lab-agentic-patterns",
-    "slug": "lab-agentic-patterns",
-    "title": "Agentic Patterns",
+    "id": "spring-maisey-tool-calling-lab",
+    "slug": "tool-calling-lab",
+    "title": "Lab - Tool Calling",
     "status": "live",
     "type": "lab",
     "entitlements": [
         "auth"
     ],
+    "order": 8,
     "duration": 30,
-    "order": 17,
     "instructors": [],
     "settings": {
-        "educates": "spring-maisey-agentic-patterns",
+        "educates": "spring-maisey-tool-calling",
         "manualCompletion": true
     }
 }
