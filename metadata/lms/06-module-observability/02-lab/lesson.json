@@ -1,17 +1,17 @@
 {
-    "id": "spring-maisey-lab-testing",
-    "slug": "lab-testing",
-    "title": "Lab - Testing",
+    "id": "spring-maisey-observability-lab",
+    "slug": "observability-lab",
+    "title": "Lab - Observability",
     "status": "live",
     "type": "lab",
     "entitlements": [
         "auth"
     ],
     "duration": 30,
-    "order": 10,
     "instructors": [],
+    "order": 12,
     "settings": {
-        "educates": "spring-maisey-testing",
+        "educates": "spring-maisey-observability",
         "manualCompletion": true
     }
 }
