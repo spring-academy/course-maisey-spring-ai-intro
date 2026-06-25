@@ -4,6 +4,8 @@
 
 .claude
 
+labs/**/resources
+
 ##
 *.swp
 .DS_Store

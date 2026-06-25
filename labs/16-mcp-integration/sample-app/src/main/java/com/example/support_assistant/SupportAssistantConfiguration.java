@@ -13,7 +13,7 @@ class SupportAssistantConfiguration {
 
     @Bean
     ChatClient chatClient(ChatClient.Builder builder) {
-        return builder.defaultSystem("You are a Spring and AI expert.").build();
+        return builder.defaultSystem("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.").build();
     }
 
     // Step 2

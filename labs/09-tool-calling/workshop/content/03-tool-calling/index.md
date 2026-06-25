@@ -174,7 +174,7 @@ session: 2
 Ask the assistant to file a ticket:
 
 ```execute
-curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Please open a ticket: Trial request for Tanzu Spring. Treat it as high priority."
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Please open a ticket: Trial request for Tanzu Spring. Treat it as high priority."
 ```
 
 You should see a response confirming the ticket was created. With debug logging enabled, the logs in the second terminal show the `createTicket` call with the model's chosen arguments.
@@ -182,7 +182,7 @@ You should see a response confirming the ticket was created. With debug logging 
 Then list the open tickets through the assistant:
 
 ```execute
-curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Show me all open support tickets."
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Show me all open support tickets."
 ```
 
 The model picks `retrieveOpenTickets`, gets the rows from the DB, and returns them as part of the response.
@@ -190,7 +190,7 @@ The model picks `retrieveOpenTickets`, gets the rows from the DB, and returns th
 Finally, mix it with RAG by asking something that's both informational and operational:
 
 ```execute
-curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Does Tanzu Spring provide support for Spring Boot 2.7? If yes, open a ticket to request a trial of Tanzu Spring"
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Does Tanzu Spring provide support for Spring Boot 2.7? If yes, open a ticket to request a trial of Tanzu Spring"
 ```
 
 The advisor pulls the answer from the knowledge base; the tool call (if the model judges it warranted) files the ticket.

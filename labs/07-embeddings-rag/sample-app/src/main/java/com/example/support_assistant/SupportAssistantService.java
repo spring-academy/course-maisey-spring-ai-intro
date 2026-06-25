@@ -5,14 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-
 @Service
 class SupportAssistantService {
 
     private static final Logger log = LoggerFactory.getLogger(SupportAssistantService.class);
-    
+
     private final ChatClient chatClient;
 
     SupportAssistantService(ChatClient chatClient) {
@@ -28,5 +25,4 @@ class SupportAssistantService {
                 .call()
                 .entity(SupportResponse.class);
     }
-
 }

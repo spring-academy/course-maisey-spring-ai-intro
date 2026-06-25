@@ -2,63 +2,59 @@
 title: Getting Started
 ---
 
-# Getting Started
+In this lab you will start building a **support assistant** that answers customer questions through a REST API. You will begin with the low-level `ChatModel` API, move on to the fluent `ChatClient`, add streaming, and finish with structured output.
 
-In this lab, you'll build a **support assistant** that answers customer questions via a REST API — your first hands-on Spring AI integration. You'll start with the low-level `ChatModel` API, move to the fluent `ChatClient`, add streaming, and finish with structured output.
+## Scaffold the Application
 
-## How the Project Was Generated
+Before we write any code we need a Spring Boot application to build on. Every Spring Boot project starts from a small set of dependencies, and for this lab we need four of them.
 
-The starter project in `~/sample-app` was generated with [Spring Initializr](https://start.spring.io). Besides `web` and `actuator`, it only needs one extra dependency: the Spring AI starter for the AI provider you want to talk to.
+- **Spring Web** lets us expose a REST API so clients can send their questions over HTTP.
+- **Spring Boot Actuator** adds health and monitoring endpoints so we can check that the application is running.
+- The **Spring AI starter** brings in the client that talks to our AI provider.
+- **Spring Boot DevTools** restarts the running application automatically when the compiled classes change, so we can iterate quickly without stopping and starting the app by hand.
 
-This workshop uses **OpenAI**, but Spring AI ships a starter per provider — switching the `PROVIDER` variable to `anthropic`, `ollama`, or `bedrock-converse` would pull the matching starter instead:
+We generate the project with the [Spring Initializr](https://start.spring.io). The command below asks the Initializr for exactly those dependencies and downloads the project as a zip file.
+
+{{< note >}}
+You don't have to run this. The generated project is already prepared for you in `~/sample-app`, and the rest of this lab edits the files in that folder.
+{{< /note >}}
 
 ```bash
-PROVIDER=openai   # or: anthropic | ollama | bedrock-converse
-
 curl https://start.spring.io/starter.zip \
-  -d dependencies=web,actuator,spring-ai-${PROVIDER} \
+  -d dependencies=web,actuator,spring-ai-openai,devtools \
   -d bootVersion=4.1.0 \
   -d type=maven-project \
   -d groupId=com.example \
   -d artifactId=support-assistant \
-  -d javaVersion=25 \
+  -d javaVersion=21 \
   -o sample-app.zip
 ```
 
-{{< note >}}
-You don't have to run this — the generated project is already available in `~/sample-app`.
-{{< /note >}}
+This workshop uses an **OpenAI compatible mock API**, but Spring AI ships a starter for every common provider. Swapping `spring-ai-openai` for `spring-ai-anthropic`, `spring-ai-ollama`, or `spring-ai-bedrock-converse` would pull the matching starter instead.
 
-Let's look at what the starter brought in. The provider-specific dependency:
+Let's look at what the starter added to the project. First the provider-specific dependency.
 
 ```editor:select-matching-text
 file: ~/sample-app/pom.xml
 text: "spring-ai-starter-model-openai"
 ```
 
-And the Spring AI BOM (Bill of Materials), which ensures all Spring AI artifacts resolve to consistent, compatible versions:
+Next the Spring AI BOM (Bill of Materials), which makes sure all Spring AI artifacts resolve to consistent and compatible versions.
 
 ```editor:select-matching-text
 file: ~/sample-app/pom.xml
 text: "spring-ai-bom"
 ```
 
-The starter pulls in the provider implementation plus the Spring Boot auto-configuration, which wires up a `ChatModel` and a `ChatClient.Builder` bean for you.
+The starter pulls in the provider implementation together with the Spring Boot auto-configuration. That auto-configuration wires up a `ChatModel` and a `ChatClient.Builder` bean for you.
 
 ## Configure Spring AI
 
-Spring AI configuration is purely declarative. Each provider has its own property namespace for API key, base URL, default model, sampling options, and so on:
+Spring AI configuration is fully declarative. Each provider has its own property namespace for the API key, base URL, default model, sampling options, and so on.
 
-| Provider | Starter | Property namespace |
-|----------|---------|--------------------|
-| **OpenAI** (this lab) | `spring-ai-starter-model-openai` | `spring.ai.openai.*` |
-| Anthropic | `spring-ai-starter-model-anthropic` | `spring.ai.anthropic.*` |
-| Amazon Bedrock | `spring-ai-starter-model-bedrock-converse` | `spring.ai.bedrock.*` |
-| Ollama | `spring-ai-starter-model-ollama` | `spring.ai.ollama.*` |
+The shape is the same everywhere. For example Anthropic uses `spring.ai.anthropic.api-key` and `spring.ai.anthropic.chat.model`, while a local Ollama needs no API key at all and only wants `spring.ai.ollama.chat.model`.
 
-The shape is the same everywhere — for example, Anthropic uses `spring.ai.anthropic.api-key` and `spring.ai.anthropic.chat.model`, while a local Ollama needs no API key at all, just `spring.ai.ollama.chat.model`.
-
-Have a look at the existing `application.properties`:
+Have a look at the existing `application.properties`.
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/resources/application.properties
@@ -67,33 +63,40 @@ before: 0
 after: 2
 ```
 
-The three `spring.mvc.apiversion.*` lines enable path-segment API versioning — a new feature in Spring Framework 7/Spring Boot 4 that we'll use for our REST endpoints (`/api/1.0/...`).
+The three `spring.mvc.apiversion.*` lines enable path-segment API versioning. This is a new feature in Spring Framework 7 and Spring Boot 4 that we will use for our REST endpoints such as `/api/v1/...`.
 
-Now append the OpenAI configuration:
+You will also notice the `spring.devtools.restart.enabled=true` line.
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/resources/application.properties
+text: "spring.devtools.restart.enabled=true"
+```
+
+This turns on the Spring Boot Developer Tools automatic restart. Developer Tools watches the compiled classes on the classpath, and whenever those classes change it restarts the application context for you. Because the restart only reloads your own classes and keeps the unchanged libraries in memory, it is much faster than a full stop and start.
+
+The restart is triggered by a change to the compiled output, not by editing the source file. In this workshop you edit the code in VS Code, and the Java language server extension recompiles the changed file on save by default. So saving the file is effectively your restart trigger.
+
+Now append the OpenAI configuration.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/resources/application.properties
 description: Add the OpenAI configuration
 text: |
 
-  spring.ai.openai.api-key=${OPENAI_API_KEY}
+  spring.ai.openai.api-key=mock-api-key
+  spring.ai.openai.base-url=http://localhost:8081/v1
   spring.ai.openai.chat.model=gpt-5.4-mini
   spring.ai.openai.chat.temperature=0.7
 ```
 
-Because the API key, model, and other options are externalized, you can tune behavior or switch models without touching code.
+Because the API key, model, and other options live outside the code, you can tune behavior or switch models without changing any code.
 
-## Set the API Key and Run the App
+The `base-url` points the OpenAI client at the local mock API instead of `https://api.openai.com`, so every request stays offline and returns deterministic responses. The starter still requires an `api-key`, so `mock-api-key` is just a placeholder that the mock accepts.
 
-Set your OpenAI API key (use your own or the one provided by your instructor) — paste it after the `=` and press Enter:
+The mock API runs inside the same application. It is an embedded WireMock server started by the `com.example.support_assistant.mock.MockOpenAiServer` class, and it listens on port 8081. Instead of hand written answers it replays real OpenAI responses that were recorded earlier and stored in the `resources/mock` folder. WireMock matches each incoming request against the recorded request body, so the plain, streaming, and structured output flows each get the response that the real OpenAI service returned. This keeps the lab predictable and offline and lets you focus on the Spring AI code rather than on a real provider, real costs, or network access. The recordings are generated by the `OpenAiRecordingTest` test and you do not edit them during the lab.
 
-```terminal:input
-text: export OPENAI_API_KEY=
-endl: false
-session: 2
-```
-
-Start the application:
+## Run the App
+Start the application.
 
 ```terminal:execute
 command: cd ~/sample-app && ./mvnw spring-boot:run
@@ -101,12 +104,12 @@ session: 2
 ```
 
 {{< note >}}
-Wait for "Started SupportAssistantApplication" in the logs before continuing.
+Wait for "Started SupportAssistantApplication" in the logs before you continue.
 {{< /note >}}
 
 ## Verify the App Is Up
 
-Smoke-check the actuator to confirm everything wired up:
+Check the actuator endpoint to confirm everything wired up correctly.
 
 ```execute
 curl http://localhost:8080/actuator/health
@@ -114,8 +117,8 @@ curl http://localhost:8080/actuator/health
 
 You should see `{"status":"UP"}`.
 
-Keep the app running in the second terminal. From here on, each step is a small edit + a restart + a `curl`.
+Keep the app running in the second terminal. From here on each step is a small edit and a `curl`. You do not restart the app by hand.
 
 ## Summary
 
-You've explored the Spring AI starter and BOM, configured the OpenAI provider declaratively, and verified the application starts. Time to talk to the model!
+We scaffolded the support assistant project, explored the Spring AI starter and BOM, configured the OpenAI provider declaratively, and verified that the application starts. Now it is time to talk to the model.

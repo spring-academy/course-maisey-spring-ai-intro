@@ -13,7 +13,7 @@ class SupportAssistantController {
         this.service = service;
     }
 
-    // curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Tell me about Spring AI"
+    // curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
     @GetMapping(path = "/api/{version}/chat")
     SupportResponse chat(@RequestParam String query) {
         return service.generateResponse(query);

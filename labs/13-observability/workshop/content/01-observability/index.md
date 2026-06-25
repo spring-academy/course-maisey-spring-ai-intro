@@ -125,14 +125,14 @@ Wait for "Started SupportAssistantApplication" before proceeding.
 Exercise the two flows you built in the earlier labs — a RAG query:
 
 ```terminal:execute
-command: curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
+command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
 session: 1
 ```
 
 And a tool-calling query:
 
 ```terminal:execute
-command: curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Please open a high-priority ticket: SSO login returns 502 on the Tanzu portal."
+command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Please open a high-priority ticket: SSO login returns 502 on the Tanzu portal."
 session: 1
 ```
 
