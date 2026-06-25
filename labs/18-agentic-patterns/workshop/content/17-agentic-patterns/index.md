@@ -116,7 +116,7 @@ ChatClient chatClient(ChatClient.Builder builder, ToolCallbackProvider tools, To
             .build();
 
     return builder
-            .defaultSystem("You are a Spring and AI expert.")
+            .defaultSystem("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.")
             .defaultTools(tools)
             .defaultAdvisors(toolSearchAdvisor)
             .build();
@@ -144,7 +144,7 @@ text: |2
                   .build();
 
           return builder
-                  .defaultSystem("You are a Spring and AI expert.")
+                  .defaultSystem("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.")
                   .defaultTools(tools)
                   .defaultAdvisors(toolSearchAdvisor)
                   .build();
@@ -308,7 +308,7 @@ session: 2
 Send a request that requires a tool — without setting a header, so the controller mints a fresh UUID:
 
 ```terminal:execute
-command: curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Please open a high-priority ticket: SSO login returns 502 on the Tanzu portal."
+command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Please open a high-priority ticket: SSO login returns 502 on the Tanzu portal."
 session: 1
 ```
 
@@ -325,7 +325,7 @@ Now try a multi-turn flow by reusing the same id:
 command: |-
   CID=$(cat /proc/sys/kernel/random/uuid)
 
-  curl -G "http://localhost:8080/api/1.0/chat" \
+  curl -G "http://localhost:8080/api/v1/chat" \
        -H "X-Conversation-Id: $CID" \
        --data-urlencode "query=What's the latest release of Spring Boot?"
 session: 1
@@ -333,7 +333,7 @@ session: 1
 
 ```terminal:execute
 command: |-
-  curl -G "http://localhost:8080/api/1.0/chat" \
+  curl -G "http://localhost:8080/api/v1/chat" \
        -H "X-Conversation-Id: $CID" \
        --data-urlencode "query=Please file a ticket asking the team to upgrade us to that version. High priority."
 session: 1
@@ -344,7 +344,7 @@ The second call sees the conversation history from the first, so "that version" 
 A pure RAG question (no tool) confirms tool search adds zero overhead when no action is needed — the model never calls `searchTools`:
 
 ```terminal:execute
-command: curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
+command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
 session: 1
 ```
 

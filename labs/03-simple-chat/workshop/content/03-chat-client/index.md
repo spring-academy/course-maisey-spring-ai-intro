@@ -1,10 +1,8 @@
 ---
-title: The ChatClient API
+title: The Fluent ChatClient API
 ---
 
-# The Fluent ChatClient API
-
-`ChatModel` works, but everyday code reads better with the fluent `ChatClient`. It wraps a `ChatModel`, lets you compose a prompt, invoke the model, and shape the response in a single readable chain — and it gives us a place to put shared defaults later.
+`ChatModel` works, but everyday code reads better with the fluent `ChatClient`. It wraps a `ChatModel`, lets you compose a prompt, invoke the model, and shape the response in a single readable chain.
 
 ## Switch to ChatClient
 
@@ -12,7 +10,7 @@ Spring Boot auto-configures a `ChatClient.Builder` but not a `ChatClient` itself
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-description: Create SupportAssistantConfiguration
+description: Configure ChatClient bean
 text: |
   package com.example.support_assistant;
 
@@ -30,25 +28,14 @@ text: |
   }
 ```
 
-Now inject the `ChatClient` into the service alongside `ChatModel` (we keep `ChatModel` around for reference, but from here on all calls go through `ChatClient`) and replace `generateResponse` with the fluent chain:
-
-```java
-String generateResponse(String query) {
-    return chatClient.prompt()      // start building a request
-            .user(query)            // add the user's message
-            .call()                 // send the request (blocking)
-            .content();             // extract the response text
-}
-```
-
-Click to apply:
+Now replace the `ChatModel` in our service with `ChatClient`:
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "private final ChatModel chatModel;"
 before: 0
 after: 0
-description: Apply - switch to ChatClient
+description: Switch to ChatClient
 cascade: true
 ```
 
@@ -57,7 +44,6 @@ file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantS
 cascade: true
 hidden: true
 text: |2
-      private final ChatModel chatModel;
       private final ChatClient chatClient;
 ```
 
@@ -75,8 +61,7 @@ file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantS
 cascade: true
 hidden: true
 text: |2
-      SupportAssistantService(ChatModel chatModel, ChatClient chatClient) {
-          this.chatModel = chatModel;
+      SupportAssistantService(ChatClient chatClient) {
           this.chatClient = chatClient;
       }
 ```
@@ -103,50 +88,39 @@ text: |2
       }
 ```
 
-```editor:insert-lines-before-line
+```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-line: 3
+text: "import org.springframework.ai.openai.OpenAiChatOptions;"
+before: 0
+after: 7
+cascade: true
 hidden: true
-text: |-
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+hidden: true
+text: |
   import org.springframework.ai.chat.client.ChatClient;
 ```
 
-Restart and test:
 
-```terminal:interrupt
-session: 2
-```
-
-```terminal:execute
-command: cd ~/sample-app && ./mvnw spring-boot:run
-session: 2
-```
-
+Verify the change took effect by calling the service:
 ```execute
-curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Tell me about Spring AI"
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
 ```
 
 ## Add a Streaming Endpoint
 
-Models generate text token by token. Swap `.call()` for `.stream()` to get a reactive `Flux<String>` and stream tokens to the client as soon as they arrive — this is what powers the "typewriter" effect in chatbots.
+Models generate text token by token. Swap `.call()` for `.stream()` to get a reactive `Flux<String>` and stream tokens to the client as soon as they arrive. This is what powers the "typewriter" effect in chatbots.
 
 Add a streaming method to the service:
-
-```java
-Flux<String> streamResponse(String query) {
-    return chatClient.prompt()
-            .user(query)
-            .stream()
-            .content();
-}
-```
-
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "String generateResponse(String query) {"
 before: 0
 after: 5
-description: Apply - add streamResponse to the service
+description: Add streamResponse to the service
 cascade: true
 ```
 
@@ -172,29 +146,19 @@ text: |2
 
 ```editor:insert-lines-before-line
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-line: 3
+line: 7
 hidden: true
 text: |-
   import reactor.core.publisher.Flux;
 ```
 
 And a streaming endpoint to the controller, producing Server-Sent Events (SSE):
-
-```java
-@GetMapping(path = "/api/{version}/chat/stream",
-            version = "1.0",
-            produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-Flux<String> chatStream(@RequestParam String query) {
-    return service.streamResponse(query);
-}
-```
-
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
-text: '@GetMapping(path = "/api/{version}/chat")'
+text: '@GetMapping(path = "/api/v{version}/chat")'
 before: 0
 after: 3
-description: Apply - add streaming endpoint to the controller
+description: Add streaming endpoint to the controller
 cascade: true
 ```
 
@@ -203,13 +167,12 @@ file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantC
 cascade: true
 hidden: true
 text: |2
-      @GetMapping(path = "/api/{version}/chat")
+      @GetMapping(path = "/api/v{version}/chat")
       String chat(@RequestParam String query) {
           return service.generateResponse(query);
       }
 
-      @GetMapping(path = "/api/{version}/chat/stream",
-                  version = "1.0",
+      @GetMapping(path = "/api/v{version}/chat/stream",
                   produces = MediaType.TEXT_EVENT_STREAM_VALUE)
       Flux<String> chatStream(@RequestParam String query) {
           return service.streamResponse(query);
@@ -218,57 +181,34 @@ text: |2
 
 ```editor:insert-lines-before-line
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
-line: 3
+line: 4
 hidden: true
 text: |-
   import org.springframework.http.MediaType;
   import reactor.core.publisher.Flux;
 ```
 
-Restart and try it with `curl -N` (no buffering) to see the typewriter effect:
-
-```terminal:interrupt
-session: 2
-```
-
-```terminal:execute
-command: cd ~/sample-app && ./mvnw spring-boot:run
-session: 2
-```
-
+Try it with `curl -N` (no buffering) to see the typewriter effect:
 ```execute
-curl -N -G "http://localhost:8080/api/1.0/chat/stream" --data-urlencode "query=Tell me about Spring AI"
+curl -N -G "http://localhost:8080/api/v1/chat/stream" --data-urlencode "query=Tell me about Spring AI"
 ```
 
 Notice the `data:` prefix of the SSE protocol on each chunk.
 
 ## Inline User Template
 
-`PromptTemplate` is still useful, but for one-off templating at the call site, `ChatClient` accepts a lambda that builds the user message with its own placeholder syntax — no separate `PromptTemplate` needed:
-
-```java
-String generateResponse(String query) {
-    return chatClient.prompt()
-            .user(u -> u
-                    .text("Answer the following question with a short, well-structured explanation: {question}")
-                    .param("question", query))
-            .call()
-            .content();
-}
-```
-
+`PromptTemplate` is still useful, but for one-off templating at the call site, `ChatClient` accepts a lambda that builds the user message with its own placeholder syntax:
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "String generateResponse(String query) {"
 before: 0
 after: 5
-description: Apply - inline user template
+description: Add inline user template
 cascade: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
       String generateResponse(String query) {
@@ -283,37 +223,24 @@ text: |2
 
 ## Inline System Prompt
 
-Same idea for the system role — declare it inline on the request:
-
-```java
-String generateResponse(String query) {
-    return chatClient.prompt()
-            .system("You are a Spring and AI expert.")
-            .user(u -> u
-                    .text("Answer the following question with a short, well-structured explanation: {question}")
-                    .param("question", query))
-            .call()
-            .content();
-}
-```
+Same idea for the system role. Declare it inline on the request:
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "String generateResponse(String query) {"
 before: 0
 after: 7
-description: Apply - inline system prompt
+description: Apply the inline system prompt
 cascade: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
       String generateResponse(String query) {
           return chatClient.prompt()
-                  .system("You are a Spring and AI expert.")
+                  .system("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.")
                   .user(u -> u
                           .text("Answer the following question with a short, well-structured explanation: {question}")
                           .param("question", query))
@@ -322,19 +249,9 @@ text: |2
       }
 ```
 
-Restart and test:
-
-```terminal:interrupt
-session: 2
-```
-
-```terminal:execute
-command: cd ~/sample-app && ./mvnw spring-boot:run
-session: 2
-```
-
+Verify the change took effect by calling the service:
 ```execute
-curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Tell me about Spring AI"
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
 ```
 
 ## Move the System Prompt to a Default
@@ -343,47 +260,19 @@ Repeating the system prompt on every call is duplication. Put it on the `ChatCli
 
 Update the bean in `SupportAssistantConfiguration`:
 
-```java
-@Bean
-public ChatClient chatClient(ChatClient.Builder builder) {
-    return builder
-            .defaultSystem("You are a Spring and AI expert.")
-            .build();
-}
-```
-
-```editor:select-matching-text
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-text: "return builder.build();"
-before: 0
-after: 0
-description: Apply - default system prompt on the ChatClient bean
-cascade: true
-```
-
-```editor:replace-text-selection
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-cascade: true
-hidden: true
-text: |2
-          return builder
-                  .defaultSystem("You are a Spring and AI expert.")
-                  .build();
-```
-
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "String generateResponse(String query) {"
 before: 0
 after: 8
+description: Apply default system prompt on the ChatClient bean
 cascade: true
-hidden: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
+cascade: true
 text: |2
       String generateResponse(String query) {
           return chatClient.prompt()
@@ -395,37 +284,109 @@ text: |2
       }
 ```
 
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+text: "return builder.build();"
+before: 0
+after: 0
+hidden: true
+cascade: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+hidden: true
+text: |2
+          return builder
+                  .defaultSystem("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.")
+                  .build();
+```
+
 The `.system(...)` line is dropped from the service at the same time.
+
+## Move the System Prompt to a File
+
+Keeping the prompt text inside Java code means every wording change needs a recompile. A cleaner option is to keep the prompt in a plain text file under `src/main/resources`. You can then inject that file with `@Value` as a `Resource` and hand it straight to `defaultSystem`.
+
+Create the prompt file under the resources folder:
+```terminal:execute
+command:  mkdir -p ~/sample-app/src/main/resources/prompts
+cascade: true
+description: Create the system prompt resource file
+```
+
+```editor:append-lines-to-file
+file: ~/sample-app/src/main/resources/prompts/system-prompt.st
+hidden: true
+text: |
+  You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.
+```
+
+Inject the resource into the bean and pass it to `defaultSystem`:
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+text: "public ChatClient chatClient(ChatClient.Builder builder) {"
+before: 0
+after: 0
+description: Load the system prompt from a resource file
+cascade: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+cascade: true
+hidden: true
+text: |2
+      public ChatClient chatClient(ChatClient.Builder builder,
+              @Value("classpath:/prompts/system-prompt.st") Resource systemPrompt) {
+```
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+text: '.defaultSystem("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.")'
+before: 0
+after: 0
+cascade: true
+hidden: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+cascade: true
+hidden: true
+text: |2
+                  .defaultSystem(systemPrompt)
+```
+
+```editor:insert-lines-before-line
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+line: 3
+hidden: true
+text: |-
+  import org.springframework.beans.factory.annotation.Value;
+  import org.springframework.core.io.Resource;
+```
+
+Verify the change took effect by calling the service:
+```execute
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
+```
 
 ## Access the Full Response
 
 `.content()` is a shortcut for the text. When you also want metadata (token counts for billing, finish reason, model id, ...), ask for the full `ChatResponse` instead:
-
-```java
-String generateResponse(String query) {
-    var chatResponse = chatClient.prompt()
-            .user(u -> u
-                    .text("Answer the following question with a short, well-structured explanation: {question}")
-                    .param("question", query))
-            .call()
-            .chatResponse();
-    log.info("Chat Response {}", chatResponse);
-    return chatResponse.getResult().getOutput().getText();
-}
-```
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "String generateResponse(String query) {"
 before: 0
 after: 7
-description: Apply - access the full ChatResponse
+description: Get access to the full ChatResponse
 cascade: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
       String generateResponse(String query) {
@@ -440,23 +401,13 @@ text: |2
       }
 ```
 
-Restart and test, then check the logs in the second terminal for the full `ChatResponse` with its usage metadata:
-
-```terminal:interrupt
-session: 2
-```
-
-```terminal:execute
-command: cd ~/sample-app && ./mvnw spring-boot:run
-session: 2
-```
-
+Test, then check the logs in the second terminal for the full `ChatResponse` with its usage metadata:
 ```execute
-curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Tell me about Spring AI"
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
 ```
 
 ## Summary
 
-You've switched to the fluent `ChatClient`: a configured bean with shared defaults (`defaultSystem`), inline user/system prompts, blocking and streaming calls, and access to the full `ChatResponse`.
+You've switched to the fluent `ChatClient`, a configured bean with shared defaults (`defaultSystem`), inline user/system prompts, blocking and streaming calls, and access to the full `ChatResponse`.
 
-One more jump to go: structured output.
+One more feature to go, the structured output parsing.

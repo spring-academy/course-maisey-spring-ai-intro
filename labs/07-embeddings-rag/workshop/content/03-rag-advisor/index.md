@@ -137,13 +137,13 @@ session: 2
 Try a question your knowledge base covers:
 
 ```execute
-curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
 ```
 
 Now try one it doesn't:
 
 ```execute
-curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Tell me about Spring AI"
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
 ```
 
 You'll get something like:
@@ -275,11 +275,11 @@ session: 2
 ```
 
 ```execute
-curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
 ```
 
 ```execute
-curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Tell me about Spring AI"
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
 ```
 
 The Tanzu question still comes back grounded in the indexed docs; the Spring AI question now gets a real answer instead of a refusal.

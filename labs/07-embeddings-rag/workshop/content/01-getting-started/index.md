@@ -6,7 +6,7 @@ title: Getting Started
 
 In this lab, you'll add **Retrieval Augmented Generation (RAG)** to the support assistant: index a small Markdown knowledge base, retrieve the most relevant chunks per query, and have the model answer grounded in them.
 
-Your starting point in `~/sample-app` is the assistant from the **Simple Chat** lab: a `ChatClient` with a default system prompt and a `/api/1.0/chat` endpoint returning a structured `SupportResponse` record.
+Your starting point in `~/sample-app` is the assistant from the **Simple Chat** lab: a `ChatClient` with a default system prompt and a `/api/v1/chat` endpoint returning a structured `SupportResponse` record.
 
 {{< note >}}
 This lab implements RAG with **OpenAI** for both chat and embeddings. The sample app also bundles the starters for Anthropic, Amazon Bedrock, and Ollama — you could switch the chat provider via Spring profiles (e.g. `application-anthropic.properties` with `SPRING_PROFILES_ACTIVE=anthropic`). The default configuration uses OpenAI.
@@ -91,7 +91,7 @@ cascade: true
 hidden: true
 text: |2
       ChatClient chatClient(ChatClient.Builder builder) {
-          return builder.defaultSystem("You are a Spring and AI expert.").build();
+          return builder.defaultSystem("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.").build();
       }
 
       @ConditionalOnMissingBean(VectorStore.class)

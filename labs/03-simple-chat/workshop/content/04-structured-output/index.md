@@ -2,11 +2,60 @@
 title: Structured Output
 ---
 
-# Structured Output with .entity(...)
+The model only ever returns text. Getting reliable, structured data out of it comes down to two things, how you ask and how you read the answer. Let's first do both by hand, then let Spring AI take over.
 
-The most interesting jump. Instead of free-form text, ask the model to return a Java type and let Spring AI handle both the prompting and the deserialization. Behind the scenes, Spring AI instructs the model to respond in a matching schema and deserializes the result for you — no string parsing on your side.
+## Prompt Engineering and Few-Shot Prompting
 
-## Define the Response Type
+Prompt engineering is the practice of shaping the prompt so the model returns what you need. One of the most effective techniques is few-shot prompting, where you show the model a few examples of the exact output you want and it follows the pattern.
+
+Now we will make the model return JSON ourselves. We write the format rules and two examples in the system prompt. We send the question as the user message. The prompt has `{` and `}` characters in it. Spring AI normally reads `{...}` as a template variable, so we use the plain `.system(String)` method. This way the braces stay as normal text. Update `generateResponse`:
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+text: "String generateResponse(String query) {"
+before: 0
+after: 9
+description: Use a hand-written few-shot prompt
+cascade: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+hidden: true
+text: |2
+      String generateResponse(String query) {
+          var chatResponse = chatClient.prompt()
+                  .system("""
+                    You are a Spring support classifier.
+                    Reply only with JSON in this form:
+                    {"category":"...","answer":"..."}
+                    The category must be one of: TECHNICAL, BILLING, SECURITY, GENERAL.
+                    Examples:
+                    - "Why was I billed twice?"     -> {"category":"BILLING","answer":"..."}
+                    - "How do I rotate my API key?" -> {"category":"SECURITY","answer":"..."}
+                    """)
+                  .user(query)
+                  .call()
+                  .chatResponse();
+          log.info("Chat Response {}", chatResponse);
+          return chatResponse.getResult().getOutput().getText();
+      }
+```
+
+Call the endpoint with a billing-style question:
+```execute
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
+```
+
+The model replies with JSON, even though the method still returns a plain `String`. The few-shot examples did the steering.
+
+This works, but it is brittle. The result is text you still have to parse yourself, the model can drift from the format on harder questions, and you carry the example prompt around by hand. Spring AI can do all of this for you, both the prompting and the parsing, returning a real Java object.
+
+## Let Spring AI Do the Work  
+
+Instead of free-form text, ask the model to return a Java type and let Spring AI handle both the prompting and the deserialization. Behind the scenes, Spring AI instructs the model to respond in a matching schema and deserializes the result for you.
+
+### Define the Response Type
 
 First, create an enum for the category of the support request:
 
@@ -43,33 +92,20 @@ text: |
   ) { }
 ```
 
-## Return the Record
+### Return the Record
 
 Change `generateResponse` to return the record via `.entity(...)`:
-
-```java
-SupportResponse generateResponse(String query) {
-    return chatClient.prompt()
-            .user(u -> u
-                    .text("Answer the following question with a short, well-structured explanation: {question}")
-                    .param("question", query))
-            .call()
-            .entity(SupportResponse.class);
-}
-```
-
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "String generateResponse(String query) {"
 before: 0
-after: 9
-description: Apply - return a SupportResponse entity
+after: 16
+description: Return a SupportResponse entity
 cascade: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
       SupportResponse generateResponse(String query) {
@@ -83,49 +119,28 @@ text: |2
 ```
 
 And change the controller method to match:
-
-```java
-@GetMapping(path = "/api/{version}/chat", version = "1.0")
-SupportResponse chat(@RequestParam String query) {
-    return service.generateResponse(query);
-}
-```
-
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
-text: '@GetMapping(path = "/api/{version}/chat")'
+text: '@GetMapping(path = "/api/v{version}/chat")'
 before: 0
 after: 3
-description: Apply - return SupportResponse from the controller
+description: Return SupportResponse from the controller
 cascade: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
-cascade: true
 hidden: true
 text: |2
-      @GetMapping(path = "/api/{version}/chat", version = "1.0")
+      @GetMapping(path = "/api/v{version}/chat") 
       SupportResponse chat(@RequestParam String query) {
           return service.generateResponse(query);
       }
 ```
 
-## Restart and Test
-
-```terminal:interrupt
-session: 2
-```
-
-```terminal:execute
-command: cd ~/sample-app && ./mvnw spring-boot:run
-session: 2
-```
-
 The same `curl` now returns JSON:
-
 ```execute
-curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Tell me about Spring AI"
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
 ```
 
 ```json
@@ -135,21 +150,6 @@ curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Tell me abo
 }
 ```
 
-The model returns structured, type-safe data your application can use directly, rather than free-form prose you'd have to parse yourself. This is the building block we'll expand on in the dedicated **Structured Output** section of the course.
+# Recap
 
-## Recap
-
-| Step | What changed | Key API |
-|------|--------------|---------|
-| 1 | Add system message | `SystemMessage`, `UserMessage` |
-| 2 | Templated user message | `PromptTemplate` |
-| 3 | Per-call options + metadata | `Prompt`, `ChatOptions`, `ChatResponse` |
-| 4 | Fluent API | `ChatClient.prompt().user(...).call().content()` |
-| 5 | Streaming endpoint | `.stream()`, `Flux<String>`, SSE |
-| 6 | Inline user template | `.user(u -> u.text(...).param(...))` |
-| 7 | Inline system prompt | `.system(...)` |
-| 8 | Default system prompt | `ChatClient.Builder#defaultSystem` |
-| 9 | Access full response | `.call().chatResponse()` |
-| 10 | Structured output | `.call().entity(Class)` |
-
-You now have the core mental model in practice: `ChatModel` is the portable contract over provider REST APIs, and `ChatClient` is the fluent, batteries-included API you'll reach for in everyday application code.
+You now have the core mental model in practice.`ChatModel` is the portable contract over provider REST APIs, and `ChatClient` is the fluent, batteries-included API you'll reach for in everyday application code.
