@@ -110,7 +110,7 @@ The "system" role sets the overall behavior and tone of the model, typically at 
 Since `Prompt` also accepts a list of `Message` objects, you can compose them explicitly:
 ```java
 Prompt prompt = new Prompt(List.of(
-    new SystemMessage("You are a Spring and AI expert."),
+    new SystemMessage("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs."),
     new UserMessage("Tell me about Spring AI")));
 ChatResponse response = chatModel.call(prompt);
 ```
@@ -164,7 +164,7 @@ class ChatConfiguration {
     @Bean
     ChatClient chatClient(ChatClient.Builder builder) {
         return builder
-            .defaultSystem("You are a Spring and AI expert.")
+            .defaultSystem("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.")
             .build();
     }
 }

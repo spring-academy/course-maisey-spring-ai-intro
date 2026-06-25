@@ -65,7 +65,7 @@ Instead of threading the callbacks into every `chatClient.prompt()` call site, r
 @Bean
 ChatClient chatClient(ChatClient.Builder builder, ToolCallbackProvider tools) {
     return builder
-            .defaultSystem("You are a Spring and AI expert.")
+            .defaultSystem("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.")
             .defaultTools(tools)
             .build();
 }
@@ -87,7 +87,7 @@ cascade: true
 text: |2
       ChatClient chatClient(ChatClient.Builder builder, ToolCallbackProvider tools) {
           return builder
-                  .defaultSystem("You are a Spring and AI expert.")
+                  .defaultSystem("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.")
                   .defaultTools(tools)
                   .build();
 ```
@@ -118,7 +118,7 @@ In the logs, you'll see the MCP client connecting to `http://localhost:8081/mcp`
 ## Test It via the Assistant
 
 ```terminal:execute
-command: curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=What is the latest stable release of Spring Boot?"
+command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is the latest stable release of Spring Boot?"
 session: 1
 ```
 
@@ -127,7 +127,7 @@ In the assistant's logs you'll see the model emitting a `spring-releases_fetchRe
 Now try a query that exercises both the remote MCP tool and an in-process tool in a single conversational turn:
 
 ```terminal:execute
-command: curl -G "http://localhost:8080/api/1.0/chat" --data-urlencode "query=Check the latest Spring AI release, and if we're behind the current GA, please open a high-priority ticket about upgrading."
+command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Check the latest Spring AI release, and if we're behind the current GA, please open a high-priority ticket about upgrading."
 session: 1
 ```
 
