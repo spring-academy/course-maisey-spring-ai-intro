@@ -29,6 +29,11 @@ spec:
       value: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)"
     - name: BOOTSTRAP_COMMAND
       value: ":"
+    volumes:
+    - name: workshop-init-container-scripts
+      secret:
+        secretName: workshop-init-container-scripts
+        defaultMode: 0755
     resources:
       memory: 4Gi
     applications:
