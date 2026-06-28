@@ -29,11 +29,6 @@ spec:
       value: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)"
     - name: BOOTSTRAP_COMMAND
       value: ":"
-    volumes:
-    - name: workshop-init-container-scripts
-      secret:
-        secretName: workshop-init-container-scripts
-        defaultMode: 0755
     resources:
       memory: 4Gi
     applications:
@@ -42,31 +37,8 @@ spec:
         layout: split
       editor:
         enabled: true
-    patches:
-      initContainers:
-      - name: pre-session-setup
-        # Educates needs a $(base_environment_image) variable can use.
-        # For now hard wire to educates-base-environment image. Aim to
-        # change for Educates 2.6.0.
-        image: ghcr.io/vmware-tanzu-labs/educates-base-environment:2.5.2
-        # Execute setup script mounted from secret.
-        command: ["/opt/init-setup-scripts/setup.sh"]
-        volumeMounts:
-        - name: workshop-init-container-scripts
-          mountPath: /opt/init-setup-scripts
   environment:
     objects:
-    - apiVersion: v1
-      kind: Secret
-      metadata:
-        name: workshop-init-container-scripts
-      stringData:
-        setup.sh: |
-          #!/bin/bash
-          set -x
-          set -eo pipefail
-
-          code-server --install-extension redhat.java
     - apiVersion: v1
       kind: Service
       metadata:
