@@ -1,5 +1,5 @@
 {
-    "id": "spring-maisey-embeddings-rag",
+    "id": "spring-maisey-embeddings-rag-module-article",
     "slug": "embeddings-rag",
     "title": "Retrieval-Augmented Generation (RAG)",
     "status": "live",
