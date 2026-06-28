@@ -1,0 +1,13 @@
+{
+    "id": "spring-maisey-advanced-patterns-module-tool-calling-article",
+    "slug": "tool-calling-article",
+    "title": "Tool Calling",
+    "status": "live",
+    "type": "article",
+    "duration": 25,
+    "order": 3,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

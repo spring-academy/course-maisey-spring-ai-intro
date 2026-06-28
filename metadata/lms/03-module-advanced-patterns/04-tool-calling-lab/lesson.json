@@ -1,0 +1,17 @@
+{
+    "id": "spring-maisey-advanced-patterns-module-tool-calling-lab",
+    "slug": "tool-calling-lab",
+    "title": "Lab - Tool Calling",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "order": 4,
+    "duration": 30,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-tool-calling",
+        "manualCompletion": true
+    }
+}

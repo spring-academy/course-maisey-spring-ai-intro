@@ -1,0 +1,13 @@
+{
+    "id": "spring-maisey-production-ready-features-module-observability-article",
+    "slug": "observability-article",
+    "title": "Observability",
+    "status": "live",
+    "type": "article",
+    "duration": 20,
+    "instructors": [],
+    "order": 3,
+    "settings": {
+        "manualCompletion": true
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "id": "spring-maisey-agentic-ai-module-agentic-patterns-article",
+    "slug": "agentic-patterns-article",
+    "title": "Agentic Patterns",
+    "status": "live",
+    "type": "article",
+    "duration": 20,
+    "order": 4,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

@@ -1,0 +1,13 @@
+{
+    "id": "spring-maisey-fundamentals-module-article",
+    "slug": "spring-ai-fundamentals-article",
+    "title": "Spring AI Fundamentals: ChatModel and ChatClient",
+    "status": "live",
+    "type": "article",
+    "duration": 30,
+    "order": 2,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

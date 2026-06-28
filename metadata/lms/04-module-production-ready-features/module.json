@@ -1,0 +1,9 @@
+{
+  "id": "spring-maisey-production-ready-features-module",
+  "slug": "production-ready-features-module",
+  "title": "Production-Ready Features",
+  "status": "live",    
+  "order": 4,
+  "settings": {
+  }
+}

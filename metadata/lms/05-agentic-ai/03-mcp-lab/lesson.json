@@ -1,0 +1,17 @@
+{
+    "id": "spring-maisey-agentic-ai-module-mcp-lab",
+    "slug": "mcp-lab",
+    "title": "Lab - Model Context Protocol (MCP)",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "duration": 30,
+    "order": 3,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-mcp",
+        "manualCompletion": true
+    }
+}

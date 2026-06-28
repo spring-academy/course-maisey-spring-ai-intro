@@ -1,0 +1,9 @@
+{
+  "id": "spring-maisey-agentic-ai-module",
+  "slug": "agentic-ai-module",
+  "title": "Agentic AI",
+  "status": "live",
+  "order": 5,
+  "settings": {
+  }
+}

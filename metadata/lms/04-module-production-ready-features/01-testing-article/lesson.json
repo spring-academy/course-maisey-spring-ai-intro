@@ -1,0 +1,13 @@
+{
+    "id": "spring-maisey-production-ready-features-module-testing-article",
+    "slug": "testing-article",
+    "title": "Testing AI Applications",
+    "status": "live",
+    "type": "article",
+    "duration": 20,
+    "order": 1,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "id": "spring-maisey-production-ready-features-module-testing-lab",
+    "slug": "testing-lab",
+    "title": "Lab - Testing",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "duration": 30,
+    "order": 2,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-testing",
+        "manualCompletion": true
+    }
+}

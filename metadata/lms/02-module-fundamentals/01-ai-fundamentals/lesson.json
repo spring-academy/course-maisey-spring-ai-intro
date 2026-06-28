@@ -1,0 +1,13 @@
+{
+    "id": "spring-maisey-fundamentals-module-ai-fundamentals",
+    "slug": "ai-fundamentals-article",
+    "title": "AI Fundamentals",
+    "status": "live",
+    "type": "article",
+    "duration": 15,
+    "order": 1,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

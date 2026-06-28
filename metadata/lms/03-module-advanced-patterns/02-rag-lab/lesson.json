@@ -1,0 +1,17 @@
+{
+    "id": "spring-maisey-advanced-patterns-module-rag-lab",
+    "slug": "embeddings-rag-lab",
+    "title": "Lab - Retrieval-Augmented Generation (RAG) ",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "duration": 30,
+    "order": 2,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-rag",
+        "manualCompletion": true
+    }
+}

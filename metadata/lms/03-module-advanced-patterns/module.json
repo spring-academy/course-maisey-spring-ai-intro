@@ -1,0 +1,9 @@
+{
+  "id": "spring-maisey-advanced-patterns-module",
+  "slug": "advanced-patterns-module",
+  "title": "Advanced AI Patterns",
+  "status": "live",
+  "order": 3,
+  "settings": {
+  }
+}

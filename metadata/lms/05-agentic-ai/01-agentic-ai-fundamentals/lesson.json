@@ -1,0 +1,13 @@
+{
+    "id": "spring-maisey-agentic-ai-module-fundamentals-article",
+    "slug": "agentic-ai-fundamentals",
+    "title": "Agentic AI Fundamentals",
+    "status": "live",
+    "type": "article",
+    "duration": 15,
+    "order": 1,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

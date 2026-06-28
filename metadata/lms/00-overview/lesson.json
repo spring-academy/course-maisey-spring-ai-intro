@@ -5,6 +5,7 @@
     "status": "live",
     "type": "article",
     "duration": 5,
+    "order": 1,
     "instructors": [ ],
     "settings": {
       "manualCompletion": true
