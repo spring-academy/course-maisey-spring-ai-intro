@@ -1,0 +1,13 @@
+{
+    "id": "spring-maisey-advanced-patterns-module-foundations-article",
+    "slug": "foundations-article",
+    "title": "Foundations of RAG and Tool Calling",
+    "status": "live",
+    "type": "article",
+    "duration": 20,
+    "order": 1,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

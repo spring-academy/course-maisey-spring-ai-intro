@@ -1,0 +1,1 @@
+Learn the theory behind two advanced AI patterns, Retrieval Augmented Generation and tool calling. You will understand why a model needs outside knowledge and actions, how embeddings and vector stores make search by meaning possible, and how a model can request tools while your code stays in control.
