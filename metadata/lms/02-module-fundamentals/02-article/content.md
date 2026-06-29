@@ -208,12 +208,13 @@ One of the most effective techniques is **Few-Shot Prompting**. Instead of only 
 ```java
 String json = chatClient.prompt()
     .system("""
-        You answer support questions. Respond only with a JSON object and no other text.
+        You are a Spring support classifier.
+        Reply only with JSON in this form:
+        {"category":"...","answer":"..."}
+        The category must be one of: TECHNICAL, BILLING, SECURITY, GENERAL.
         Examples:
-        Question: What is Spring Boot?
-        Answer: {"category": "TECHNICAL", "summary": "Spring Boot is ..."}
-        Question: How can I update my payment details?
-        Answer: {"category": "BILLING", "summary": "You can update your payment details ..."}
+        - "Why was I billed twice?"     -> {"category":"BILLING","answer":"..."}
+        - "How do I rotate my API key?" -> {"category":"SECURITY","answer":"..."}
         """)
     .user("Tell me about Spring AI")
     .call()
@@ -227,12 +228,14 @@ This works, and few-shot prompting remains a valuable technique for steering mod
 This is exactly the boilerplate that Spring AI's structured output support abstracts away. Instead of returning raw text, `.call()` can map the model's output directly onto a Java type via `.entity(...)`:
 
 ```java
-record SupportAnswer(String category, String summary) {}
+enum SupportCategory { TECHNICAL, BILLING, SECURITY, GENERAL }
 
-SupportAnswer answer = chatClient.prompt()
+record SupportResponse(SupportCategory category, String answer) {}
+
+SupportResponse answer = chatClient.prompt()
     .user("Tell me about Spring AI")
     .call()
-    .entity(SupportAnswer.class);
+    .entity(SupportResponse.class);
 ```
 
 Behind the scenes, Spring AI does the same thing you just did by hand: it appends format instructions to your prompt that tell the model to respond as JSON matching your type's structure, except that these instructions are generated from the Java type itself, and then deserializes the result into the object for you. You get structured, type-safe data your application can use directly, with no manual parsing and no brittle string handling. The boundary between "AI code" and the rest of your Spring application disappears: the model becomes just another collaborator that returns domain objects.
