@@ -1,18 +1,18 @@
 apiVersion: training.educates.dev/v1beta1
 kind: Workshop
 metadata:
-  name: spring-maisey-mcp-integration
+  name: spring-maisey-rag
 spec:
-  title: Spring Academy - Spring AI - MCP Integration
-  description: "Expose your Spring AI tools as a Model Context Protocol server"
+  title: Spring Academy - Spring AI - Embeddings & RAG
+  description: "Build a Retrieval-Augmented Generation pipeline to answer questions from your own docs"
   difficulty: beginner
-  duration: 20m
+  duration: 30m
   vendor: Broadcom
   workshop:
     image: jdk21-environment:*
     files:
       - http:
-          url: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)/spring-maisey-mcp-integration.tar.gz"
+          url: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)/spring-maisey-rag.tar.gz"
   request:
     parameters:
     - name: USER_DOMAIN

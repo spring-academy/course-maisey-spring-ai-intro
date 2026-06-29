@@ -1,18 +1,18 @@
 apiVersion: training.educates.dev/v1beta1
 kind: Workshop
 metadata:
-  name: spring-maisey-simple-chat
+  name: spring-maisey-mcp
 spec:
-  title: Spring Academy - Spring AI - Simple Chat
-  description: "Build your first Spring AI integration using the ChatClient API"
+  title: Spring Academy - Spring AI - MCP Integration
+  description: "Expose your Spring AI tools as a Model Context Protocol server"
   difficulty: beginner
-  duration: 30m
+  duration: 20m
   vendor: Broadcom
   workshop:
     image: jdk21-environment:*
     files:
       - http:
-          url: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)/spring-maisey-simple-chat.tar.gz"
+          url: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)/spring-maisey-mcp.tar.gz"
   request:
     parameters:
     - name: USER_DOMAIN

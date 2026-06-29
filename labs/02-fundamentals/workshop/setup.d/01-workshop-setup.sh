@@ -9,3 +9,7 @@ chmod +x sample-app/mvnw
 
 code-server --install-extension redhat.java
 (cd sample-app && ./mvnw dependency:go-offline)
+
+rm -rf sample-app/src/test/java/com/example/support_assistant/mock
+rm -rf sample-app/src/test/resources/prompts
+rm sample-app/src/test/resources/junit-platform.properties

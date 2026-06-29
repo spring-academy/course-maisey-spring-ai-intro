@@ -1,0 +1,48 @@
+{
+  "id" : "92e7caf0-fb58-4d9b-a1d0-dc256a00bdc4",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream == true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 1)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "v1_chat_completions-92e7caf0-fb58-4d9b-a1d0-dc256a00bdc4.txt",
+    "headers" : {
+      "x-request-id" : "req_90167fd082b14be2b88b34d9ef6a2c0b",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "Server" : "cloudflare",
+      "CF-Ray" : "a115af23df15d824-GRU",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199992",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Thu, 25 Jun 2026 17:27:39 GMT",
+      "x-ratelimit-reset-tokens" : "2ms",
+      "access-control-expose-headers" : [ "X-Request-ID", "CF-Ray", "CF-Ray" ],
+      "set-cookie" : "__cf_bm=d86peUMt3hzQWW2EBKPLN7e4PqLhZpTMSdcT6OzNrxY-1782408458.8599865-1.0.1.1-DZ8LEOfsZnsXvnDr93h8d2_4BIVou3p8vEYhW_9gj_4wkN3z5UZ4WZtvoJ6fe7LUOHAkrdzWRZG6YKftXHu1sVM2hyPxAYWhTx6303B_BIXhhLruF7JNW4vzWj_O0nX8; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Thu, 25 Jun 2026 17:57:39 GMT",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "269",
+      "alt-svc" : "h3=\":443\"; ma=86400",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "text/event-stream; charset=utf-8"
+    }
+  },
+  "uuid" : "92e7caf0-fb58-4d9b-a1d0-dc256a00bdc4",
+  "persistent" : true,
+  "insertionIndex" : 4
+}

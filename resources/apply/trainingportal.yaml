@@ -28,13 +28,13 @@ spec:
     clarity:
       trackingId: "${ANALYTICS_CLARITY_ID}"
   workshops:
-    - name: spring-maisey-simple-chat
+    - name: spring-maisey-fundamentals
       expires: 45m
       orphaned: 10m
       deadline: 90m
       overdue: 2m
       reserved: ${TRAINING_PORTAL_RESERVED}
-    - name: spring-maisey-embeddings-rag
+    - name: spring-maisey-rag
       expires: 45m
       orphaned: 10m
       deadline: 90m
@@ -46,7 +46,7 @@ spec:
       deadline: 80m
       overdue: 2m
       reserved: ${TRAINING_PORTAL_RESERVED}
-    - name: spring-maisey-mcp-integration
+    - name: spring-maisey-mcp
       expires: 30m
       orphaned: 10m
       deadline: 60m

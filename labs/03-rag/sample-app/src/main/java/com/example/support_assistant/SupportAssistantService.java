@@ -20,8 +20,7 @@ class SupportAssistantService {
         return chatClient.prompt()
                 .user(u -> u
                         .text("Answer the following question with a short, well-structured explanation: {question}")
-                        .param("question", query)
-                )
+                        .param("question", query))
                 .call()
                 .entity(SupportResponse.class);
     }

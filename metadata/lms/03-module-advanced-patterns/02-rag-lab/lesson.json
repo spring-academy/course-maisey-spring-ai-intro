@@ -1,6 +1,6 @@
 {
     "id": "spring-maisey-advanced-patterns-module-rag-lab",
-    "slug": "embeddings-rag-lab",
+    "slug": "rag-lab",
     "title": "Lab - Retrieval-Augmented Generation (RAG) ",
     "status": "live",
     "type": "lab",

@@ -1,10 +1,10 @@
 apiVersion: training.educates.dev/v1beta1
 kind: Workshop
 metadata:
-  name: spring-maisey-embeddings-rag
+  name: spring-maisey-fundamentals
 spec:
-  title: Spring Academy - Spring AI - Embeddings & RAG
-  description: "Build a Retrieval-Augmented Generation pipeline to answer questions from your own docs"
+  title: Spring Academy - Spring AI - Simple Chat
+  description: "Build your first Spring AI integration using the ChatClient API"
   difficulty: beginner
   duration: 30m
   vendor: Broadcom
@@ -12,7 +12,7 @@ spec:
     image: jdk21-environment:*
     files:
       - http:
-          url: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)/spring-maisey-embeddings-rag.tar.gz"
+          url: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)/spring-maisey-fundamentals.tar.gz"
   request:
     parameters:
     - name: USER_DOMAIN
