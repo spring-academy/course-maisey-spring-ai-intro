@@ -2,7 +2,7 @@
 
 In the foundations section you saw what RAG is and why it works. Models only know their training data, so you retrieve relevant facts, augment the prompt, and let the model generate a grounded answer. That rests on embeddings, a vector store, and an ETL pipeline that reads, chunks, and loads your documents. This section shows how Spring AI gives you each of those pieces, and how an advisor ties them together at query time.
 
-## The `EmbeddingModel` Contract
+## The `EmbeddingModel`
 
 Just as `ChatModel` is the portable contract over chat providers, Spring AI defines **`EmbeddingModel`** as the portable contract over embedding providers (OpenAI, Ollama, and others). You hand it text and it returns vectors.
 
@@ -19,11 +19,11 @@ spring.ai.openai.embedding.model=text-embedding-3-small
 
 Remember the rule from the foundations section. You must use the same embedding model for indexing and for querying, because vectors are only comparable when they were produced the same way.
 
-In practice you'll rarely call `EmbeddingModel` directly. It does its work behind the scenes, inside the vector store and the RAG advisors we'll meet next.
+In practice you'll rarely call `EmbeddingModel` directly. It does its work behind the scenes, such as inside the `VectorStore` abstraction.
 
 ## The `VectorStore` Abstraction
 
-Spring AI defines a single **`VectorStore`** abstraction over the many vector database implementations (PGVector, Redis, Qdrant, Milvus, Chroma, and many more), plus a `SimpleVectorStore` for testing. As with everything else, swapping implementations is mostly a dependency-and-configuration change, not a rewrite. You add the matching starter, and the auto-configuration provides a `VectorStore` bean.
+Spring AI defines a single **`VectorStore`** abstraction over the many vector database implementations (PGVector, Redis, Qdrant, Milvus, Chroma, and many more), plus an in-memory `SimpleVectorStore` for testing. As with everything else, swapping implementations is mostly a dependency and configuration change, not a rewrite. You add the matching starter, and the auto-configuration provides a `VectorStore` bean.
 
 The store works with the **`Document`** abstraction, a piece of text plus arbitrary metadata.
 
@@ -96,16 +96,19 @@ vectorStore.write(splitter.split(reader.read()));
 
 You run this once, and again whenever your documents change, to populate the store. With indexing done, everything is in place for the query-time phase.
 
-## The Advisor Pattern
+You now have all the pieces of retrieval, augment, and generation. Embed the question, search the vector store, attach the results to the prompt, call the model. You *could* wire those steps together by hand, but Spring AI handles this based on the **advisors** concept.
 
-You now have all the pieces of retrieval-and-generation. Embed the question, search the vector store, attach the results to the prompt, call the model. You *could* wire those steps together by hand on every request, but retrieval is a *cross-cutting concern*, the kind of logic you want to apply consistently around many calls without scattering it through your code. Spring AI handles this with **advisors**.
+## The Advisor Concept
 
-If you've used Servlet filters or Spring's `HandlerInterceptor`, advisors will feel familiar. An advisor is an **interceptor that wraps a `ChatClient` call**, with a chance to act both *before* the request reaches the model and *after* the response comes back. Several advisors form a **chain**, and a request passes through all of them on the way in, hits the model, and passes back through them on the way out. This is the classic "around" pattern. Each advisor can inspect and modify the request, decide whether to proceed, and then inspect and modify the response.
+Interceptors are an essential part that enables programmers to control the execution by intercepting it. Spring also supports a variety of interceptors for different purposes, such as the `HandlerInterceptor` or `ClientHttpRequestInterceptor`.
+If you've used on of those, advisors will feel familiar. 
 
-Concretely, the framework wraps your `Prompt` in a **`ChatClientRequest`** (the request plus a shared context map) and hands it to the first advisor. Each advisor does its *before* work, then calls the chain to invoke the next advisor; the last one calls the model. The model's answer travels back as a **`ChatClientResponse`**, and each advisor gets to do its *after* work as it unwinds. A logging advisor captures the shape nicely, logging on the way in, delegating to the rest of the chain, and logging on the way out.
+An advisor is an **interceptor that wraps a `ChatClient` call**, with a chance to act both *before* the request reaches the model and *after* the response comes back. Several advisors form a **chain**, and a request passes through all of them on the way in, hits the model, and passes back through them on the way out. This is the classic "around" pattern. Each advisor can inspect and modify the request, decide whether to proceed, and then inspect and modify the response.
+
+Concretely, the framework wraps your `Prompt` in a **`ChatClientRequest`** (the request plus a shared context map) and hands it to the first advisor. Each advisor does its *before* work, then calls the chain to invoke the next advisor, and the last one calls the model. The model's answer travels back as a **`ChatClientResponse`**, and each advisor gets to do its *after* work as it unwinds. A logging advisor captures the shape nicely, logging on the way in, delegating to the rest of the chain, and logging on the way out.
 
 ```java
-public ChatClientResponse adviseCall(ChatClientRequest request, CallAdvisorChain chain) {
+ChatClientResponse adviseCall(ChatClientRequest request, CallAdvisorChain chain) {
     logRequest(request);                                 // before
     ChatClientResponse response = chain.nextCall(request); // delegate down the chain → model
     logResponse(response);                               // after
@@ -115,11 +118,21 @@ public ChatClientResponse adviseCall(ChatClientRequest request, CallAdvisorChain
 
 A few properties are worth understanding, because they explain how advisors behave when you combine them.
 
-- **Order matters, and it's stack-like.** Each advisor reports a priority via `getOrder()` (lower runs first). On the way *in*, advisors run lowest-order first; on the way *out*, the order reverses, just like nested method calls. So an advisor that adds context before the model also gets the first look at the response.
-- **Around both phases, two flavors.** The same advisor can implement the blocking `.call()` path (`CallAdvisor`) and the reactive `.stream()` path (`StreamAdvisor`), so cross-cutting behavior works whether you wait for the whole answer or stream it.
-- **A shared context map** travels with the request through the whole chain. This is how you pass per-request parameters to an advisor at call time, for example telling a memory advisor which conversation this is.
+- **Name.** Each advisor returns a unique name from `getName()`. It identifies the advisor in the chain, so it shows up in logs and lets you refer to a specific advisor when you need to.
+- **Order.** Each advisor reports a priority via `getOrder()` (lower runs first). On the way *in*, advisors run lowest-order first, on the way *out*, the order reverses, just like nested method calls. So an advisor that adds context before the model also gets the first look at the response.
+- **Blocking and reactive.** The same advisor can implement the blocking `.call()` path (`CallAdvisor`) and the reactive `.stream()` path (`StreamAdvisor`), so cross-cutting behavior works whether you wait for the whole answer or stream it.
+- **Shared context.** A context map travels with the request through the whole chain. This is how you pass per-request parameters to an advisor at call time, for example telling a memory advisor which conversation this is.
 
-You register advisors in one of two places. Most live on the `ChatClient` as **defaults**, applied to every call made through that client.
+You read and write that shared context through the `context()` map on the request. Because the request is immutable, you produce an updated copy with your entry added rather than mutating it in place.
+
+```java
+Object conversationId = request.context().get("conversationId"); // read
+ChatClientRequest updated = request.mutate()
+    .context("retrievedAt", Instant.now())                       // write
+    .build();
+```
+
+You register advisors in one of two places. Either on a `ChatClient` instance as defaults, applied to every call made through that client.
 
 ```java
 ChatClient chatClient = builder

@@ -1,0 +1,48 @@
+{
+  "id" : "418da89e-db2f-4896-af68-57990a88a339",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\",\"role\":\"system\"},{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-DywQjMl2fmVQa7j40LIO388Ock6vK\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783416657,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"Spring AI is Spring’s project for building AI-powered applications with a familiar Spring programming model. It gives you abstractions and integrations for working with:\\n\\n- **Chat models** and prompt/response flows\\n- **Embedding models** for semantic search and retrieval\\n- **Vector stores** for similarity search\\n- **Tool/function calling** to let models use application capabilities\\n- **Image generation** and other AI-related features, depending on the provider\\n\\nIt is designed to make it easier to switch between AI providers while keeping your application code more consistent with Spring style and dependency injection.\\n\\n### What it’s good for\\n- Chatbots and assistants\\n- Retrieval-augmented generation (RAG)\\n- Semantic search over documents\\n- AI workflows that call external tools/services\\n\\n### Typical integrations\\nSpring AI supports providers such as OpenAI-compatible APIs and other model/vector store providers through starter dependencies and auto-configuration.\\n\\n### Official docs\\nYou can find the official Spring AI documentation here:  \\nhttps://docs.spring.io/spring-ai/reference/\\n\\nIf you want, I can also give you:\\n- a **quick start example**\\n- an explanation of **RAG with Spring AI**\\n- or help you choose the right **Spring AI starter** for your use case.\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 46,\n    \"completion_tokens\": 254,\n    \"total_tokens\": 300,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "14ms",
+      "set-cookie" : "__cf_bm=BbtLu17JS2WJqGC3qYVDAnzayggF6LvxJgahp2mt158-1783416656.4609818-1.0.1.1-FE1QcKGSOSzzg7L4a2rmKqWdmRY0UI9d.0.e4AXLW2izDLXJ6UrFOtnvUPy4QetEDjWFmmulo4KgBADwRLzd415t0N86JZGSYUXR.dN7o49hYGsPQH26C0IY5QeTnovv; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Tue, 07 Jul 2026 10:00:59 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_b664c9027cc942dcb28843156a1add7a",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a175d556eacde0cd-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199951",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Tue, 07 Jul 2026 09:30:59 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "2226",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "418da89e-db2f-4896-af68-57990a88a339",
+  "persistent" : true,
+  "insertionIndex" : 61
+}

@@ -2,53 +2,17 @@
 title: Retrieval with Advisors
 ---
 
-# Retrieval at Query Time
-
-Spring AI's `QuestionAnswerAdvisor` plugs retrieval into the existing `ChatClient` chain — it runs a similarity search against the `VectorStore` before the model call and appends the matches to the prompt. No changes to the controller, no manual prompt stitching.
+Spring AI's `QuestionAnswerAdvisor` plugs retrieval into the existing `ChatClient` chain. It runs a similarity search against the `VectorStore` before the model call and appends the matches to the prompt. 
 
 ## Add the QuestionAnswerAdvisor
 
 Inject the `VectorStore` into `SupportAssistantService`:
-
-```java
-private final ChatClient chatClient;
-private final VectorStore vectorStore;
-
-SupportAssistantService(ChatClient chatClient, VectorStore vectorStore) {
-    this.chatClient = chatClient;
-    this.vectorStore = vectorStore;
-}
-```
-
-And add the advisor to `generateResponse`:
-
-```java
-SupportResponse generateResponse(String query) {
-    var ragSearchRequest = SearchRequest.builder().topK(3).similarityThreshold(0.7).build();
-    var ragAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
-            .searchRequest(ragSearchRequest)
-            .build();
-
-    return chatClient.prompt()
-            .user(u -> u
-                    .text("Answer the following question with a short, well-structured explanation: {question}")
-                    .param("question", query))
-            .advisors(ragAdvisor)
-            .call()
-            .entity(SupportResponse.class);
-}
-```
-
-The `SearchRequest` defines the retrieval: the top 3 most similar chunks, and only if they pass a 0.7 cosine-similarity threshold.
-
-Click to apply (the required imports are added automatically):
-
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "private final ChatClient chatClient;"
 before: 0
 after: 0
-description: Apply - add the QuestionAnswerAdvisor
+description: Inject the `VectorStore`
 cascade: true
 ```
 
@@ -72,7 +36,6 @@ hidden: true
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
       SupportAssistantService(ChatClient chatClient, VectorStore vectorStore) {
@@ -81,13 +44,14 @@ text: |2
       }
 ```
 
+Configure and add the QuestionAnswerAdvisor to the ChatClient interaction:
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "SupportResponse generateResponse(String query) {"
 before: 0
-after: 8
+after: 7
 cascade: true
-hidden: true
+description: Configure and add the QuestionAnswerAdvisor 
 ```
 
 ```editor:replace-text-selection
@@ -96,7 +60,7 @@ cascade: true
 hidden: true
 text: |2
       SupportResponse generateResponse(String query) {
-          var ragSearchRequest = SearchRequest.builder().topK(3).similarityThreshold(0.7).build();
+          var ragSearchRequest = SearchRequest.builder().topK(4).similarityThreshold(0.4).build();
           var ragAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
                   .searchRequest(ragSearchRequest)
                   .build();
@@ -121,92 +85,61 @@ text: |-
   import org.springframework.ai.vectorstore.VectorStore;
 ```
 
+The `SearchRequest` defines the retrieval. The top 4 most similar chunks, and only if they pass a 0.4 cosine-similarity threshold.
+
 ## Test the Grounded Assistant
 
-Restart the application:
-
-```terminal:interrupt
-session: 2
-```
-
-```terminal:execute
-command: cd ~/sample-app && ./mvnw spring-boot:run
-session: 2
-```
-
-Try a question your knowledge base covers:
+Try questions your knowledge base covers:
 
 ```execute
-curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Does VMware Tanzu Spring provide commercial support for Micrometer?"
 ```
 
 Now try one it doesn't:
 
 ```execute
-curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about breaking changes in Spring Framework 7"
 ```
 
 You'll get something like:
 
-> I can't answer that from the provided context, because it only mentions Tanzu Spring support and Spring Cloud components, not Spring AI.
+> I can’t answer that from the provided context ...
 
-That's the advisor's **default prompt** at work — it instructs the model to refuse anything outside the retrieved context. Strict, and often what you want. For our assistant, though, we'd rather fall back to the model's general knowledge when the knowledge base has nothing.
+That's the advisor's **default prompt**, which instructs the model to refuse anything outside the retrieved context. Strict, and often what you want. For our assistant, though, we'd rather fall back to the model's general knowledge when the knowledge base has nothing.
 
 ## Customize the RAG Prompt
 
 Override the advisor's prompt with our own template. The two placeholders are filled by the advisor: `{query}` with the user's question, `{question_answer_context}` with the retrieved chunks:
 
 ```editor:append-lines-to-file
-file: ~/sample-app/src/main/resources/prompts/rag
+file: ~/sample-app/src/main/resources/prompts/rag.st
 description: Create the custom RAG prompt
 text: |
-  {query}
+  Use the following retrieved context to answer the user's question. Follow these rules:
 
-  Context information is below, surrounded by ---------------------
+  1. If the answer can be found in the context, base your answer strictly on that context.
+  2. If the context does not contain the information needed to answer, rely on your own general knowledge to answer, and explicitly note that the answer is not drawn from the provided context.
+  3. If you are unsure or the question cannot be answered from either the context or your own knowledge, say so clearly rather than guessing.
+  4. Do not fabricate facts, sources, or citations.
 
-  ---------------------
+  ---
+  Context:
   {question_answer_context}
-  ---------------------
+  ---
 
-  Reply to the user based on the context if possible.
+  Question:
+  {query}
 ```
 
 The key change is the closing line: "based on the context **if possible**". That gives the model permission to fall back to general knowledge when retrieval comes up empty, while still preferring the context when it has relevant material.
 
 Inject the resource into the service and pass it to the advisor as a `PromptTemplate`:
-
-```java
-@Value("classpath:/prompts/rag")
-private Resource ragPromptResource;
-```
-
-```java
-SupportResponse generateResponse(String query) {
-    var ragSearchRequest = SearchRequest.builder().topK(3).similarityThreshold(0.7).build();
-    var promptTemplate = PromptTemplate.builder().resource(ragPromptResource).build();
-    var ragAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
-            .searchRequest(ragSearchRequest)
-            .promptTemplate(promptTemplate)
-            .build();
-
-    return chatClient.prompt()
-            .user(u -> u
-                    .text("Answer the following question with a short, well-structured explanation: {question}")
-                    .param("question", query))
-            .advisors(ragAdvisor)
-            .call()
-            .entity(SupportResponse.class);
-}
-```
-
-Click to apply:
-
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "private final VectorStore vectorStore;"
 before: 0
 after: 0
-description: Apply - use the custom RAG prompt
+description: Use the custom RAG prompt
 cascade: true
 ```
 
@@ -217,7 +150,7 @@ hidden: true
 text: |2
       private final VectorStore vectorStore;
 
-      @Value("classpath:/prompts/rag")
+      @Value("classpath:/prompts/rag.st")
       private Resource ragPromptResource;
 ```
 
@@ -236,7 +169,7 @@ cascade: true
 hidden: true
 text: |2
       SupportResponse generateResponse(String query) {
-          var ragSearchRequest = SearchRequest.builder().topK(3).similarityThreshold(0.7).build();
+          var ragSearchRequest = SearchRequest.builder().topK(4).similarityThreshold(0.4).build();
           var promptTemplate = PromptTemplate.builder().resource(ragPromptResource).build();
           var ragAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
                   .searchRequest(ragSearchRequest)
@@ -263,36 +196,17 @@ text: |-
   import org.springframework.core.io.Resource;
 ```
 
-Restart and re-run both queries:
-
-```terminal:interrupt
-session: 2
-```
-
-```terminal:execute
-command: cd ~/sample-app && ./mvnw spring-boot:run
-session: 2
+Re-run both queries:
+```execute
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Does VMware Tanzu Spring provide commercial support for Micrometer?"
 ```
 
 ```execute
-curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about breaking changes in Spring Framework 7"
 ```
 
-```execute
-curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
-```
-
-The Tanzu question still comes back grounded in the indexed docs; the Spring AI question now gets a real answer instead of a refusal.
+The Tanzu question still comes back grounded in the indexed docs, the Spring AI question now gets a real answer instead of a refusal.
 
 ## Recap
 
-| Step | What changed |
-|------|--------------|
-| 1 | Added `spring-ai-vector-store-advisor` and `spring-ai-markdown-document-reader` |
-| 2 | Configured `spring.ai.openai.embedding.*` (other providers: same pattern, own namespace) |
-| 3 | Fallback `SimpleVectorStore` bean via `@ConditionalOnMissingBean` |
-| 4 | `KnowledgeBaseIndexer` — read Markdown, split into chunks, load into the `VectorStore` |
-| 5 | `QuestionAnswerAdvisor` on the `ChatClient` chain |
-| 6 | Custom RAG prompt to allow fallback when context is empty |
-
-Your support assistant now answers from your own documents — with the model's general knowledge as a graceful fallback.
+Your support assistant now answers from your own documents, with the model's general knowledge as a graceful fallback.

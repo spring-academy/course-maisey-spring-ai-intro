@@ -24,6 +24,8 @@ The bridge that makes both phases work is the embedding. It is what lets you fin
 
 An embedding is a numerical representation of a piece of content. It is an array of floating point numbers, called a vector, that captures the meaning of the content. The important property is that texts with similar meaning produce vectors that sit close together in this numerical space, even when they share no words. The question "How do I reset my password" and the sentence "I forgot my login credentials" land near each other. A question about the weather lands far away. By measuring the distance between two vectors you measure how related two pieces of text are. This is what makes search by meaning possible instead of search by exact keyword.
 
+The length of that array is fixed by the embedding model and is called the number of dimensions. Each model always outputs the same size, for example 1536 numbers for OpenAI text-embedding-3-small or 768 for many open models, no matter how long the input text is. More dimensions can capture finer shades of meaning, but they also take more storage and make the similarity search a little slower. Because the size is fixed per model, vectors from two different models do not line up and cannot be compared, which is one more reason you stay with a single embedding model.
+
 One rule matters above all. You must use the same embedding model for indexing and for querying. The vectors are only comparable when they were produced the same way. The model that embeds your documents is the model that must embed the user question.
 
 ### The Vector Store and Similarity Search

@@ -19,7 +19,7 @@ class SupportAssistantService {
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
 
-    @Value("classpath:/prompts/rag")
+    @Value("classpath:/prompts/rag-prompt.st")
     private Resource ragPromptResource;
 
     SupportAssistantService(ChatClient chatClient, VectorStore vectorStore) {
@@ -28,7 +28,7 @@ class SupportAssistantService {
     }
 
     SupportResponse generateResponse(String query) {
-        var ragSearchRequest = SearchRequest.builder().topK(3).similarityThreshold(0.7).build();
+        var ragSearchRequest = SearchRequest.builder().topK(4).similarityThreshold(0.4).build();
 
         var promptTemplate = PromptTemplate.builder().resource(ragPromptResource).build();
         var ragAdvisor = QuestionAnswerAdvisor.builder(vectorStore).searchRequest(ragSearchRequest)

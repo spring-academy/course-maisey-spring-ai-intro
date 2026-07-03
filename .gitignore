@@ -6,6 +6,8 @@
 
 labs/**/local-resources
 
+openai-mock-gen/src/main/resources/mock
+
 ##
 *.swp
 .DS_Store

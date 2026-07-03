@@ -2,22 +2,22 @@
 title: Getting Started
 ---
 
-# Getting Started
-
 In this lab, you'll add **Retrieval Augmented Generation (RAG)** to the support assistant: index a small Markdown knowledge base, retrieve the most relevant chunks per query, and have the model answer grounded in them.
 
-Your starting point in `~/sample-app` is the assistant from the **Simple Chat** lab: a `ChatClient` with a default system prompt and a `/api/v1/chat` endpoint returning a structured `SupportResponse` record.
+Your starting point in `~/sample-app` is the assistant from the **Spring AI fundamentals** lab, a `ChatClient` with a default system prompt and a `/api/v1/chat` endpoint returning a structured `SupportResponse` record.
 
 {{< note >}}
-This lab implements RAG with **OpenAI** for both chat and embeddings. The sample app also bundles the starters for Anthropic, Amazon Bedrock, and Ollama — you could switch the chat provider via Spring profiles (e.g. `application-anthropic.properties` with `SPRING_PROFILES_ACTIVE=anthropic`). The default configuration uses OpenAI.
+Every call to OpenAI in this lab is mocked, both the chat model and the embedding model. The application sends its requests to a local mock server that returns predefined responses, so you do not need a real API key or an internet connection. The application code stays exactly the same as it would be against the real OpenAI service.
 {{< /note >}}
 
 ## Add the RAG Dependencies
 
-Two additional Spring AI modules are needed:
+To keep things simple, this lab uses an in memory vector store. For production you would normally use an external service instead, which needs an extra dependency such as `spring-ai-starter-vector-store-pgvector`. Embedding models can also need their own dependency depending on the provider. For example `spring-ai-starter-model-bedrock-converse` covers chat but does **not** ship an embedding model, so on AWS Bedrock you would add the broader `spring-ai-starter-model-bedrock` starter next to it. Some providers such as Anthropic do not offer an embedding model at all, so there you would use a different provider for the embeddings.
 
-- `spring-ai-vector-store-advisor` brings the `QuestionAnswerAdvisor` that plugs retrieval into a `ChatClient` chain.
-- `spring-ai-markdown-document-reader` parses `.md` files into Spring AI `Document` objects.
+Two additional Spring AI modules are needed.
+
+- `spring-ai-vector-store-advisor` connects the vector store to the chat pipeline. Before the model is called it searches the store for the content that is most relevant to the user question and adds that content to the prompt, so the answer is grounded in your own data.
+- `spring-ai-markdown-document-reader` reads Markdown files and splits them into smaller pieces of text that can be stored in the vector store.
 
 ```editor:insert-lines-before-line
 file: ~/sample-app/pom.xml
@@ -35,64 +35,27 @@ text: |2
   		</dependency>
 ```
 
-{{< note >}}
-With other providers the dependencies can differ. For example, `spring-ai-starter-model-bedrock-converse` covers chat but does **not** ship an embedding model, so on AWS Bedrock you'd add the broader `spring-ai-starter-model-bedrock` starter alongside it.
-{{< /note >}}
-
 ## Configure the Embedding Model
 
-Embeddings live in the same provider namespace as chat (`spring.ai.<provider>.embedding.*`). Because the sample app has several provider starters on the classpath, `spring.ai.model.embedding` explicitly picks which one serves the embedding model — just like `spring.ai.model.chat` already does for chat.
+For most providers the embedding settings live in the same namespace as the chat settings, under `spring.ai.<provider>.embedding.*`. Some providers are an exception. On AWS Bedrock for example the chat model and the embedding model can come from different starters, so their settings live under different namespaces. Because the sample app has several provider starters on the classpath, `spring.ai.model.embedding` explicitly picks which one serves the embedding model, just like `spring.ai.model.chat` already does for chat.
 
 Append the OpenAI embedding configuration:
-
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/resources/application.properties
 description: Configure the OpenAI embedding model
 text: |
-
-  spring.ai.model.embedding=openai
   spring.ai.openai.embedding.model=text-embedding-3-small
 ```
 
-For the other providers, the shape is similar — you'd append the matching block to the profile file instead:
-
-- **Ollama**: `spring.ai.ollama.embedding.model=nomic-embed-text-v2-moe` (after `ollama pull nomic-embed-text-v2-moe`)
-- **Bedrock**: `spring.ai.model.embedding=bedrock-cohere` with `spring.ai.bedrock.cohere.embedding.model=cohere.embed-multilingual-v3`
-- **Anthropic**: doesn't publish an embedding model — you'd pick a separate provider (e.g. Voyage) for embeddings while keeping Anthropic for chat
-
 ## Provide a VectorStore Bean
+As already mentioned, this lab uses the in memory `SimpleVectorStore`. This store is not provided by auto-configuration, so we create the bean ourselves in `SupportAssistantConfiguration`. This step is only needed for the in memory store. External stores such as pgvector are auto-configured by their own starter, so you would not have to define the bean yourself.
 
-The embedding vectors need a place to live. For this lab we use the in-memory `SimpleVectorStore` — but no auto-configuration provides it, so we create the bean ourselves in `SupportAssistantConfiguration`:
-
-```java
-@ConditionalOnMissingBean(VectorStore.class)
-@Bean
-VectorStore simpleVectorStore(EmbeddingModel embeddingModel) {
-    return SimpleVectorStore.builder(embeddingModel).build();
-}
-```
-
-`@ConditionalOnMissingBean` makes this bean drop out the moment a real `VectorStore` shows up. For example, if you added the `spring-ai-starter-vector-store-pgvector` starter, its auto-configured PostgreSQL-backed store would take over — the same class works in both setups. Note the `EmbeddingModel` parameter: the store uses it to turn documents into vectors.
-
-Click to apply (the required imports are added automatically):
-
-```editor:select-matching-text
+```editor:insert-lines-before-line
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-text: "ChatClient chatClient(ChatClient.Builder builder) {"
-before: 0
-after: 2
-description: Apply - add the SimpleVectorStore bean
+description: Add the SimpleVectorStore bean
 cascade: true
-```
-
-```editor:replace-text-selection
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-cascade: true
-hidden: true
+line: 17
 text: |2
-      ChatClient chatClient(ChatClient.Builder builder) {
-          return builder.defaultSystem("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.").build();
-      }
 
       @ConditionalOnMissingBean(VectorStore.class)
       @Bean
@@ -112,15 +75,9 @@ text: |-
   import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 ```
 
-## Set the API Key and Run the App
+`@ConditionalOnMissingBean` makes this bean drop out the moment a real `VectorStore` shows up. For example, if you added the `spring-ai-starter-vector-store-pgvector` starter, its auto-configured PostgreSQL-backed store would take over. Note the `EmbeddingModel` parameter, the store uses it to turn documents into vectors.
 
-Set your OpenAI API key (use your own or the one provided by your instructor) — paste it after the `=` and press Enter:
-
-```terminal:input
-text: export OPENAI_API_KEY=
-endl: false
-session: 2
-```
+## Run the App
 
 Start the application (the first run downloads the new dependencies):
 
@@ -141,6 +98,7 @@ curl http://localhost:8080/actuator/health
 
 You should see `{"status":"UP"}`. Keep the app running in the second terminal.
 
+
 ## Summary
 
-You've added the RAG modules, configured the OpenAI embedding model declaratively, and provided an in-memory `VectorStore`. Next: fill it with knowledge.
+You've added necessary RAG dependencies, configured the OpenAI embedding model declaratively, and provided an in-memory `VectorStore`. In the next section, you'll fill it with knowledge.

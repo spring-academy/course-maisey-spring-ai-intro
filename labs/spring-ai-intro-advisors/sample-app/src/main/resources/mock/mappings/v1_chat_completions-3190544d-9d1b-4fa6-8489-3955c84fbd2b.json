@@ -1,0 +1,48 @@
+{
+  "id" : "3190544d-9d1b-4fa6-8489-3955c84fbd2b",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a Spring support classifier.\\nReply only with JSON in this form:\\n{\\\"category\\\":\\\"...\\\",\\\"answer\\\":\\\"...\\\"}\\nThe category must be one of: TECHNICAL, BILLING, SECURITY, GENERAL.\\nExamples:\\n- \\\"Why was I billed twice?\\\"     -> {\\\"category\\\":\\\"BILLING\\\",\\\"answer\\\":\\\"...\\\"}\\n- \\\"How do I rotate my API key?\\\" -> {\\\"category\\\":\\\"SECURITY\\\",\\\"answer\\\":\\\"...\\\"}\\n\",\"role\":\"system\"},{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-DywQuYEFZLZo9CSvqnAwcv6u4N69j\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783416668,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"category\\\":\\\"GENERAL\\\",\\\"answer\\\":\\\"Spring AI is a Spring project that brings AI capabilities into the Spring ecosystem. It provides abstractions and integrations for working with large language models, chat/completions, embeddings, vector stores, and related AI features in a Spring-friendly way. If you want, I can also explain how it works, what it supports, or show a quick example.\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 101,\n    \"completion_tokens\": 81,\n    \"total_tokens\": 182,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "27ms",
+      "set-cookie" : "__cf_bm=6B3R47gmweUp5wXbT9fTlDsWVDF8nwaB6v2wFuGl1u4-1783416667.9115832-1.0.1.1-e.92vW2GkIE4BM1bjstIdfo6EULjQ9brga4YtgHYwINxWkVwRqzWB.GVcOyJjc2ehdJKvOsV6zJTotysoog3sm6PWrezQDFqWBo8LX6_la2hiY_4dxVpnlh.n0Tj6mOY; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Tue, 07 Jul 2026 10:01:09 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_e7cd673596724bf49c14f7ebdf7c0b5c",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a175d59e6f37fbc8-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199907",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Tue, 07 Jul 2026 09:31:09 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "1097",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "3190544d-9d1b-4fa6-8489-3955c84fbd2b",
+  "persistent" : true,
+  "insertionIndex" : 57
+}
