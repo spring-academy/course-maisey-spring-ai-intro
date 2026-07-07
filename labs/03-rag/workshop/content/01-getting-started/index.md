@@ -7,7 +7,7 @@ In this lab, you'll add **Retrieval Augmented Generation (RAG)** to the support 
 Your starting point in `~/sample-app` is the assistant from the **Spring AI fundamentals** lab, a `ChatClient` with a default system prompt and a `/api/v1/chat` endpoint returning a structured `SupportResponse` record.
 
 {{< note >}}
-Every call to OpenAI in this lab is mocked, both the chat model and the embedding model. The application sends its requests to a local mock server that returns predefined responses, so you do not need a real API key or an internet connection. The application code stays exactly the same as it would be against the real OpenAI service.
+Every call to OpenAI in this lab is mocked. The application sends its requests to a local mock server that returns predefined responses, so you do not need a real API key. The application code stays exactly the same as it would be against the real OpenAI service.
 {{< /note >}}
 
 ## Add the RAG Dependencies

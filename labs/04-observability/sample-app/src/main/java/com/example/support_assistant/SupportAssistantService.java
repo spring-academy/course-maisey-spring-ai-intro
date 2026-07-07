@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service;
 class SupportAssistantService {
 
     private static final Logger log = LoggerFactory.getLogger(SupportAssistantService.class);
-
+    
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
     private final SupportTicketService supportTicketService;
 
-    @Value("classpath:/prompts/rag")
+    @Value("classpath:/prompts/rag-prompt.st")
     private Resource ragPromptResource;
 
     SupportAssistantService(ChatClient chatClient, VectorStore vectorStore, SupportTicketService supportTicketService) {
@@ -30,7 +30,7 @@ class SupportAssistantService {
     }
 
     SupportResponse generateResponse(String query) {
-        var ragSearchRequest = SearchRequest.builder().topK(3).similarityThreshold(0.7).build();
+        var ragSearchRequest = SearchRequest.builder().topK(4).similarityThreshold(0.4).build();
 
         var promptTemplate = PromptTemplate.builder().resource(ragPromptResource).build();
         var ragAdvisor = QuestionAnswerAdvisor.builder(vectorStore).searchRequest(ragSearchRequest)

@@ -1,0 +1,50 @@
+{
+  "id" : "32fb7ee0-d620-494d-80e3-96c4a2928f05",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 1)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-Dz4PelxIo3DCq2146MVDMsPSAqtMw\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783447342,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"Spring AI is a Spring ecosystem project for building AI-powered Java applications with a familiar Spring-style API. It gives you abstractions and integrations for working with large language models and other AI services without tying your app too tightly to one provider.\\n\\n## What it helps you do\\n- Call chat models like OpenAI, Anthropic, Azure OpenAI, Google, and others\\n- Generate embeddings for semantic search and retrieval\\n- Build RAG apps that combine your data with model responses\\n- Use vector stores for similarity search\\n- Work with prompt templates, chat memory, and tool/function calling\\n- Integrate AI features into Spring Boot apps with minimal boilerplate\\n\\n## Why people use it\\n- **Spring-native**: Fits naturally into Spring Boot apps\\n- **Provider abstraction**: Easier to switch between model providers\\n- **Productivity**: Less low-level API handling\\n- **Enterprise-friendly**: Works well with DI, config, observability, and testing patterns common in Spring apps\\n\\n## Core concepts\\n- **ChatModel / ChatClient**: Send prompts and receive generated text or structured responses\\n- **EmbeddingModel**: Turn text into vectors for search and retrieval\\n- **VectorStore**: Store and query embeddings\\n- **Prompt templates**: Build reusable prompts with variables\\n- **Advisor / memory patterns**: Add context, history, or retrieval results to prompts\\n- **Tool calling**: Let the model invoke app functions\\n\\n## Typical use cases\\n- Chatbots\\n- Document Q&A\\n- Semantic search\\n- Summarization\\n- Classification\\n- Code assistance\\n- Workflow automation with AI tools\\n\\n## Example\\nA simple Spring AI chat call often looks conceptually like this:\\n\\n```java\\nString response = chatClient.prompt()\\n    .user(\\\"Write a short poem about Spring AI\\\")\\n    .call()\\n    .content();\\n```\\n\\n## Good to know\\n- Spring AI is evolving quickly, so APIs may change between versions.\\n- You usually configure the model provider and credentials via Spring Boot properties.\\n- For production apps, you’ll want to think about latency, cost, rate limits, prompt safety, and observability.\\n\\nIf you want, I can also give you:\\n1. a **Spring AI quickstart**\\n2. a **RAG example**\\n3. a **comparison with LangChain/LlamaIndex**\\n4. a **Spring Boot configuration example**\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 11,\n    \"completion_tokens\": 488,\n    \"total_tokens\": 499,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "2ms",
+      "set-cookie" : "__cf_bm=yE3hzFQ6MSWT7kVV2SGR06eJccQG1v6ZGGEqdNifM1c-1783447342.2176738-1.0.1.1-sQ_hyn5k1xciyrR0pjImY_fqcdKB.2eEOH_KoU.yWxEkPlK6FsJMLrU2ISQg77jfwu7xeo44QVQmyruDy8g_7uCTdKt94SXCte2ci2LCiZG60VMsT1879mv74fLsnbvf; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Tue, 07 Jul 2026 18:32:26 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_46993e17e9f149888dd436d76a1cc1d5",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a178c280d9cae32a-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199992",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Tue, 07 Jul 2026 18:02:26 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "3781",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "32fb7ee0-d620-494d-80e3-96c4a2928f05",
+  "persistent" : true,
+  "scenarioName" : "scenario-7-v1-chat-completions",
+  "requiredScenarioState" : "scenario-7-v1-chat-completions-2",
+  "insertionIndex" : 115
+}

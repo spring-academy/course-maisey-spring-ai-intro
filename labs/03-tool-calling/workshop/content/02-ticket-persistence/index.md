@@ -2,9 +2,7 @@
 title: Ticket Persistence
 ---
 
-# The SupportTicket Entity and Repository
-
-Before the model can file tickets, we need plain Spring Data building blocks: an entity mapped to the `support_ticket` table and a repository to read and write it. Nothing AI-specific yet — but the design choices here matter for the tool calls later.
+Before the model can file tickets, we need some plain Spring Data building blocks. We need an entity mapped to the `support_ticket` table and a repository to read and write it. There is nothing AI-specific yet, but the design choices here matter for the tool calls later.
 
 ## The SupportTicket Entity
 
@@ -46,12 +44,12 @@ text: |
   }
 ```
 
-A few things worth pointing out:
+Here are a few things worth pointing out.
 
-- **`@PersistenceCreator`** on the compact canonical constructor — disambiguates the two constructors so Spring Data definitely uses the 6-arg one when reading rows.
-- **Convenience constructor** for tool calls — the LLM only needs to supply `summary`, `category`, and `priority`. `id` is `null` (DB-generated), `status` defaults to `OPEN`, `createdAt` to now.
-- **`withId(...)` wither** — Spring Data calls it after the INSERT to thread the DB-generated id back into a new record instance.
-- **Nested enums** for `Status` and `Priority` — they're tightly coupled to the ticket, so they live with it. The `category` reuses the `SupportCategory` enum you already know from the structured `SupportResponse`.
+- **`@PersistenceCreator`** on the compact canonical constructor. This tells Spring Data which constructor to use, so it always uses the 6-arg one when it reads rows.
+- **Convenience constructor** for tool calls. The LLM only needs to give `summary`, `category`, and `priority`. `id` is `null` because the database creates it, `status` starts as `OPEN`, and `createdAt` is set to now.
+- **`withId(...)` wither**. Spring Data calls it after the INSERT to put the database-generated id back into a new record instance.
+- **Nested enums** for `Status` and `Priority`. They are closely tied to the ticket, so they live inside it. The `category` reuses the `SupportCategory` enum you already know from the structured `SupportResponse`.
 
 ## The Repository
 
@@ -73,21 +71,8 @@ text: |
   }
 ```
 
-`ListCrudRepository` gives us `save`, `findAll`, `findById`, and friends. The two derived query methods cover the lookups we want to expose as tools.
-
-## Verify It Still Starts
-
-Restart to make sure the new entity and repository wire up cleanly:
-
-```terminal:interrupt
-session: 2
-```
-
-```terminal:execute
-command: cd ~/sample-app && ./mvnw spring-boot:run
-session: 2
-```
+`ListCrudRepository` gives us `save`, `findAll`, `findById`, and more. The two derived query methods cover the lookups we want to expose as tools.
 
 ## Summary
 
-You've created the `SupportTicket` record and its Spring Data JDBC repository. Now comes the interesting part: handing these capabilities to the model as tools.
+You've created the `SupportTicket` record and its Spring Data JDBC repository. Now comes the interesting part. Next you will hand these capabilities to the model as tools.

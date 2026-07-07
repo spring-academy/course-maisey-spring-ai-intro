@@ -2,16 +2,14 @@
 title: Tool Calling
 ---
 
-# Giving the Model Tools
+Now you will use Spring AI's tool calling. You add the `@Tool` annotation to your methods and the framework does four things for you.
 
-This is where Spring AI's tool calling shows up. Annotate methods with `@Tool` and the framework will:
+1. It reads the method signature and builds a JSON schema that describes the tool.
+2. It sends these schemas to the model with every call.
+3. When the model asks to call a tool, the framework runs the method with the arguments the model provided.
+4. It sends the return value back to the model so the model can finish its answer.
 
-1. Generate a JSON schema describing the tool from the method signature.
-2. Pass those schemas to the model with each call.
-3. When the model emits a tool call, invoke the method with the model-supplied arguments.
-4. Feed the return value back into the model so it can finish its answer.
-
-## The Tool-Bearing Service
+## Implement the Service that Provides the Tools
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportTicketService.java
@@ -55,46 +53,21 @@ text: |
   }
 ```
 
-Two annotations do the heavy lifting:
+Two annotations do most of the work.
 
-- **`@Tool(description = "...")`** — what the tool does, in the model's voice. This is the most important text in the whole step: the model decides whether to call the tool based on it, so be explicit about the trigger (here: "explicitly requests to create, open, or file a support ticket").
-- **`@ToolParam(description = "...")`** — describes each parameter. The model uses these to fill the arguments correctly. Enum types are turned into the model's available choices automatically.
+- **`@Tool(description = "...")`** explains what the tool does, written for the model to read. This is the most important text in the whole step. The model reads it to decide if it should call the tool, so say clearly when the tool should be used. In this example the model should call it when the user "explicitly requests to create, open, or file a support ticket".
+- **`@ToolParam(description = "...")`** explains each parameter. The model reads these to fill in the arguments correctly. Spring AI turns enum types into the choices the model can pick from.
 
-## Register the Tools on the ChatClient Chain
+## Register the Tools on the ChatClient
 
-Inject `SupportTicketService` into `SupportAssistantService`:
-
-```java
-private final SupportTicketService supportTicketService;
-
-SupportAssistantService(ChatClient chatClient, VectorStore vectorStore, SupportTicketService supportTicketService) {
-    this.chatClient = chatClient;
-    this.vectorStore = vectorStore;
-    this.supportTicketService = supportTicketService;
-}
-```
-
-And add `.tools(supportTicketService)` to the chain in `generateResponse`:
-
-```java
-return chatClient.prompt()
-        .user(u -> u
-                .text("Answer the following question with a short, well-structured explanation: {question}")
-                .param("question", query))
-        .advisors(ragAdvisor)
-        .tools(supportTicketService)
-        .call()
-        .entity(SupportResponse.class);
-```
-
-Click to apply:
+Inject `SupportTicketService` into the `SupportAssistantService`:
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "private final VectorStore vectorStore;"
 before: 0
 after: 0
-description: Apply - register the tools on the ChatClient chain
+description: Inject the SupportTicketService
 cascade: true
 ```
 
@@ -118,7 +91,6 @@ hidden: true
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
       SupportAssistantService(ChatClient chatClient, VectorStore vectorStore, SupportTicketService supportTicketService) {
@@ -128,31 +100,31 @@ text: |2
       }
 ```
 
+Then register the `SupportTicketService` instance's tools on the `ChatClient`:
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: ".advisors(ragAdvisor)"
 before: 0
 after: 0
+description: 
 cascade: true
-hidden: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
               .advisors(ragAdvisor)
               .tools(supportTicketService)
 ```
 
-`.tools(Object)` registers every `@Tool`-annotated method on the bean. Spring AI handles the multi-turn dance — emit schemas → model returns tool calls → execute → feed results back → final answer — transparently.
+`.tools(Object)` registers every method on the bean that has the `@Tool` annotation. Spring AI handles all the steps for you. It sends the schemas, the model returns tool calls, Spring AI runs them, sends the results back, and the model gives the final answer. You do not need to write any of this yourself.
 
-To watch that dance in the logs, enable debug logging for Spring AI (optional):
+To see these steps in the logs, turn on debug logging for Spring AI.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/resources/application.properties
-description: Optional - enable Spring AI debug logging
+description: Enable Spring AI debug logging
 text: |
 
   logging.level.org.springframework.ai=debug
@@ -160,51 +132,29 @@ text: |
 
 ## Try It Out
 
-Restart the application:
-
-```terminal:interrupt
-session: 2
-```
-
-```terminal:execute
-command: cd ~/sample-app && ./mvnw spring-boot:run
-session: 2
-```
-
 Ask the assistant to file a ticket:
 
 ```execute
-curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Please open a ticket: Trial request for Tanzu Spring. Treat it as high priority."
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Open a high priority ticket to request a trial for VMware Tanzu Spring"
 ```
 
-You should see a response confirming the ticket was created. With debug logging enabled, the logs in the second terminal show the `createTicket` call with the model's chosen arguments.
+You should see a response that confirms the ticket was created. If you turned on debug logging, the logs in the second terminal show the `createTicket` call with the arguments the model chose.
 
-Then list the open tickets through the assistant:
+Then list the open tickets through the assistant.
+```execute
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Provide me an overview of all open support tickets"
+```
+
+The model picks `retrieveOpenTickets`, gets the rows from the database, and returns them in the response.
+
+Finally, combine this with RAG. Ask a question that needs both an answer and an action.
 
 ```execute
-curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Show me all open support tickets."
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Does VMware Tanzu Spring provide support for Spring Boot 2.7? If yes, open a ticket to request a trial"
 ```
 
-The model picks `retrieveOpenTickets`, gets the rows from the DB, and returns them as part of the response.
-
-Finally, mix it with RAG by asking something that's both informational and operational:
-
-```execute
-curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Does Tanzu Spring provide support for Spring Boot 2.7? If yes, open a ticket to request a trial of Tanzu Spring"
-```
-
-The advisor pulls the answer from the knowledge base; the tool call (if the model judges it warranted) files the ticket.
+The advisor pulls the answer from the knowledge base. If the model decides a ticket is needed, the tool call files it.
 
 ## Recap
 
-| Step | What changed |
-|------|--------------|
-| 1 | Added `spring-boot-starter-data-jdbc` + H2 driver (Postgres users reuse their pgvector datasource) |
-| 2 | Configured the H2 datasource |
-| 3 | `schema.sql` creates `support_ticket` at startup |
-| 4 | `SupportTicket` record with nested enums, `@PersistenceCreator`, and `withId(...)` |
-| 5 | `SupportTicketRepository extends ListCrudRepository<SupportTicket, Long>` |
-| 6 | `SupportTicketService` with `@Tool` / `@ToolParam` methods |
-| 7 | `.tools(supportTicketService)` on the `ChatClient` chain |
-
-Your support assistant doesn't just answer anymore — it acts: the model decides when to file or look up tickets, and Spring AI turns that decision into real method calls.
+Your support assistant does more than answer questions now. It also acts. The model decides when to file or look up tickets, and Spring AI turns that decision into real method calls.

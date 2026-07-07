@@ -1,6 +1,7 @@
 package com.example.support_assistant.mock;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
@@ -9,6 +10,8 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
 import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -18,7 +21,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -41,25 +46,7 @@ final class ChatFlows {
                     + "relevant official docs when one exists, never inventing URLs.";
 
     static void exercise(ChatModel chatModel, ChatClient.Builder chatClientBuilder, EmbeddingModel embeddingModel) throws IOException {
-
-        var vectorStore = SimpleVectorStore.builder(embeddingModel).build();
-
-        var knowledgeFiles = new PathMatchingResourcePatternResolver().getResources("classpath:knowledge-base/*.md");
-
-        var documentReaderConfig = MarkdownDocumentReaderConfig.builder()
-                        .withHorizontalRuleCreateDocument(true)
-                        .withIncludeBlockquote(true)
-                        .withIncludeCodeBlock(true)
-                        .build();
-        var documentReader = new MarkdownDocumentReader(Arrays.asList(knowledgeFiles), documentReaderConfig);
-        List<Document> documents = documentReader.read();
-
-        var tokenTextSplitter = TokenTextSplitter.builder()
-                .withMinChunkLengthToEmbed(25)
-                .build();
-        var splitDocuments = tokenTextSplitter.apply(documents);
-        vectorStore.add(splitDocuments);
-
+        // Lab 02-fundamentals
         assertNotBlank(chatModel.call("Tell me about Spring AI"));
 
         var chatClient = chatClientBuilder.build();
@@ -124,6 +111,25 @@ final class ChatFlows {
         assertNotNull(response.category(), "structured response category");
         assertNotBlank(response.answer());
 
+        // Lab 03-rag
+        var vectorStore = SimpleVectorStore.builder(embeddingModel).build();
+
+        var knowledgeFiles = new PathMatchingResourcePatternResolver().getResources("classpath:knowledge-base/*.md");
+
+        var documentReaderConfig = MarkdownDocumentReaderConfig.builder()
+                .withHorizontalRuleCreateDocument(true)
+                .withIncludeBlockquote(true)
+                .withIncludeCodeBlock(true)
+                .build();
+        var documentReader = new MarkdownDocumentReader(Arrays.asList(knowledgeFiles), documentReaderConfig);
+        List<Document> documents = documentReader.read();
+
+        var tokenTextSplitter = TokenTextSplitter.builder()
+                .withMinChunkLengthToEmbed(25)
+                .build();
+        var splitDocuments = tokenTextSplitter.apply(documents);
+        vectorStore.add(splitDocuments);
+
         var ragSearchRequest = SearchRequest.builder().topK(4).similarityThreshold(0.4).build();
         QuestionAnswerAdvisor ragAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
                 .searchRequest(ragSearchRequest)
@@ -166,6 +172,27 @@ final class ChatFlows {
             assertNotNull(response.category(), "structured response category");
             assertNotBlank(response.answer());
         }
+
+        // Lab 03-tool-calling
+        // Share a single Tools instance across the flow so a ticket created by one
+        // query is visible to the follow-up queries, mirroring the app's DB-backed
+        // SupportTicketService that persists tickets across requests.
+        var tools = new Tools();
+        for (var question : List.of(
+                "Open a high priority ticket to request a trial for VMware Tanzu Spring",
+                "Provide me an overview of all open support tickets",
+                "Does VMware Tanzu Spring provide support for Spring Boot 2.7? If yes, open a ticket to request a trial"
+        )) {
+            response = chatClientWithSystemPrompt.prompt()
+                    .user(u -> u
+                            .text("Answer the following question with a short, well-structured explanation: {question}")
+                            .param("question", question)
+                    )
+                    .advisors(ragAdvisor)
+                    .tools(tools)
+                    .call()
+                    .entity(SupportResponse.class);
+        }
     }
 
     private static void assertNotBlank(String content) {
@@ -187,4 +214,50 @@ final class ChatFlows {
             @JsonPropertyDescription("The helpful answer to the customer's question")
             String answer
     ) { }
+
+    record SupportTicket(@Nullable Long id, String summary, SupportCategory category, Priority priority,
+                         Status status, LocalDateTime createdAt) {
+
+        SupportTicket { }
+
+        SupportTicket(String summary, SupportCategory category, Priority priority) {
+            this(null, summary, category, priority, Status.OPEN, LocalDateTime.now());
+        }
+
+        SupportTicket withId(Long id) {
+            return new SupportTicket(id, summary, category, priority, status, createdAt);
+        }
+
+        enum Status {
+            OPEN, IN_PROGRESS, CLOSED
+        }
+
+        enum Priority {
+            LOW, MEDIUM, HIGH, CRITICAL
+        }
+    }
+
+    static class Tools {
+
+        private SupportTicket ticket;
+
+        @Tool(description = "Create a new support ticket. Use this when the user explicitly requests to create, open, or file a support ticket.")
+        SupportTicket createTicket(
+                @ToolParam(description = "Brief summary of the issue (max 100 chars)") String summary,
+                @ToolParam(description = "The category of the issue") SupportCategory category,
+                @ToolParam(description = "The priority of the support ticket") SupportTicket.Priority priority) {
+            ticket = new SupportTicket(1L, summary, category, priority, SupportTicket.Status.OPEN, LocalDateTime.now());
+            return ticket;
+        }
+
+        @Tool(description = "List all support tickets")
+        List<SupportTicket> retrieveTickets() {
+            return ticket == null ? Collections.emptyList() : List.of(ticket);
+        }
+
+        @Tool(description = "List all support tickets that are not yet resolved")
+        List<SupportTicket> retrieveOpenTickets() {
+            return ticket == null ? Collections.emptyList() : List.of(ticket);
+        }
+    }
 }
