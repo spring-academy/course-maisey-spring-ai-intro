@@ -45,7 +45,7 @@ text: |2
 ```
 
 {{< note >}}
-⚠️ **Security note.** This exposes `/actuator/metrics` and `/actuator/prometheus` on the application port. **Do not do this in production.** Bind actuator to a separate management port (`management.server.port`), restrict it to an internal network, and put authentication in front of it. The endpoints leak request paths, model names, and (with the flags below) prompt content — all worth protecting.
+⚠️ **Security note** This exposes `/actuator/metrics` and `/actuator/prometheus` on the application port. **Do not do this in production.** Bind actuator to a separate management port (`management.server.port`), restrict it to an internal network, and put authentication in front of it. The endpoints leak request paths, model names, and (with the flags below) prompt content — all worth protecting.
 {{< /note >}}
 
 For the Prometheus formatting, you also need the Micrometer registry as an additional dependency:

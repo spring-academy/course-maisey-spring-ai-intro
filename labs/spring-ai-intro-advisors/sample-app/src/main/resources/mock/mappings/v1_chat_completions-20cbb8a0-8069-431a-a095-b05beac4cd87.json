@@ -1,0 +1,48 @@
+{
+  "id" : "20cbb8a0-8069-431a-a095-b05beac4cd87",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\",\"role\":\"system\"},{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-DzgyiqELP9aGQMsCaFe5LsJ6TdUPx\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783595588,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"Spring AI is Spring’s project for building AI-powered applications in the Spring ecosystem. It provides a consistent, Spring-friendly abstraction over different model providers and AI capabilities so you can integrate things like chat, embeddings, image generation, and more without tying your app too tightly to a single vendor.\\n\\n### What it helps with\\n- **Chat/completions**: send prompts to LLMs and receive responses\\n- **Embeddings**: turn text into vectors for search and retrieval\\n- **Vector stores**: store and query embeddings for RAG-style apps\\n- **Prompt templates**: organize and render prompts cleanly\\n- **Tool/function calling**: let models invoke application tools\\n- **Streaming**: handle token-by-token responses where supported\\n\\n### Why use it\\n- Keeps your code aligned with Spring conventions\\n- Reduces vendor lock-in through abstractions\\n- Fits naturally into Spring Boot apps and dependency injection\\n- Makes it easier to build common AI patterns like chatbots and retrieval-augmented generation\\n\\n### Typical use cases\\n- Customer support assistants\\n- Internal knowledge search\\n- Document Q&A\\n- Content generation\\n- Workflow automation with AI tools\\n\\n### Official docs\\nYou can find the official Spring AI documentation here:  \\nhttps://docs.spring.io/spring-ai/reference/\\n\\nIf you want, I can also give you:\\n- a **quick start example**\\n- an **architecture overview**\\n- or a **comparison with LangChain / direct OpenAI API usage**\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 46,\n    \"completion_tokens\": 302,\n    \"total_tokens\": 348,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "14ms",
+      "set-cookie" : "__cf_bm=DtS5YvPiUof_C5bQpnioI6MnhvGmESloBc2gvwCJ4ws-1783595588.4594295-1.0.1.1-NLaVJ9Ropbsx8N57gPWhxxOegCqR3uJ62_9wZ2WgdFvlsaWoxKUXaL_5bCh.31pwj686FatIoB2n4kPqVmNY1BuoTZ2HyqBMCfzKXLTWw.PiICv28JrX4U5isoPlJ67n; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Thu, 09 Jul 2026 11:43:12 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_dc439cf2dc424c968557490923152f78",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a186e5cbdb65de7b-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199951",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Thu, 09 Jul 2026 11:13:12 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "3392",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "20cbb8a0-8069-431a-a095-b05beac4cd87",
+  "persistent" : true,
+  "insertionIndex" : 109
+}

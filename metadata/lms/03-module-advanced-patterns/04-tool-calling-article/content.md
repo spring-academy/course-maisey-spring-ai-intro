@@ -104,9 +104,9 @@ This produces the same kind of `ToolCallback` you'd get from an annotated method
 
 The defaults handle most applications, but a few knobs are worth knowing exist for when you need them.
 
-- **Returning a result directly.** By default every tool result goes back to the model for a final, natural-language response. Sometimes you want the raw tool output returned straight to your caller instead, skipping that extra model round-trip. Setting `returnDirect = true` on a `@Tool` does exactly that.
-- **Handling failures.** When a tool throws, Spring AI wraps it in a `ToolExecutionException`. By default the error *message* is sent back to the model so it can recover or explain the problem gracefully; you can instead make failures propagate as exceptions (`spring.ai.tools.throw-exception-on-error=true`) when you'd rather handle them in your own code.
-- **Controlling the loop yourself.** The auto-registered advisor is one of several execution strategies. For full manual control you can drive the tool-calling loop directly against a `ChatModel`, executing calls and re-prompting until there are no more, but you'll reach for that rarely.
+- **Returning a result directly** By default every tool result goes back to the model for a final, natural-language response. Sometimes you want the raw tool output returned straight to your caller instead, skipping that extra model round-trip. Setting `returnDirect = true` on a `@Tool` does exactly that.
+- **Handling failures** When a tool throws, Spring AI wraps it in a `ToolExecutionException`. By default the error *message* is sent back to the model so it can recover or explain the problem gracefully. You can instead make failures propagate as exceptions (`spring.ai.tools.throw-exception-on-error=true`) when you'd rather handle them in your own code.
+- **Controlling the loop yourself** The auto-registered advisor is one of several execution strategies. For full manual control you can drive the tool-calling loop directly against a `ChatModel`, executing calls and re-prompting until there are no more, but you'll reach for that rarely.
 
 Keep in mind the safety guidance from the foundations section. The model decides which tools to call and with what arguments, and it can be steered by the user's input, so treat a tool call as untrusted input to your own code. Validate arguments, scope what each tool is permitted to do, and use `ToolContext` (not model parameters) for anything security-sensitive.
 

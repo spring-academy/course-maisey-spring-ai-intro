@@ -2,45 +2,21 @@
 title: Getting Started
 ---
 
-# Getting Started
+In this lab you will write automated tests for the support assistant. Code that calls an LLM cannot be tested like normal code. The model rewords answers, picks different synonyms, and sometimes refuses to answer at all. Two patterns get you most of the way there.
 
-In this lab, you'll write automated tests for the support assistant. LLM-backed code can't be tested like normal code — the model rewords answers, picks synonyms, and sometimes refuses outright. Two patterns get us most of the way:
+1. **Semantic assertions** These are cheap and mostly deterministic checks. You assert on the meaning of the answer, so you look for the key concepts and not the exact text.
+2. **LLM as judge** For harder questions like "is this answer really relevant to the retrieved context?", you use a second model call to grade the output.
 
-1. **Semantic assertions** — for cheap, deterministic-ish checks, assert on meaning (key concepts, not exact text).
-2. **LLM-as-judge** — for harder questions like "is this answer actually relevant to the retrieved context?", use a separate model call to grade the output.
+Both patterns come built into Spring AI. You only wire them into a normal `@SpringBootTest`.
 
-Both come out of the box in Spring AI; you just wire them into a regular `@SpringBootTest`.
-
-Your starting point in `~/sample-app` is the full support assistant: RAG over a Markdown knowledge base, structured output, and tool calls to a ticket repository.
-
-{{< note >}}
-This lab uses **OpenAI**. The sample app also bundles the starters for Anthropic, Amazon Bedrock, and Ollama — you could switch the chat provider via Spring profiles (e.g. `SPRING_PROFILES_ACTIVE=anthropic`). The default configuration uses OpenAI.
-{{< /note >}}
+Your starting point in `~/sample-app` is the support assistant you implemented in the previous labs.
 
 ## Test Dependencies
 
-Nothing to add. The project already ships `spring-boot-starter-webmvc-test` (which pulls in JUnit 5, AssertJ, and `@SpringBootTest`) and `spring-boot-starter-actuator-test` — they were part of the project from the start. The `RelevancyEvaluator` you'll use later lives in `spring-ai-client-chat`, which the OpenAI chat starter (like the other provider starters) already brings in transitively.
+There is nothing to add. The project already ships `spring-boot-starter-webmvc-test`, which pulls in JUnit 5, AssertJ, and `@SpringBootTest`. It also ships `spring-boot-starter-actuator-test`. Both were part of the project from the start. The `RelevancyEvaluator` you will use later lives in `spring-ai-client-chat`, which the OpenAI chat starter already brings in for you. The other provider starters do the same.
 
-So: no new dependencies.
-
-## Set the API Key
-
-The tests call the real OpenAI API, so the key must be available in the terminal that runs Maven. Set your OpenAI API key (use your own or the one provided by your instructor) — paste it after the `=` and press Enter:
-
-```terminal:input
-text: export OPENAI_API_KEY=
-endl: false
-session: 2
-```
-
-## Stop the Running Application
-
-The tests use `webEnvironment = DEFINED_PORT`, which starts the application context on its real port (8080). If the app from a previous lab is still running there, the tests can't start — stop it first:
-
-```terminal:interrupt
-session: 2
-```
+So you do not need to add any new dependencies.
 
 ## Summary
 
-Everything you need for testing is already on the classpath, your API key is set, and port 8080 is free. Next: a first test that checks response quality without depending on exact wording.
+Everything you need for testing is already on the classpath. In the next step you will write a first test that checks response quality without depending on the exact wording.

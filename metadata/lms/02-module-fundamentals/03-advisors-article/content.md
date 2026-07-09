@@ -1,5 +1,3 @@
-## Cross-Cutting Behavior Around a Call
-
 So far you've used the `ChatClient` to send a prompt and shape the response, and you've configured shared defaults like a system prompt on the client itself. Real applications need more than that. They need behavior that runs *around* every call, no matter what the prompt is. Think of logging each request and response, keeping conversation history, blocking unwanted content, or retrieving documents to ground an answer. You don't want to scatter that logic through every service method.
 
 Spring AI solves this with **advisors**. An advisor is the extension point that lets you add such cross-cutting behavior once and apply it to every call a `ChatClient` makes, while your prompting code stays the same fluent chain you already know.
@@ -24,10 +22,10 @@ ChatClientResponse adviseCall(ChatClientRequest request, CallAdvisorChain chain)
 
 A few properties are worth understanding, because they explain how advisors behave when you combine them.
 
-- **Name.** Each advisor returns a unique name from `getName()`. It identifies the advisor in the chain, so it shows up in logs and lets you refer to a specific advisor when you need to.
-- **Order.** Each advisor reports a priority via `getOrder()`, the method it inherits from Spring's `Ordered` interface. A lower value runs first on the way *in*, and on the way *out* the order reverses, just like nested method calls. So an advisor that adds context before the model also gets the first look at the response.
-- **Blocking and reactive.** The same advisor can implement the blocking `.call()` path (`CallAdvisor`) and the reactive `.stream()` path (`StreamAdvisor`), so cross-cutting behavior works whether you wait for the whole answer or stream it.
-- **Shared context.** A context map travels with the request through the whole chain. This is how you pass per-request parameters to an advisor at call time, for example telling a memory advisor which conversation this is.
+- **Name** Each advisor returns a unique name from `getName()`. It identifies the advisor in the chain, so it shows up in logs and lets you refer to a specific advisor when you need to.
+- **Order** Each advisor reports a priority via `getOrder()`, the method it inherits from Spring's `Ordered` interface. A lower value runs first on the way *in*, and on the way *out* the order reverses, just like nested method calls. So an advisor that adds context before the model also gets the first look at the response.
+- **Blocking and reactive** The same advisor can implement the blocking `.call()` path (`CallAdvisor`) and the reactive `.stream()` path (`StreamAdvisor`), so cross-cutting behavior works whether you wait for the whole answer or stream it.
+- **Shared context** A context map travels with the request through the whole chain. This is how you pass per-request parameters to an advisor at call time, for example telling a memory advisor which conversation this is.
 
 The order is a plain `int`, and `Ordered` names the two extremes for you.
 
@@ -51,18 +49,16 @@ You register advisors in one of two places. Either on a `ChatClient` instance as
 
 ```java
 ChatClient chatClient = builder
-    .defaultAdvisors(
-        MessageChatMemoryAdvisor.builder(chatMemory).build(),  // conversation memory
-        new SimpleLoggerAdvisor())                             // logging
+    .defaultAdvisors(new SimpleLoggerAdvisor())  // logging on every call
     .build();
 ```
 
-Or you attach and parameterize them **per request**, which is also how you feed values into that shared context map.
+Or you attach them **per request**, when a single call needs behavior the client's defaults don't include. This is also where you feed values into that shared context map, by passing a parameter to the advisor at call time.
 
 ```java
 String answer = chatClient.prompt()
     .user("How do I reset my password?")
-    .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "user-42"))
+    .advisors(new SimpleLoggerAdvisor())
     .call()
     .content();
 ```
@@ -72,6 +68,38 @@ String answer = chatClient.prompt()
 Spring AI ships a set of built-in advisors for exactly these recurring patterns. The **chat-memory advisors** maintain conversation history, a **`SafeGuardAdvisor`** blocks unwanted content, a **`SimpleLoggerAdvisor`** logs the request and response, the **`ToolCallingAdvisor`** runs the tool-calling loop, and the **RAG advisors** ground answers in your own documents. You'll meet the tool-calling and RAG advisors in the advanced patterns module.
 
 The beauty of the pattern is that adding any of these is a configuration change on the `ChatClient`, while your prompting code stays the same fluent chain. And when none of the built-in advisors fits, you write your own by implementing `CallAdvisor` (and `StreamAdvisor` for streaming), exactly as the logging example above showed.
+
+## The Chat Memory Advisor
+
+A language model has no memory of its own. Each call is stateless, so on its own the model cannot remember what the user said a moment ago. The chat-memory advisor fills that gap. It stores the messages of a conversation and replays them on the next call, so the model sees the earlier turns and can answer a follow-up question in context.
+
+Spring AI offers two variants. The **`MessageChatMemoryAdvisor`** retrieves the past messages and adds them to the prompt as real message objects, keeping the original user and assistant roles. The **`VectorStoreChatMemoryAdvisor`** stores the history in a `VectorStore` and pulls back only the most relevant pieces as text, which suits very long conversations where replaying everything would be wasteful. For most applications the message variant is the right default.
+
+Both advisors delegate the actual storage to a **`ChatMemory`**. The default implementation is **`MessageWindowChatMemory`**, a sliding window that keeps the most recent messages up to a limit (20 by default) and drops the oldest whole turns once the window is full. You build one and hand it to the advisor.
+
+```java
+ChatMemory chatMemory = MessageWindowChatMemory.builder()
+    .maxMessages(20)
+    .build();
+
+ChatClient chatClient = builder
+    .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+    .build();
+```
+
+Where those messages actually live is the job of a separate **`ChatMemoryRepository`**. Out of the box you get an **`InMemoryChatMemoryRepository`**, which keeps everything in a map and loses it on restart, fine for a demo. For real deployments Spring AI ships repositories backed by JDBC, Cassandra, Neo4j, MongoDB, and Redis, each added as a starter dependency and auto-configured. Swapping the store is a configuration change, the advisor and your prompting code stay the same.
+
+The one thing the advisor needs from you at call time is a **conversation id**, so it knows which conversation to load and append to. You pass it as a per-request parameter through the shared context, using the `ChatMemory.CONVERSATION_ID` key.
+
+```java
+String answer = chatClient.prompt()
+    .user("And what about the second one?")
+    .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "user-42"))
+    .call()
+    .content();
+```
+
+This id is required. If you leave it out the advisor throws at runtime, because it has no way to tell one user's conversation from another. In practice you derive it from something stable like the user or session, so each user keeps a separate history. You can read more in the [Chat Memory reference](https://docs.spring.io/spring-ai/reference/api/chat-memory.html).
 
 ## Recursive Advisors
 

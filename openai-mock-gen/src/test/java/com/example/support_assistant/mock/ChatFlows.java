@@ -5,22 +5,23 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.evaluation.RelevancyEvaluator;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.evaluation.EvaluationRequest;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
 import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * The chat flows the workshop relies on, exercised both when recording fixtures
@@ -201,9 +203,6 @@ final class ChatFlows {
         }
 
         // Lab 03-tool-calling
-        // Share a single Tools instance across the flow so a ticket created by one
-        // query is visible to the follow-up queries, mirroring the app's DB-backed
-        // SupportTicketService that persists tickets across requests.
         var tools = new Tools();
         for (var question : List.of(
                 "Open a high priority ticket to request a trial for VMware Tanzu Spring",
@@ -220,6 +219,27 @@ final class ChatFlows {
                     .call()
                     .entity(SupportResponse.class);
         }
+
+        // Lab 04-testing
+        var question = "What are the key features of VMware Tanzu Spring?";
+        var chatResponse = chatClientWithSystemPrompt.prompt()
+                .user(question)
+                .advisors(QuestionAnswerAdvisor.builder(vectorStore).build())
+                .call()
+                .chatResponse();
+
+        var evaluationRequest = new EvaluationRequest(
+                question,
+                chatResponse.getMetadata().get(QuestionAnswerAdvisor.RETRIEVED_DOCUMENTS),
+                chatResponse.getResult().getOutput().getText()
+        );
+        var evaluatorChatClientBuilder = chatClientBuilder.defaultOptions(ChatOptions.builder().model("gpt-5.4-nano"));
+        var evaluator = new RelevancyEvaluator(evaluatorChatClientBuilder);
+        var evaluationResponse = evaluator.evaluate(evaluationRequest);
+
+        assertThat(evaluationResponse.isPass())
+                .as("RAG response should be relevant to the retrieved context")
+                .isTrue();
     }
 
     private static void assertNotBlank(String content) {

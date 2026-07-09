@@ -1,0 +1,48 @@
+{
+  "id" : "c62cdc26-6ba7-40cc-af0a-0c60e07982f9",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 1)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-Dzgyu3A2wcPXzrwHc6YCek9aiFkKe\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783595600,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"Spring AI is a Spring ecosystem project that makes it easier to build AI-powered applications in Java.\\n\\n### What it does\\nIt provides a consistent, Spring-style abstraction over AI services such as:\\n- **Large language models (LLMs)**\\n- **Chat and completion APIs**\\n- **Embeddings**\\n- **Vector stores**\\n- **Prompt management**\\n- **Tool/function calling**\\n\\n### Why it’s useful\\nInstead of writing provider-specific code for OpenAI, Anthropic, Azure OpenAI, or others, Spring AI lets you work with a more unified API. That means:\\n- easier integration into Spring Boot apps\\n- cleaner configuration\\n- simpler switching between AI providers\\n\\n### Common use cases\\n- chatbots and assistants\\n- retrieval-augmented generation (RAG)\\n- semantic search\\n- document Q&A\\n- AI-powered business workflows\\n\\n### In short\\nSpring AI helps Java developers add AI capabilities to Spring applications in a structured, production-friendly way.\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 24,\n    \"completion_tokens\": 197,\n    \"total_tokens\": 221,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "7ms",
+      "set-cookie" : "__cf_bm=H7RCuw4APTFkWixHBN9AeLZ.LTQJuVpHa0g3hlvX.Sg-1783595599.644317-1.0.1.1-I5fh7WzqmBm93mjkOv7gmTPog28DeQRgy37Wa4rmglNDlhpQh1B.x9gDRvVUwEe_O3mThkHXc6IknCRd7FPkcjnGqkKJhjo3Ys6.wurgyNJAp7.VxrC7DXegfSuGp5E7; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Thu, 09 Jul 2026 11:43:22 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_a585de0d9991413eb019e496f3285a24",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a186e611c9c98909-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199974",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Thu, 09 Jul 2026 11:13:22 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "2086",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "c62cdc26-6ba7-40cc-af0a-0c60e07982f9",
+  "persistent" : true,
+  "insertionIndex" : 106
+}

@@ -18,8 +18,8 @@ All of these are composition patterns, not products. Pick the simplest one that 
 
 An autonomous agent is only as capable as the tools it can reach, so the natural move is to give it more: your tools, plus several MCP servers' worth of others. But there's a wall you hit fast. The conventional approach sends *every* tool definition to the model on *every* request, and that creates two problems:
 
-1. **Token bloat.** A multi-server setup with 50+ tools burns a large amount of context before the user has said anything. The measured cost is real, for a 28-tool setup, tool definitions alone consume roughly 5,400 tokens on Gemini, 7,200 on OpenAI, and 17,300 on Anthropic, every single request.
-2. **Accuracy degradation.** When a model faces 30+ similarly-named tools, it picks the wrong one more often. More tools can make an agent *worse*.
+1. **Token bloat** A multi-server setup with 50+ tools burns a large amount of context before the user has said anything. The measured cost is real, for a 28-tool setup, tool definitions alone consume roughly 5,400 tokens on Gemini, 7,200 on OpenAI, and 17,300 on Anthropic, every single request.
+2. **Accuracy degradation** When a model faces 30+ similarly-named tools, it picks the wrong one more often. More tools can make an agent *worse*.
 
 Spring AI's answer, now part of the official release, is the **Tool Search Tool**: instead of loading all tools upfront, the agent *discovers them on demand*. The idea is simple and clever, you give the model one tool, a search tool, and let it look up the others when it needs them.
 

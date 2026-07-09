@@ -2,7 +2,7 @@
 title: Basic Response Quality Test
 ---
 
-Start with the simplest possible check: did the model respond at all, and does the response mention the things you'd expect for the question? Asserting on *exact strings* is brittle — a paraphrase will flip the test red even when the answer is fine. Assert on **concepts** instead.
+Start with the simplest possible check: did the model respond at all, and does the response mention the things you'd expect for the question? Asserting on *exact strings* is brittle, a paraphrase will flip the test red even when the answer is fine. Assert on **concepts** instead.
 
 ## Create the Test
 
@@ -30,7 +30,7 @@ text: |
       @Test
       void responseIsNotEmpty() {
           String response = chatClient.prompt()
-                  .user("What is Spring Boot?")
+                  .user("Tell me about Spring AI")
                   .call()
                   .content();
 
@@ -42,16 +42,16 @@ text: |
       @Test
       void responseContainsRelevantConcepts() {
           String response = chatClient.prompt()
-                  .user("What is Spring Boot?")
+                  .user("Tell me about Spring AI")
                   .call()
                   .content();
 
           assertThat(response.toLowerCase())
                   .satisfiesAnyOf(
-                          r -> assertThat(r).contains("framework"),
+                          r -> assertThat(r).contains("spring"),
                           r -> assertThat(r).contains("java"),
-                          r -> assertThat(r).contains("application"),
-                          r -> assertThat(r).contains("spring")
+                          r -> assertThat(r).contains("ai"),
+                          r -> assertThat(r).contains("abstraction")
                   );
       }
   }
@@ -59,8 +59,8 @@ text: |
 
 Two patterns to notice:
 
-- **`isNotNull().isNotBlank()`** — the smoke test. Catches outright API failures and empty responses.
-- **`satisfiesAnyOf(...)`** — the semantic assertion. The test passes as long as *at least one* of the expected concepts appears. Any decent answer to "What is Spring Boot?" mentions at least one of framework / java / application / spring, regardless of exact wording.
+- **`isNotNull().isNotBlank()`** Catches outright API failures and empty responses.
+- **`satisfiesAnyOf(...)`** The test passes as long as *at least one* of the expected concepts appears. Any decent answer to "Tell me about Spring AI" mentions at least one of spring / java / ai / abstraction, regardless of exact wording.
 
 ## Run It
 
@@ -71,12 +71,6 @@ session: 2
 
 Wait for `BUILD SUCCESS` — both tests should pass.
 
-{{< note >}}
-Each test hits the real OpenAI API and burns tokens. Cheap, but it's still cost — pin the cheapest model in a test profile (`spring.ai.openai.chat.model=...`) if you want to keep bills predictable. The same applies to Anthropic and Amazon Bedrock. With **Ollama** there's no cost since the model runs locally, but the tests are slower.
-{{< /note >}}
-
-These tests don't touch the database or the vector store, so the same code passes regardless of whether you're on the in-memory `SimpleVectorStore` (default) or the commented-out PostgreSQL/pgvector setup.
-
 ## Summary
 
-You've written a smoke test and a semantic assertion that survive paraphrasing. Next: the harder question — is a RAG answer actually grounded in the retrieved documents?
+You've written a smoke test and a semantic assertion that survive paraphrasing. In the next step you will look at the harder question of whether a RAG answer is actually grounded in the retrieved documents.

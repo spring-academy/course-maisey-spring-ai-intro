@@ -1,8 +1,9 @@
 package com.example.support_assistant;
 
-import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
 import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
@@ -29,13 +30,21 @@ class KnowledgeBaseIndexer {
         this.vectorStore = vectorStore;
     }
 
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     public void index() {
-        var config = MarkdownDocumentReaderConfig.builder().build();
-        var documentReader = new MarkdownDocumentReader(Arrays.asList(knowledgeFiles), config);
-        var tokenTextSplitter = TokenTextSplitter.builder().build();
-        List<Document> documents = tokenTextSplitter.apply(documentReader.get());
-        vectorStore.add(documents);
-        log.info("Loaded {} document chunks into vector store", documents.size());
+        var documentReaderConfig = MarkdownDocumentReaderConfig.builder()
+                .withHorizontalRuleCreateDocument(true)
+                .withIncludeBlockquote(true)
+                .withIncludeCodeBlock(true)
+                .build();
+        var documentReader = new MarkdownDocumentReader(Arrays.asList(knowledgeFiles), documentReaderConfig);
+        List<Document> documents = documentReader.read();
+
+        var tokenTextSplitter = TokenTextSplitter.builder()
+                .withMinChunkLengthToEmbed(25)
+                .build();
+        var splitDocuments = tokenTextSplitter.apply(documents);
+        vectorStore.add(splitDocuments);
+        log.info("Loaded {} document chunks into vector store", splitDocuments.size());
     }
 }
