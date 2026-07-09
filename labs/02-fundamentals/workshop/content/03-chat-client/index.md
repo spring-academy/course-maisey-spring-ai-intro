@@ -114,60 +114,65 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 Models generate text token by token. Swap `.call()` for `.stream()` to get a reactive `Flux<String>` and stream tokens to the client as soon as they arrive. This is what powers the "typewriter" effect in chatbots.
 
-Add a streaming method to the service:
+To keep this focused, we add the whole streaming call as a throwaway endpoint directly in the controller and remove it again at the end of this section. The rest of the lab stays on the blocking `.call()`. Inject the `ChatClient` into the controller so the streaming method can use it directly.
+
 ```editor:select-matching-text
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-text: "String generateResponse(String query) {"
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
+text: "import org.springframework.web.bind.annotation.RestController;"
 before: 0
-after: 5
-description: Add streamResponse to the service
+after: 0
+description: Inject the ChatClient into the controller
 cascade: true
 ```
 
 ```editor:replace-text-selection
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
+hidden: true
 cascade: true
-hidden: true
-text: |2
-      String generateResponse(String query) {
-          return chatClient.prompt()
-                  .user(query)
-                  .call()
-                  .content();
-      }
-
-      Flux<String> streamResponse(String query) {
-          return chatClient.prompt()
-                  .user(query)
-                  .stream()
-                  .content();
-      }
-```
-
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-line: 7
-hidden: true
-text: |-
+text: |
+  import org.springframework.web.bind.annotation.RestController;
+  import org.springframework.ai.chat.client.ChatClient;
+  import org.springframework.http.MediaType;
   import reactor.core.publisher.Flux;
 ```
 
-And a streaming endpoint to the controller, producing Server-Sent Events (SSE):
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
-text: '@GetMapping(path = "/api/v{version}/chat")'
+text: "private final SupportAssistantService service;"
 before: 0
-after: 3
-description: Add streaming endpoint to the controller
+after: 4
+description: Inject the ChatClient into the controller
+hidden: true
 cascade: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
-cascade: true
 hidden: true
 text: |2
-      @GetMapping(path = "/api/v{version}/chat")
+      private final SupportAssistantService service;
+      private final ChatClient chatClient;
+
+      SupportAssistantController(SupportAssistantService service, ChatClient chatClient) {
+          this.service = service;
+          this.chatClient = chatClient;
+      }
+```
+
+Now add the streaming endpoint, producing Server-Sent Events (SSE):
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
+text: "String chat(@RequestParam String query) {"
+before: 0
+after: 2
+description: Add the streaming endpoint
+cascade: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
+hidden: true
+text: |2
       String chat(@RequestParam String query) {
           return service.generateResponse(query);
       }
@@ -175,17 +180,11 @@ text: |2
       @GetMapping(path = "/api/v{version}/chat/stream",
                   produces = MediaType.TEXT_EVENT_STREAM_VALUE)
       Flux<String> chatStream(@RequestParam String query) {
-          return service.streamResponse(query);
+          return chatClient.prompt()
+                  .user(query)
+                  .stream()
+                  .content();
       }
-```
-
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
-line: 4
-hidden: true
-text: |-
-  import org.springframework.http.MediaType;
-  import reactor.core.publisher.Flux;
 ```
 
 Try it with `curl -N` (no buffering) to see the typewriter effect:
@@ -194,6 +193,64 @@ curl -N -G "http://localhost:8080/api/v1/chat/stream" --data-urlencode "query=Te
 ```
 
 Notice the `data:` prefix of the SSE protocol on each chunk.
+
+Now that you have seen streaming work, remove the throwaway endpoint again so the controller stays simple for the rest of the lab. This drops the streaming method, the injected `ChatClient`, and the extra imports.
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
+text: "String chat(@RequestParam String query) {"
+before: 0
+after: 11
+description: Remove the streaming endpoint
+cascade: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
+cascade: true
+hidden: true
+text: |2
+      String chat(@RequestParam String query) {
+          return service.generateResponse(query);
+      }
+```
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
+text: "private final SupportAssistantService service;"
+before: 0
+after: 6
+cascade: true
+hidden: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
+cascade: true
+hidden: true
+text: |2
+      private final SupportAssistantService service;
+
+      SupportAssistantController(SupportAssistantService service) {
+          this.service = service;
+      }
+```
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
+text: "import org.springframework.web.bind.annotation.RestController;"
+before: 0
+after: 3
+hidden: true
+cascade: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
+hidden: true
+text: |
+  import org.springframework.web.bind.annotation.RestController;
+```
 
 ## Inline User Template
 
@@ -219,6 +276,11 @@ text: |2
                   .call()
                   .content();
       }
+```
+
+Verify the change took effect by calling the service:
+```execute
+curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
 ```
 
 ## Inline System Prompt
@@ -408,6 +470,6 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 ## Summary
 
-You've switched to the fluent `ChatClient`, a configured bean with shared defaults (`defaultSystem`), inline user/system prompts, blocking and streaming calls, and access to the full `ChatResponse`.
+You've switched to the fluent `ChatClient`, a configured bean with shared defaults (`defaultSystem`), inline user/system prompts, a quick look at streaming, and access to the full `ChatResponse`.
 
 One more feature to go, the structured output parsing.

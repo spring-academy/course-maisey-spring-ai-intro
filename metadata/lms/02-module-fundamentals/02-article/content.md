@@ -244,4 +244,4 @@ The `.entity(...)` method isn't limited to flat records. It handles nested types
 
 ## What's Next
 
-You now have the core mental model: models are REST APIs, `ChatModel` is the portable contract over them, `ChatClient` is the fluent, batteries-included API you'll reach for in everyday application code, and structured output turns model responses into type-safe domain objects. In the next section it's time to put it into practice in a hands-on lab.
+You now have the core mental model: models are REST APIs, `ChatModel` is the portable contract over them, `ChatClient` is the fluent, batteries-included API you'll reach for in everyday application code, and structured output turns model responses into type-safe domain objects. In the next section you'll meet the **advisor**, the mechanism Spring AI uses to add cross-cutting behavior around every call.

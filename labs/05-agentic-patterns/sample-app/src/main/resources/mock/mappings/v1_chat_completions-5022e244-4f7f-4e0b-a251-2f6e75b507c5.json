@@ -1,0 +1,48 @@
+{
+  "id" : "5022e244-4f7f-4e0b-a251-2f6e75b507c5",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-DzdSS5lg1163Ah3z6dtALFNQZs1uR\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783582056,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"Spring AI is Spring’s project for building AI-powered applications in a familiar Spring style. It gives you abstractions for working with chat models, embeddings, vector stores, function calling, and prompt management so you can integrate LLMs and other AI services into Spring Boot apps more cleanly.\\n\\nTypical uses include:\\n- chat and completion workflows\\n- retrieval-augmented generation (RAG)\\n- text embeddings and semantic search\\n- tool/function calling\\n- connecting to different AI providers through a consistent API\\n\\nIf you already know Spring, it helps you add AI features without wiring everything manually.\\n\\nOfficial docs: https://docs.spring.io/spring-ai/reference/\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 59,\n    \"completion_tokens\": 134,\n    \"total_tokens\": 193,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "20ms",
+      "set-cookie" : "__cf_bm=OMSuKEXeNImbxxxP5540wvTfEv18unJmkZckewQ3Krk-1783582056.6079354-1.0.1.1-n8eMROzM4rnuj.zmsWl5oqWtAu4Dbu6Won801FilYqVqq_NGGT_PPZujPtE3bW3lDOyX6LlNARkG5Rg6F_nBuBVC2qPoUFYuP.SRz303CmLbF4fuAewN7MzUZgVQ4S1E; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Thu, 09 Jul 2026 07:57:38 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_705ea119ffaf4bb192c847c7f0a62ad8",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a1859b6dcaeae0dd-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199933",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Thu, 09 Jul 2026 07:27:38 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "1678",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "5022e244-4f7f-4e0b-a251-2f6e75b507c5",
+  "persistent" : true,
+  "insertionIndex" : 108
+}

@@ -9,6 +9,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 @Component
 class MockOpenAiServer implements SmartLifecycle {
 
+
     private final WireMockServer server;
 
     MockOpenAiServer() {

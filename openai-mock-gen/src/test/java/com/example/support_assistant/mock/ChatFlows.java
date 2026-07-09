@@ -3,7 +3,10 @@ package com.example.support_assistant.mock;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -77,6 +80,13 @@ final class ChatFlows {
         assertNotNull(chunks, "streamed content");
         assertFalse(chunks.isEmpty(), "streamed content");
 
+        assertNotBlank(chatClient.prompt()
+                .user(u -> u
+                        .text("Answer the following question with a short, well-structured explanation: {question}")
+                        .param("question", "Tell me about Spring AI"))
+                .call()
+                .content());
+
         var systemPrompt = new ClassPathResource("/prompts/system-prompt.st");
         var chatClientWithSystemPrompt = chatClientBuilder.defaultSystem(systemPrompt).build();
 
@@ -101,15 +111,32 @@ final class ChatFlows {
         assertNotNull(jsonStringResponse, "json content");
         assertTrue(jsonStringResponse.contains("category") && jsonStringResponse.contains("answer"), "json content contains relevant attributes");
 
-        SupportResponse response = chatClientWithSystemPrompt.prompt()
+        var chatMemory = MessageWindowChatMemory.builder().build();
+        var memoryClient = chatClientWithSystemPrompt.mutate()
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+                .build();
+        var conversationId = "123e4567-e89b-12d3-a456-426614174000";
+
+        SupportResponse response = memoryClient.prompt()
                 .user(u -> u
                         .text("Answer the following question with a short, well-structured explanation: {question}")
                         .param("question", "Tell me about Spring AI"))
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
                 .call()
                 .entity(SupportResponse.class);
         assertNotNull(response, "structured response");
         assertNotNull(response.category(), "structured response category");
         assertNotBlank(response.answer());
+        
+        SupportResponse followUp = memoryClient.prompt()
+                .user(u -> u
+                        .text("Answer the following question with a short, well-structured explanation: {question}")
+                        .param("question", "What did I just ask you about?"))
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+                .call()
+                .entity(SupportResponse.class);
+        assertNotNull(followUp, "memory follow-up response");
+        assertNotBlank(followUp.answer());
 
         // Lab 03-rag
         var vectorStore = SimpleVectorStore.builder(embeddingModel).build();

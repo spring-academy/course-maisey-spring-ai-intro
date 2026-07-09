@@ -150,6 +150,8 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 }
 ```
 
-# Recap
+## Recap
 
-You now have the core mental model in practice.`ChatModel` is the portable contract over provider REST APIs, and `ChatClient` is the fluent, batteries-included API you'll reach for in everyday application code.
+You now have the core mental model in practice. `ChatModel` is the portable contract over provider REST APIs, and `ChatClient` is the fluent, batteries-included API you'll reach for in everyday application code.
+
+One more building block to go, the advisor, which lets you add behavior around every call.

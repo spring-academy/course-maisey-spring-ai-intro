@@ -1,0 +1,17 @@
+{
+    "id": "spring-maisey-fundamentals-module-lab",
+    "slug": "spring-ai-fundamentals-lab",
+    "title": "Lab - Spring AI Fundamentals: ChatModel and ChatClient",
+    "status": "live",
+    "type": "lab",
+    "entitlements": [
+        "auth"
+    ],
+    "duration": 30,
+    "order": 4,
+    "instructors": [],
+    "settings": {
+        "educates": "spring-maisey-fundamentals",
+        "manualCompletion": true
+    }
+}

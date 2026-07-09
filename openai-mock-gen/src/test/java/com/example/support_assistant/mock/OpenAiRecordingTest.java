@@ -67,6 +67,12 @@ class OpenAiRecordingTest {
         recordingServer.startRecording(recordSpec()
                 .forTarget(OPENAI_TARGET)
                 .matchRequestBodyWithEqualToJson(true, true)
+                // Collapse repeated identical requests (e.g. a query embedded once per RAG loop, or
+                // a chat request issued at several lab steps) into a single reusable stub. Without
+                // this WireMock chains the duplicates into scenario states, which only replay in the
+                // exact recorded order/count. The workshop replays each request standalone, so a
+                // scenario stub sitting at a non-Started state returns 404.
+                .ignoreRepeatRequests()
                 .transformers(StripVolatileFieldsTransformer.NAME)
                 .build());
     }

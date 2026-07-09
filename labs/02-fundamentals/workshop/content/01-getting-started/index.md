@@ -2,7 +2,7 @@
 title: Getting Started
 ---
 
-In this lab you will start building a **support assistant** that answers customer questions through a REST API. You will begin with the low-level `ChatModel` API, move on to the fluent `ChatClient`, add streaming, and finish with structured output.
+In this lab you will start building a **support assistant** that answers customer questions through a REST API. You will begin with the low-level `ChatModel` API, move on to the fluent `ChatClient`, and finish with structured output.
 
 ## Scaffold the Application
 

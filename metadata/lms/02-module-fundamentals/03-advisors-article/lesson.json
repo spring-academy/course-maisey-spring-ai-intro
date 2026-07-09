@@ -1,0 +1,13 @@
+{
+    "id": "spring-maisey-fundamentals-module-advisors-article",
+    "slug": "spring-ai-advisors-article",
+    "title": "Spring AI Fundamentals: The Advisor Concept",
+    "status": "live",
+    "type": "article",
+    "duration": 20,
+    "order": 3,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

@@ -98,61 +98,11 @@ You run this once, and again whenever your documents change, to populate the sto
 
 You now have all the pieces of retrieval, augment, and generation. Embed the question, search the vector store, attach the results to the prompt, call the model. You *could* wire those steps together by hand, but Spring AI handles this based on the **advisors** concept.
 
-## The Advisor Concept
+## RAG as an Advisor
 
-Interceptors are an essential part that enables programmers to control the execution by intercepting it. Spring also supports a variety of interceptors for different purposes, such as the `HandlerInterceptor` or `ClientHttpRequestInterceptor`.
-If you've used on of those, advisors will feel familiar. 
+You met the **advisor** concept in the fundamentals module. Recall that an advisor is an interceptor that wraps a `ChatClient` call, acting *before* the request reaches the model and *after* the response comes back, with several advisors forming a chain. Adding one is a configuration change on the `ChatClient`, while your prompting code stays the same fluent chain.
 
-An advisor is an **interceptor that wraps a `ChatClient` call**, with a chance to act both *before* the request reaches the model and *after* the response comes back. Several advisors form a **chain**, and a request passes through all of them on the way in, hits the model, and passes back through them on the way out. This is the classic "around" pattern. Each advisor can inspect and modify the request, decide whether to proceed, and then inspect and modify the response.
-
-Concretely, the framework wraps your `Prompt` in a **`ChatClientRequest`** (the request plus a shared context map) and hands it to the first advisor. Each advisor does its *before* work, then calls the chain to invoke the next advisor, and the last one calls the model. The model's answer travels back as a **`ChatClientResponse`**, and each advisor gets to do its *after* work as it unwinds. A logging advisor captures the shape nicely, logging on the way in, delegating to the rest of the chain, and logging on the way out.
-
-```java
-ChatClientResponse adviseCall(ChatClientRequest request, CallAdvisorChain chain) {
-    logRequest(request);                                 // before
-    ChatClientResponse response = chain.nextCall(request); // delegate down the chain → model
-    logResponse(response);                               // after
-    return response;
-}
-```
-
-A few properties are worth understanding, because they explain how advisors behave when you combine them.
-
-- **Name.** Each advisor returns a unique name from `getName()`. It identifies the advisor in the chain, so it shows up in logs and lets you refer to a specific advisor when you need to.
-- **Order.** Each advisor reports a priority via `getOrder()` (lower runs first). On the way *in*, advisors run lowest-order first, on the way *out*, the order reverses, just like nested method calls. So an advisor that adds context before the model also gets the first look at the response.
-- **Blocking and reactive.** The same advisor can implement the blocking `.call()` path (`CallAdvisor`) and the reactive `.stream()` path (`StreamAdvisor`), so cross-cutting behavior works whether you wait for the whole answer or stream it.
-- **Shared context.** A context map travels with the request through the whole chain. This is how you pass per-request parameters to an advisor at call time, for example telling a memory advisor which conversation this is.
-
-You read and write that shared context through the `context()` map on the request. Because the request is immutable, you produce an updated copy with your entry added rather than mutating it in place.
-
-```java
-Object conversationId = request.context().get("conversationId"); // read
-ChatClientRequest updated = request.mutate()
-    .context("retrievedAt", Instant.now())                       // write
-    .build();
-```
-
-You register advisors in one of two places. Either on a `ChatClient` instance as defaults, applied to every call made through that client.
-
-```java
-ChatClient chatClient = builder
-    .defaultAdvisors(
-        MessageChatMemoryAdvisor.builder(chatMemory).build(),  // conversation memory
-        QuestionAnswerAdvisor.builder(vectorStore).build())    // RAG
-    .build();
-```
-
-Or you attach and parameterize them **per request**, which is also how you feed values into that shared context map.
-
-```java
-String answer = chatClient.prompt()
-    .user("How do I reset my password?")
-    .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "user-42"))
-    .call()
-    .content();
-```
-
-Spring AI ships a set of built-in advisors for exactly these recurring patterns. The **chat-memory advisors** that maintain conversation history, the **`ToolCallingAdvisor`** that runs the tool-calling loop (you'll meet it in the next section), a **`SafeGuardAdvisor`** that blocks unwanted content, a logging advisor, and, most relevant here, the RAG advisors. The beauty of the pattern is that adding any of these is a configuration change on the `ChatClient`, while your prompting code stays the same fluent chain. RAG is just one more advisor in the chain.
+RAG is just one more advisor in that chain. A RAG advisor retrieves matching documents from the vector store and injects them into the prompt as context, so the call proceeds to the model grounded in your own data. Spring AI ships two such advisors, a simple one and a modular one.
 
 ## Bringing It Together with the `QuestionAnswerAdvisor`
 
