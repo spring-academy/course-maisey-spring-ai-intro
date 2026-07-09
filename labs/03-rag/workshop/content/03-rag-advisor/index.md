@@ -47,9 +47,9 @@ text: |2
 Configure and add the QuestionAnswerAdvisor to the ChatClient interaction:
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-text: "SupportResponse generateResponse(String query) {"
+text: "SupportResponse generateResponse(String query, String conversationId) {"
 before: 0
-after: 7
+after: 8
 cascade: true
 description: Configure and add the QuestionAnswerAdvisor 
 ```
@@ -59,7 +59,7 @@ file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantS
 cascade: true
 hidden: true
 text: |2
-      SupportResponse generateResponse(String query) {
+      SupportResponse generateResponse(String query, String conversationId) {
           var ragSearchRequest = SearchRequest.builder().topK(4).similarityThreshold(0.4).build();
           var ragAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
                   .searchRequest(ragSearchRequest)
@@ -70,6 +70,7 @@ text: |2
                           .text("Answer the following question with a short, well-structured explanation: {question}")
                           .param("question", query))
                   .advisors(ragAdvisor)
+                  .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
                   .call()
                   .entity(SupportResponse.class);
       }
@@ -156,9 +157,9 @@ text: |2
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-text: "SupportResponse generateResponse(String query) {"
+text: "SupportResponse generateResponse(String query, String conversationId) {"
 before: 0
-after: 13
+after: 14
 cascade: true
 hidden: true
 ```
@@ -168,7 +169,7 @@ file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantS
 cascade: true
 hidden: true
 text: |2
-      SupportResponse generateResponse(String query) {
+      SupportResponse generateResponse(String query, String conversationId) {
           var ragSearchRequest = SearchRequest.builder().topK(4).similarityThreshold(0.4).build();
           var promptTemplate = PromptTemplate.builder().resource(ragPromptResource).build();
           var ragAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
@@ -181,6 +182,7 @@ text: |2
                           .text("Answer the following question with a short, well-structured explanation: {question}")
                           .param("question", query))
                   .advisors(ragAdvisor)
+                  .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
                   .call()
                   .entity(SupportResponse.class);
       }
