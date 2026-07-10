@@ -1,0 +1,48 @@
+{
+  "id" : "5d890178-d6ae-4dc9-9cb5-6912ae5ba21d",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about Spring AI\\nYour response should be in JSON format.\\nDo not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.\\nDo not include markdown code blocks in your response.\\nRemove the ```json markdown from the output.\\nHere is the JSON Schema instance your output must adhere to:\\n```{\\n  \\\"$schema\\\" : \\\"https://json-schema.org/draft/2020-12/schema\\\",\\n  \\\"type\\\" : \\\"object\\\",\\n  \\\"properties\\\" : {\\n    \\\"answer\\\" : {\\n      \\\"type\\\" : \\\"string\\\",\\n      \\\"description\\\" : \\\"The helpful answer to the customer's question\\\"\\n    },\\n    \\\"category\\\" : {\\n      \\\"type\\\" : \\\"string\\\",\\n      \\\"enum\\\" : [ \\\"TECHNICAL\\\", \\\"BILLING\\\", \\\"SECURITY\\\", \\\"GENERAL\\\" ],\\n      \\\"description\\\" : \\\"The category of the support question: TECHNICAL, BILLING, SECURITY, or GENERAL\\\"\\n    }\\n  },\\n  \\\"required\\\" : [ \\\"answer\\\", \\\"category\\\" ],\\n  \\\"additionalProperties\\\" : false\\n}```\\n\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-DzhXbuSZMHeVEfflhg0Pqmai5JS0I\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783597751,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"answer\\\":\\\"Spring AI is a Spring project for building AI-powered applications with familiar Spring patterns. It provides abstractions and integrations for working with large language models, embeddings, vector stores, chat models, and tool/function calling. It is designed to make it easier to add generative AI features to Spring Boot applications.\\\\n\\\\nOfficial docs: https://docs.spring.io/spring-ai/reference/\\\",\\\"category\\\":\\\"GENERAL\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 277,\n    \"completion_tokens\": 86,\n    \"total_tokens\": 363,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "84ms",
+      "set-cookie" : "__cf_bm=AC3VGdskjQUt3FguWirCX02LBO1aW_76AFdwWKNFfS0-1783597751.327286-1.0.1.1-eqO3WcKIRnqz9zFm9UlVcbe6A9BPUSzyeK2RGrBeIZY6juL7iqzd4IqJ91_7mWXbrtQLw_l9SGloBDC6bgyadlcOK_JHKV44Kq9tX_sBl9Ty9IqJyRLL8tMKiK55KkwV; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Thu, 09 Jul 2026 12:19:12 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_c4cf8f3117964e7cbd51c010d2997aaf",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a1871a99cd1e0567-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199720",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Thu, 09 Jul 2026 11:49:12 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "1072",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "5d890178-d6ae-4dc9-9cb5-6912ae5ba21d",
+  "persistent" : true,
+  "insertionIndex" : 111
+}

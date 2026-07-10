@@ -2,27 +2,15 @@
 title: Observability
 ---
 
-By now the Support Assistant covers chat, structured output, RAG, tool calling, and tests. This lab wires up **observability**: structured logs of every prompt and completion, and Micrometer metrics including token usage. Spring AI hooks into Spring's `Observation` API, so you get metrics and traces for chat calls, embeddings, vector store queries, and tool invocations out of the box.
+By now the Support Assistant covers chat, structured output, RAG, tool calling, and tests. In this lab you add **observability**. You get structured logs of every prompt and completion, and Micrometer metrics that include token usage. Spring AI hooks into Spring's `Observation` API, so you get metrics and traces for chat calls, embeddings, vector store queries, and tool calls without extra work.
 
-The application in the `sample-app` directory contains the state after the previous labs. If you wanted to recreate the base project yourself, you could generate it via Spring Initializr — set `PROVIDER` to the Spring AI model starter of your choice:
+The application in the `sample-app` directory contains the state after the previous labs. 
 
-```bash
-PROVIDER=openai # Alternatives: anthropic, ollama, bedrock-converse
-curl https://start.spring.io/starter.tgz \
-  -d artifactId=support-assistant \
-  -d name=support-assistant \
-  -d packageName=com.example.support-assistant \
-  -d type=maven-project \
-  -d javaVersion=25 \
-  -d dependencies=web,actuator,data-jdbc,h2,devtools,docker-compose,spring-ai-${PROVIDER} \
-  | tar -xzvf -
-```
-
-The `actuator` dependency is already part of the project. It provides Spring Boot's production-ready endpoints, which we'll build on in this lab. As in the previous labs, the implementation uses **OpenAI**; configurations for Anthropic, Ollama, and AWS Bedrock are available as Spring profiles (`application-<provider>.properties`) in the `src/main/resources` directory.
+The `actuator` dependency is already part of the project. It provides Spring Boot's production-ready endpoints.
 
 ## Debug Logging for Spring AI
 
-Spring AI's debug logging is already enabled in `application.properties` from the tool-calling lab:
+Spring AI's debug logging is already enabled in `application.properties` from the tool-calling lab.
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/resources/application.properties
@@ -30,11 +18,11 @@ text: "logging.level.org.springframework.ai=debug"
 description: Show the Spring AI debug logging configuration
 ```
 
-Besides tool-call decisions, it also surfaces the rendered prompts, retrieved documents, and raw responses at the right log levels — handy when an answer is surprising and you want to know why.
+Besides tool-call decisions, it also shows the rendered prompts, the retrieved documents, and the raw responses at the right log levels. This is helpful when an answer is surprising and you want to know why.
 
 ## Expose the Actuator Endpoints
 
-Expose the metrics and Prometheus endpoints via Spring Boot Actuator:
+Expose the metrics and Prometheus endpoints with Spring Boot Actuator.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/resources/application.properties
@@ -45,10 +33,10 @@ text: |2
 ```
 
 {{< note >}}
-⚠️ **Security note** This exposes `/actuator/metrics` and `/actuator/prometheus` on the application port. **Do not do this in production.** Bind actuator to a separate management port (`management.server.port`), restrict it to an internal network, and put authentication in front of it. The endpoints leak request paths, model names, and (with the flags below) prompt content — all worth protecting.
+⚠️ **Security note** This exposes `/actuator/metrics` and `/actuator/prometheus` on the application port. **Do not do this in production.** Bind actuator to a separate management port (`management.server.port`), restrict it to an internal network, and put authentication in front of it. The endpoints leak request paths, model names, and (with the flags below) prompt content, which are all worth protecting.
 {{< /note >}}
 
-For the Prometheus formatting, you also need the Micrometer registry as an additional dependency:
+For the Prometheus formatting, you also need the Micrometer registry as an additional dependency.
 
 ```xml
 <dependency>
@@ -61,7 +49,7 @@ For the Prometheus formatting, you also need the Micrometer registry as an addit
 ```editor:select-matching-text
 file: ~/sample-app/pom.xml
 text: "<artifactId>spring-boot-starter-actuator</artifactId>"
-description: Apply - Add the Micrometer Prometheus registry to pom.xml
+description: Add the Micrometer Prometheus registry dependency
 before: 2
 after: 1
 cascade: true
@@ -84,11 +72,11 @@ text: |2
 
 ## Verbose Spring AI Observation Content
 
-Spring AI's observations don't include prompt and response content by default (PII risk). Opt in if you want it in logs and traces:
+Spring AI's observations do not include prompt and response content by default, because of the PII risk. Opt in if you want it in logs and traces.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/resources/application.properties
-description: Apply - Include prompt and response content in observations
+description: Include prompt and response content in observations
 text: |2
 
   # Not recommended for production - high data volume and risk of exposing sensitive content
@@ -99,19 +87,11 @@ text: |2
   spring.ai.vectorstore.observations.log-query-response=true
 ```
 
-In a workshop or development setup, this is gold — you see every prompt the model sees, every retrieved document, every tool argument. In production, it's a compliance liability; default it off.
+In a workshop or development setup, this is very useful. You see every prompt the model sees, every retrieved document, and every tool argument. In production, it is a compliance risk, so keep it off by default.
 
 ## Generate Traffic and Inspect the Metrics
 
-Set your OpenAI API key in the terminal session the application will run in:
-
-```terminal:input
-text: export OPENAI_API_KEY=
-endl: false
-session: 2
-```
-
-Start the application:
+Start the application.
 
 ```terminal:execute
 command: cd ~/sample-app && ./mvnw spring-boot:run
@@ -122,62 +102,59 @@ session: 2
 Wait for "Started SupportAssistantApplication" before proceeding.
 {{< /note >}}
 
-Exercise the two flows you built in the earlier labs — a RAG query:
+Now try the two flows you built in the earlier labs. First a RAG query.
 
 ```terminal:execute
-command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
+command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Does VMware Tanzu Spring provide commercial support for Micrometer?"
 session: 1
 ```
 
-And a tool-calling query:
+And then a tool-calling query.
 
 ```terminal:execute
-command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Please open a high-priority ticket: SSO login returns 502 on the Tanzu portal."
+command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Open a high priority ticket to request a trial for VMware Tanzu Spring"
 session: 1
 ```
 
-Repeat each a few times so the histograms have something interesting to show.
+Run each one a few times so the histograms have some data to show.
 
 ### Inspect via the Metrics Endpoint
 
-List all metric names registered in the app:
+List all metric names registered in the app.
 
 ```terminal:execute
 command: curl -s http://localhost:8080/actuator/metrics | jq
 session: 1
 ```
 
-Drill into one — total tokens consumed per call type (input vs output):
+Look at one metric, the total tokens used per call type (input versus output).
 
 ```terminal:execute
 command: curl -s http://localhost:8080/actuator/metrics/gen_ai.client.token.usage | jq
 session: 1
 ```
 
-The response breaks down `input` tokens (sent to the model) and `output` tokens (generated by the model). These are the numbers that determine cost.
+The response breaks down `input` tokens (sent to the model) and `output` tokens (generated by the model). These are the numbers that drive cost.
 
-Chat client request latency:
+Chat client request latency.
 
 ```terminal:execute
 command: curl -s http://localhost:8080/actuator/metrics/gen_ai.client.operation | jq
 session: 1
 ```
 
-Vector store query timings:
+Vector store query timings.
 
 ```terminal:execute
 command: curl -s http://localhost:8080/actuator/metrics/spring.ai.vector.store.client.operation | jq
 session: 1
 ```
 
-The metric names follow the OpenTelemetry GenAI semantic conventions. Useful tags you'll see: `gen_ai.system` (`openai`, `anthropic`, ...), `gen_ai.request.model`, `gen_ai.operation.name` (`chat`, `embedding`, ...), and on token usage `gen_ai.token.type` (`input` / `output`).
+The metric names follow the OpenTelemetry GenAI semantic conventions. You will see useful tags such as `gen_ai.system` (`openai`, `anthropic`, ...), `gen_ai.request.model`, `gen_ai.operation.name` (`chat`, `embedding`, ...), and on token usage `gen_ai.token.type` (`input` / `output`).
 
-The metric *names* and *shapes* are provider-agnostic. What varies is the `gen_ai.system` tag value and which labels carry meaningful data:
+The metric *names* and *shapes* are provider-agnostic. What changes is the `gen_ai.system` tag value and which labels carry meaningful data.
 
-- **OpenAI / Anthropic / Bedrock** — every call has accurate input/output token counts because the provider returns them in the response. Cost dashboards are straightforward.
-- **Ollama** — token counts are reported, but the values come from the local model and aren't billed against anything; useful for throughput, not cost.
-
-The same applies to the vector store: the `SimpleVectorStore` used in this lab emits `spring.ai.vector.store.*` observations the same way as, for example, pgvector, so dashboards transfer between setups without changes. With pgvector, you additionally get the standard JDBC/HikariCP metrics (`hikaricp_*`, `jdbc_*`) for connection-pool health.
+The same applies to the vector store. The `SimpleVectorStore` used in this lab emits `spring.ai.vector.store.*` observations the same way as, for example, pgvector, so dashboards transfer between setups without changes. With pgvector you also get the standard JDBC and HikariCP metrics (`hikaricp_*`, `jdbc_*`) for connection pool health.
 
 ### Inspect via the Prometheus Endpoint
 
@@ -186,7 +163,7 @@ command: curl -s http://localhost:8080/actuator/prometheus | grep gen_ai
 session: 1
 ```
 
-You'll see entries like:
+You will see entries like this.
 
 ```
 gen_ai_client_token_usage_sum{gen_ai_system="openai",gen_ai_request_model="gpt-5.4-mini",gen_ai_token_type="input"} 482.0
@@ -194,21 +171,13 @@ gen_ai_client_token_usage_count{gen_ai_system="openai",gen_ai_request_model="gpt
 gen_ai_client_operation_seconds_bucket{gen_ai_operation_name="chat",le="0.5"} 1.0
 ```
 
-That's already enough to scrape with any Prometheus-compatible TSDB.
+That is already enough to scrape with any Prometheus-compatible TSDB.
 
-Reference: [Spring AI Observability documentation](https://docs.spring.io/spring-ai/reference/observability/index.html)
+## Going Further With OpenTelemetry Export Into Grafana
 
-## Stop the Application
+The actuator endpoints are good for spot checks. For a real dashboard, push everything via OTLP into a stack that stores and visualizes it. This is not part of this lab, but here is how you could set it up for local testing.
 
-```terminal:interrupt
-session: 2
-```
-
-## Going Further: OpenTelemetry Export Into Grafana
-
-The actuator endpoints are great for spot checks. For a real dashboard, push everything via OTLP into a stack that stores and visualizes it. This is not part of this lab, but here is how you could set it up for local testing.
-
-The `grafana/otel-lgtm` image bundles Grafana, Mimir (metrics), Loki (logs), Tempo (traces), and an OTel collector into a single container — add it as a service to the project's `compose.yaml`:
+The `grafana/otel-lgtm` image bundles Grafana, Mimir (metrics), Loki (logs), Tempo (traces), and an OTel collector into a single container. Add it as a service to the project's `compose.yaml`.
 
 ```yaml
   otel-lgtm:
@@ -222,24 +191,15 @@ The `grafana/otel-lgtm` image bundles Grafana, Mimir (metrics), Loki (logs), Tem
       - otel
 ```
 
-And start it with:
+And start it with this command.
 
 ```bash
 docker compose --profile otel up -d
 ```
 
-Spring Boot **4.1.0-RC1** ships a new, simpler observability story for AI apps: the `spring-boot-starter-opentelemetry` starter wires tracing, metrics, and logs OTLP exporters in one shot, and the Spring AI observation set is broader (per-document retrieval spans, structured tool-call attributes). Bump the parent in `pom.xml`:
+Spring Boot **4.1.0** ships a new and simpler observability story for AI apps. The `spring-boot-starter-opentelemetry` starter wires the tracing, metrics, and logs OTLP exporters in one step, and the Spring AI observation set is broader (per-document retrieval spans and structured tool-call attributes).
 
-```xml
-<parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.1.0-RC1</version>
-    <relativePath/>
-</parent>
-```
-
-And add the starter:
+Add the starter.
 
 ```xml
 <dependency>
@@ -248,7 +208,7 @@ And add the starter:
 </dependency>
 ```
 
-Then point Spring Boot at the OTLP endpoints in `application.properties`:
+Then point Spring Boot at the OTLP endpoints in `application.properties`.
 
 ```properties
 management.otlp.tracing.endpoint=http://localhost:4318/v1/traces
@@ -258,15 +218,15 @@ management.otlp.logging.endpoint=http://localhost:4318/v1/logs
 management.tracing.sampling.probability=1.0
 ```
 
-`sampling.probability=1.0` captures every request — fine for development, dial it down (`0.1`, `0.01`) before anything resembling production traffic.
+`sampling.probability=1.0` captures every request. That is fine for development, but lower it (`0.1`, `0.01`) before anything close to production traffic.
 
-After restarting the application and generating some traffic, Grafana is available at `http://localhost:3000` (default credentials `admin` / `admin`), with Mimir, Loki, and Tempo pre-configured as datasources:
+After you restart the application and generate some traffic, Grafana is available at `http://localhost:3000` (default credentials `admin` / `admin`), with Mimir, Loki, and Tempo pre-configured as datasources.
 
-- **Explore → Tempo** — search by service name `support-assistant`; click a trace to see the chat span tree (HTTP request → ChatClient call → vector store query → tool invocation → second ChatClient call → response).
-- **Explore → Loki** — `{service_name="support-assistant"}` shows the structured Spring AI logs (with prompts and completions if you enabled the observation content flags).
-- **Explore → Mimir** — the same `gen_ai_*` metrics, ready to graph.
+- **Explore → Tempo.** Search by service name `support-assistant`, then click a trace to see the chat span tree (HTTP request → ChatClient call → vector store query → tool invocation → second ChatClient call → response).
+- **Explore → Loki.** Query `{service_name="support-assistant"}` to show the structured Spring AI logs (with prompts and completions if you enabled the observation content flags).
+- **Explore → Mimir.** The same `gen_ai_*` metrics, ready to graph.
 
-Token usage is the metric most teams want first — it's the proxy for cost. To visualize it per request, paste this into **Explore → Prometheus**:
+Token usage is the metric most teams want first, because it is the proxy for cost. To visualize it per request, paste this into **Explore → Prometheus**.
 
 ```promql
 sum by (gen_ai_token_type, gen_ai_request_model) (
@@ -274,4 +234,4 @@ sum by (gen_ai_token_type, gen_ai_request_model) (
 )
 ```
 
-What this asks: "across the last minute, how many tokens per second are we burning, broken down by whether they were input or output and by which model served them?"
+In plain words this asks how many tokens per second you use across the last minute, broken down by whether they were input or output and by which model served them.

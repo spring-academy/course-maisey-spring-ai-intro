@@ -90,7 +90,10 @@ final class ChatFlows {
                 .content());
 
         var systemPrompt = new ClassPathResource("/prompts/system-prompt.st");
-        var chatClientWithSystemPrompt = chatClientBuilder.defaultSystem(systemPrompt).build();
+        // Build through mutate() so the shared chatClientBuilder keeps no default system prompt.
+        // The Lab 04 RelevancyEvaluator reuses chatClientBuilder, and the sample-app injects a
+        // fresh builder there, so it must stay free of a system message for the fixtures to match.
+        var chatClientWithSystemPrompt = chatClientBuilder.build().mutate().defaultSystem(systemPrompt).build();
 
         assertNotBlank(chatClientWithSystemPrompt.prompt()
                 .user("Answer the following question with a short, well-structured explanation: Tell me about Spring AI")
@@ -221,6 +224,11 @@ final class ChatFlows {
         }
 
         // Lab 04-testing
+        assertNotBlank(chatClientWithSystemPrompt.prompt()
+                .user("Tell me about Spring AI")
+                .call()
+                .content());
+
         var question = "What are the key features of VMware Tanzu Spring?";
         var chatResponse = chatClientWithSystemPrompt.prompt()
                 .user(question)
