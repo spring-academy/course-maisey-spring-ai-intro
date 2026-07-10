@@ -7,3 +7,4 @@ pathways:
 
       steps:
       - 01-observability
+      - 02-opentelemetry-grafana

@@ -37,6 +37,16 @@ spec:
         layout: split
       editor:
         enabled: true
+      docker:
+        enabled: true
+        socket:
+          enabled: true
+    ingresses:
+    - name: grafana
+      port: 3000
+    dashboards:
+    - name: Grafana
+      url: $(ingress_protocol)://grafana-$(session_name).$(ingress_domain)
   environment:
     objects:
     - apiVersion: v1

@@ -37,15 +37,6 @@ text: |2
 {{< /note >}}
 
 For the Prometheus formatting, you also need the Micrometer registry as an additional dependency.
-
-```xml
-<dependency>
-    <groupId>io.micrometer</groupId>
-    <artifactId>micrometer-registry-prometheus</artifactId>
-    <scope>runtime</scope>
-</dependency>
-```
-
 ```editor:select-matching-text
 file: ~/sample-app/pom.xml
 text: "<artifactId>spring-boot-starter-actuator</artifactId>"
@@ -173,65 +164,4 @@ gen_ai_client_operation_seconds_bucket{gen_ai_operation_name="chat",le="0.5"} 1.
 
 That is already enough to scrape with any Prometheus-compatible TSDB.
 
-## Going Further With OpenTelemetry Export Into Grafana
-
-The actuator endpoints are good for spot checks. For a real dashboard, push everything via OTLP into a stack that stores and visualizes it. This is not part of this lab, but here is how you could set it up for local testing.
-
-The `grafana/otel-lgtm` image bundles Grafana, Mimir (metrics), Loki (logs), Tempo (traces), and an OTel collector into a single container. Add it as a service to the project's `compose.yaml`.
-
-```yaml
-  otel-lgtm:
-    image: grafana/otel-lgtm:latest
-    container_name: support-assistant-otel-lgtm
-    ports:
-      - "3000:3000" # Grafana UI
-      - "4317:4317" # OTLP gRPC
-      - "4318:4318" # OTLP HTTP
-    profiles:
-      - otel
-```
-
-And start it with this command.
-
-```bash
-docker compose --profile otel up -d
-```
-
-Spring Boot **4.1.0** ships a new and simpler observability story for AI apps. The `spring-boot-starter-opentelemetry` starter wires the tracing, metrics, and logs OTLP exporters in one step, and the Spring AI observation set is broader (per-document retrieval spans and structured tool-call attributes).
-
-Add the starter.
-
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-opentelemetry</artifactId>
-</dependency>
-```
-
-Then point Spring Boot at the OTLP endpoints in `application.properties`.
-
-```properties
-management.otlp.tracing.endpoint=http://localhost:4318/v1/traces
-management.otlp.metrics.export.url=http://localhost:4318/v1/metrics
-management.otlp.logging.endpoint=http://localhost:4318/v1/logs
-
-management.tracing.sampling.probability=1.0
-```
-
-`sampling.probability=1.0` captures every request. That is fine for development, but lower it (`0.1`, `0.01`) before anything close to production traffic.
-
-After you restart the application and generate some traffic, Grafana is available at `http://localhost:3000` (default credentials `admin` / `admin`), with Mimir, Loki, and Tempo pre-configured as datasources.
-
-- **Explore → Tempo.** Search by service name `support-assistant`, then click a trace to see the chat span tree (HTTP request → ChatClient call → vector store query → tool invocation → second ChatClient call → response).
-- **Explore → Loki.** Query `{service_name="support-assistant"}` to show the structured Spring AI logs (with prompts and completions if you enabled the observation content flags).
-- **Explore → Mimir.** The same `gen_ai_*` metrics, ready to graph.
-
-Token usage is the metric most teams want first, because it is the proxy for cost. To visualize it per request, paste this into **Explore → Prometheus**.
-
-```promql
-sum by (gen_ai_token_type, gen_ai_request_model) (
-  rate(gen_ai_client_token_usage_total[1m])
-)
-```
-
-In plain words this asks how many tokens per second you use across the last minute, broken down by whether they were input or output and by which model served them.
+In the next section you go further and push everything into a Grafana stack over OpenTelemetry, so you get dashboards, traces, and log search instead of spot checks.
