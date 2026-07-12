@@ -116,22 +116,8 @@ In the assistant's logs you will see the model make a `spring-releases_fetchRele
 Now try a query that uses both the remote MCP tool and an in-process tool in a single conversation turn.
 
 ```terminal:execute
-command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Check the latest Spring AI release, and if we're behind the current GA, please open a high-priority ticket about upgrading."
+command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is the latest release of Spring Boot? Please also open a high-priority ticket to request access to Spring Application Advisor to accelerate upgrading our application to that version."
 session: 1
 ```
 
 The model calls `fetchReleasesInfo`, the remote MCP tool, and `createTicket`, the in-process tool, in one turn.
-
-## Stop the Applications
-
-Stop the Support Assistant.
-
-```terminal:interrupt
-session: 2
-```
-
-Then stop the MCP server.
-
-```terminal:interrupt
-session: 3
-```

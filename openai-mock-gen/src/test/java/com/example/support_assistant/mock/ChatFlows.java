@@ -16,8 +16,10 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.evaluation.EvaluationRequest;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
 import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
@@ -248,6 +250,53 @@ final class ChatFlows {
         assertThat(evaluationResponse.isPass())
                 .as("RAG response should be relevant to the retrieved context")
                 .isTrue();
+
+        // Lab 05-mcp
+        // The MCP client adds the remote spring-releases tool as a default tool on the ChatClient.
+        // No MCP server runs while recording, so we stand in a ToolCallback with the same name and
+        // schema the client would import (the client imports the tool under its plain name,
+        // fetchReleasesInfo, without a connection prefix). The recorder strips tool-result content
+        // from the request matcher, so a canned return value is enough for the fixtures to match.
+        var mcpChatClient = chatClientWithSystemPrompt.mutate()
+                .defaultTools(springReleasesToolCallback())
+                .build();
+        for (var mcpQuestion : List.of(
+                "What is the latest stable release of Spring Boot?",
+                "What is the latest release of Spring Boot? Please also open a high-priority ticket to request access to Spring Application Advisor to accelerate upgrading our application to that version."
+        )) {
+            mcpChatClient.prompt()
+                    .user(u -> u
+                            .text("Answer the following question with a short, well-structured explanation: {question}")
+                            .param("question", mcpQuestion))
+                    .advisors(ragAdvisor)
+                    .tools(tools)
+                    .call()
+                    .entity(SupportResponse.class);
+        }
+    }
+
+    private static ToolCallback springReleasesToolCallback() {
+        var definition = ToolDefinition.builder()
+                .name("fetchReleasesInfo")
+                .description("Get all releases for a Spring project, including version and support status.")
+                .inputSchema("""
+                        {
+                          "type": "object",
+                          "properties": { "projectSlug": { "type": "string" } }
+                        }
+                        """)
+                .build();
+        return new ToolCallback() {
+            @Override
+            public ToolDefinition getToolDefinition() {
+                return definition;
+            }
+
+            @Override
+            public String call(String toolInput) {
+                return "[{\"version\":\"3.5.0\",\"status\":\"GENERAL_AVAILABILITY\",\"current\":true}]";
+            }
+        };
     }
 
     private static void assertNotBlank(String content) {

@@ -180,6 +180,7 @@ text: |
   management.otlp.tracing.export.enabled=true
   management.tracing.sampling.probability=1.0
 
+  spring.docker.compose.enabled=true
   spring.docker.compose.profiles.active=otel
 ```
 
@@ -201,6 +202,7 @@ text: |2
   management.otlp.metrics.export.enabled=false
   management.otlp.tracing.export.enabled=false
   management.otlp.logging.export.enabled=false
+  spring.docker.compose.enabled=false
 ```
 
 Now the default run is lightweight, with no exporters and no otel-lgtm container. When you want the full stack again, start the application with the `local-observability` profile.

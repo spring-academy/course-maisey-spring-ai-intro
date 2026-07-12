@@ -2,45 +2,33 @@
 title: Agentic Patterns
 ---
 
-Your Support Assistant has a growing tool inventory: three in-process ticket tools, plus every tool advertised by every connected MCP server — like the Spring Releases MCP server you connected in the previous lab.
+Your Support Assistant has a growing set of tools. It has three in-process ticket tools. It also has every tool advertised by every connected MCP server, like the Spring Releases MCP server you connected in the previous lab.
 
-There's a problem with that: **every chat call sends the full tool schema to the model**, regardless of whether any of those tools could plausibly help with this question. Each tool description is tokens you pay for on every request, the model has more chances to pick a wrong tool, and the prompt bloats as you add MCP servers.
+This creates a problem. **Every chat call sends the full tool schema to the model**, even when none of those tools can help with the question. Every tool description costs tokens on every request. The model also has more chances to pick the wrong tool, and the prompt keeps growing as you add MCP servers.
 
-The fix is the **Tool Search Tool**: an agentic pattern where the model is given a *single* meta-tool called something like `searchTools`, plus an index that embeds every real tool's description into the vector store. When the model needs to act, it calls `searchTools` with a natural-language query, gets back the top-K most relevant tools, and only those flow into the next turn. It's RAG, but for tools.
-
-## Configure the AI Provider
-
-Spring AI supports many chat model providers, such as OpenAI, Anthropic, Amazon Bedrock, and Ollama. In this workshop, we use **OpenAI**. The sample application also ships Spring profiles for the alternatives (`application-anthropic.properties`, `application-ollama.properties`, `application-bedrock-converse.properties`) — set the related credentials and `SPRING_PROFILES_ACTIVE` accordingly if you want to try one of them instead.
-
-Set your OpenAI API key in the terminal session the Support Assistant will run in:
-
-```terminal:input
-text: export OPENAI_API_KEY=
-endl: false
-session: 2
-```
+The fix is the **Tool Search Tool**. This is an agentic pattern. The model gets a *single* meta-tool, called something like `searchTools`, plus an index that embeds every real tool's description into the vector store. When the model needs to act, it calls `searchTools` with a natural-language query. It gets back the most relevant tools, and only those flow into the next turn. It is RAG, but for tools.
 
 ## Start the Spring Releases MCP Server
 
-The Spring Releases MCP server from the MCP Integration lab is already part of this workshop environment. Start it so its `fetchReleasesInfo` tool is available to the Support Assistant:
+The Spring Releases MCP server from the MCP lab is already part of this workshop environment. Start it so its `fetchReleasesInfo` tool is available to the Support Assistant.
 
 ```terminal:execute
 command: cd ~/spring-releases-mcp-server && ./mvnw spring-boot:run
 session: 3
 ```
 
-You should see the embedded MCP server start on port 8081 and log one registered tool at startup.
+You should see the embedded MCP server start on port 8090 and log one registered tool at startup.
 
 ## Add the Tool Search Advisor Dependency
 
-Add the Tool Search advisor to the Support Assistant's `pom.xml`:
+Add the Tool Search advisor to the Support Assistant's `pom.xml`.
 
 ```editor:select-matching-text
 file: ~/sample-app/pom.xml
-text: "</dependencies>"
-description: "Apply - Add the Spring AI Tool Search advisor"
-before: 0
-after: 0
+text: "<artifactId>spring-ai-starter-mcp-client</artifactId>"
+description: "Add the Spring AI Tool Search advisor"
+before: 2
+after: 1
 cascade: true
 ```
 
@@ -50,30 +38,25 @@ hidden: true
 text: |2
   		<dependency>
   			<groupId>org.springframework.ai</groupId>
+  			<artifactId>spring-ai-starter-mcp-client</artifactId>
+  		</dependency>
+  		<dependency>
+  			<groupId>org.springframework.ai</groupId>
   			<artifactId>spring-ai-tool-search-advisor</artifactId>
   		</dependency>
-  	</dependencies>
 ```
 
-This pulls in `ToolSearchToolCallingAdvisor`, `ToolIndex`, and the vector-store-backed default implementation (`VectorToolIndex`).
+This pulls in `ToolSearchToolCallingAdvisor`, `ToolIndex`, and the default implementation backed by the vector store, `VectorToolIndex`.
 
 ## Configure the ToolIndex
 
-The index is what stores the tool descriptions for similarity search. The default `VectorToolIndex` reuses your existing `VectorStore` — so the same `SimpleVectorStore` that holds the knowledge base chunks will also hold the tool descriptions, in separate vectors.
+The index stores the tool descriptions for similarity search. The default `VectorToolIndex` reuses your existing `VectorStore`. So the same `SimpleVectorStore` that holds the knowledge base chunks also holds the tool descriptions, in separate vectors.
 
-Add the bean to `SupportAssistantConfiguration.java`:
-
-```java
-@Bean
-ToolIndex toolIndex(VectorStore vectorStore) {
-    return new VectorToolIndex(vectorStore);
-}
-```
-
+Add the bean to `SupportAssistantConfiguration.java`.
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
 text: "class SupportAssistantConfiguration {"
-description: "Apply - Configure the ToolIndex"
+description: "Configure the ToolIndex"
 before: 0
 after: 0
 cascade: true
@@ -101,34 +84,17 @@ text: |-
   import org.springframework.ai.tool.toolsearch.index.vectorstore.VectorToolIndex;
 ```
 
-On startup, the auto-configuration iterates every available `ToolCallback` (in-process + MCP) and embeds its name + description into the index. From this point on the model never sees those tools directly — it sees only `searchTools`.
+On startup, the auto-configuration goes through every available `ToolCallback`, both in-process and MCP, and embeds its name and description into the index. From this point on, the model never sees those tools directly. It sees only `searchTools`.
 
 ## Add the ToolSearchToolCallingAdvisor to the ChatClient
 
-Wire the advisor as a **default** on the `ChatClient` bean so every call goes through it. Update the `chatClient` factory method in `SupportAssistantConfiguration.java`:
-
-```java
-@Bean
-ChatClient chatClient(ChatClient.Builder builder, ToolCallbackProvider tools, ToolIndex toolIndex) {
-    var toolSearchAdvisor = ToolSearchToolCallingAdvisor.builder()
-            .toolIndex(toolIndex)
-            .maxResults(5)
-            .build();
-
-    return builder
-            .defaultSystem("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.")
-            .defaultTools(tools)
-            .defaultAdvisors(toolSearchAdvisor)
-            .build();
-}
-```
-
+Register the advisor as a **default** on the `ChatClient` bean so every call goes through it. Update the `chatClient` factory method in `SupportAssistantConfiguration.java`.
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-text: "ChatClient chatClient(ChatClient.Builder builder, ToolCallbackProvider tools) {"
-description: "Apply - Add the Tool Search advisor to the ChatClient"
-before: 0
-after: 1
+text: "public ChatClient chatClient(ChatClient.Builder builder,"
+description: "Add the Tool Search advisor to the ChatClient"
+before: 1
+after: 11
 cascade: true
 ```
 
@@ -137,17 +103,26 @@ file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantC
 hidden: true
 cascade: true
 text: |2
-      ChatClient chatClient(ChatClient.Builder builder, ToolCallbackProvider tools, ToolIndex toolIndex) {
+      @Bean
+      public ChatClient chatClient(ChatClient.Builder builder,
+                                   @Value("classpath:/prompts/system-prompt.st") Resource systemPrompt,
+                                   ChatMemory chatMemory,
+                                   ToolCallbackProvider tools,
+                                   ToolIndex toolIndex) {
           var toolSearchAdvisor = ToolSearchToolCallingAdvisor.builder()
                   .toolIndex(toolIndex)
                   .maxResults(5)
                   .build();
 
           return builder
-                  .defaultSystem("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.")
+                  .defaultSystem(systemPrompt)
+                  .defaultAdvisors(
+                          new SimpleLoggerAdvisor(Ordered.LOWEST_PRECEDENCE),
+                          MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                          toolSearchAdvisor)
                   .defaultTools(tools)
-                  .defaultAdvisors(toolSearchAdvisor)
                   .build();
+      }
 ```
 
 ```editor:insert-lines-before-line
@@ -157,30 +132,30 @@ line: 3
 text: import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
 ```
 
-What changed:
+What changed.
 
-- **`ToolIndex toolIndex` injected** alongside the existing `ToolCallbackProvider`.
-- **`maxResults(5)`** — the advisor will inject the top 5 most relevant tools per turn. Tune this for your tool count and model context budget.
-- **`.defaultAdvisors(toolSearchAdvisor)`** — registered once on the bean, so every `chatClient.prompt()` chain picks it up.
+- **`ToolIndex toolIndex` is injected** next to the existing `ToolCallbackProvider`.
+- **`maxResults(5)`**. The advisor injects the 5 most relevant tools per turn. Tune this for your tool count and model context budget.
+- **`toolSearchAdvisor` added to `defaultAdvisors`**. It sits next to the logger and memory advisors the bean already has, so every `chatClient.prompt()` chain picks it up.
 
-Behind the scenes, when the model decides to act, the advisor:
+Behind the scenes, when the model decides to act, the advisor does this.
 
 1. Intercepts the call before tools are sent to the model.
 2. Replaces the full tool list with just the `searchTools` meta-tool.
 3. When the model calls `searchTools("create a ticket about login failures")`, runs a similarity search against the `ToolIndex`.
 4. Surfaces the matching tools to the model on the next turn so it can actually invoke them.
 
-The full list — `createTicket`, `retrieveTickets`, `retrieveOpenTickets`, `spring-releases_fetchReleasesInfo`, etc. — is no longer in every prompt.
+The full list of `createTicket`, `retrieveTickets`, `retrieveOpenTickets`, `fetchReleasesInfo`, and the rest is no longer in every prompt.
 
 ## Wire Conversation Memory Through a Conversation ID
 
-The advisor is multi-turn by design: turn 1 is "search for tools", turn 2 is "now actually call them". For that to work, the framework needs `ChatMemory` plus a **conversation id** so it can correlate the two turns. `ChatMemory` is auto-configured (`MessageWindowChatMemory` + in-memory repository) once the advisor is on the classpath; the only thing you have to supply is the conversation id per request.
+The advisor is multi-turn by design. Turn 1 is "search for tools". Turn 2 is "now call them". For this to work, the framework needs `ChatMemory` and a **conversation id** so it can connect the two turns. `ChatMemory` is auto-configured once the advisor is on the classpath, with `MessageWindowChatMemory` and an in-memory repository. The only thing you supply is the conversation id per request.
 
 See the [Spring AI Tool Search Tool documentation](https://docs.spring.io/spring-ai/reference/2.0/api/tools.html#tool-search-tool) for the framework contract.
 
 ### Accept the Conversation ID as a Header
 
-Update `SupportAssistantController.java` to read `X-Conversation-Id` from the request, falling back to a generated UUID when the client doesn't supply one:
+Update `SupportAssistantController.java` to read `X-Conversation-Id` from the request. When the client does not supply one, fall back to a generated UUID.
 
 ```java
 @GetMapping(path = "/api/{version}/chat")
@@ -226,11 +201,11 @@ text: |2
   import java.util.UUID;
 ```
 
-`@RequestHeader.defaultValue` only takes string literals, hence the null-check + `UUID.randomUUID()` fallback. Clients that *do* want a continuous conversation (the typical case for an agentic assistant — turn N+1 needs to see turn N's history) supply a stable id.
+`@RequestHeader.defaultValue` only takes string literals, so you use a null check with a `UUID.randomUUID()` fallback instead. A client that wants a continuous conversation supplies a stable id. This is the typical case for an agentic assistant, where turn N+1 needs to see the history from turn N.
 
 ### Pass the ID Into the Chain
 
-Update `SupportAssistantService.generateResponse` to accept the id and forward it via the advisor param. The framework looks for it under `ChatMemory.CONVERSATION_ID`:
+Update `SupportAssistantService.generateResponse` to accept the id and forward it through the advisor param. The framework looks for it under `ChatMemory.CONVERSATION_ID`.
 
 ```java
 SupportResponse generateResponse(String query, String conversationId) {
@@ -294,7 +269,7 @@ line: 3
 text: import org.springframework.ai.chat.memory.ChatMemory;
 ```
 
-The `.advisors(a -> a.param(...))` call passes the conversation id to **every** registered advisor — both your RAG advisor and the tool-search advisor pick it up. Each call with the same `conversationId` lands in the same memory window; a fresh UUID gives the client a clean slate.
+The `.advisors(a -> a.param(...))` call passes the conversation id to **every** registered advisor. Both your RAG advisor and the tool-search advisor pick it up. Each call with the same `conversationId` lands in the same memory window. A fresh UUID gives the client a clean slate.
 
 ## Start the Support Assistant
 
@@ -305,21 +280,21 @@ session: 2
 
 ## Test It
 
-Send a request that requires a tool — without setting a header, so the controller mints a fresh UUID:
+Send a request that needs a tool. Do not set a header, so the controller creates a fresh UUID.
 
 ```terminal:execute
 command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Please open a high-priority ticket: SSO login returns 502 on the Tanzu portal."
 session: 1
 ```
 
-With `logging.level.org.springframework.ai=debug` already enabled in `application.properties`, you'll see in the assistant's logs:
+With `logging.level.org.springframework.ai=debug` already enabled in `application.properties`, you will see this in the assistant's logs.
 
 1. A first model call where only `searchTools` is advertised.
-2. The model emitting a `searchTools` call with the user's intent as the query.
-3. The advisor running a similarity search against the `ToolIndex` and returning the top 5 hits — `createTicket` should be one of them.
-4. A second model call with just those matched tools advertised; the model then picks `createTicket`.
+2. The model emits a `searchTools` call with the user's intent as the query.
+3. The advisor runs a similarity search against the `ToolIndex` and returns the top 5 hits. `createTicket` should be one of them.
+4. A second model call with only those matched tools advertised. The model then picks `createTicket`.
 
-Now try a multi-turn flow by reusing the same id:
+Now try a multi-turn flow by reusing the same id.
 
 ```terminal:execute
 command: |-
@@ -339,9 +314,9 @@ command: |-
 session: 1
 ```
 
-The second call sees the conversation history from the first, so "that version" refers to the Spring Boot release the model fetched a moment ago — and the tool search advisor still picks the right action (`createTicket`) from the indexed pool.
+The second call sees the conversation history from the first. So "that version" refers to the Spring Boot release the model fetched a moment ago. The tool search advisor still picks the right action, `createTicket`, from the indexed pool.
 
-A pure RAG question (no tool) confirms tool search adds zero overhead when no action is needed — the model never calls `searchTools`:
+A pure RAG question, with no tool, confirms that tool search adds no overhead when no action is needed. The model never calls `searchTools`.
 
 ```terminal:execute
 command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
@@ -350,13 +325,13 @@ session: 1
 
 ## Stop the Applications
 
-Stop the Support Assistant:
+Stop the Support Assistant.
 
 ```terminal:interrupt
 session: 2
 ```
 
-And the MCP server:
+Then stop the MCP server.
 
 ```terminal:interrupt
 session: 3

@@ -1,0 +1,48 @@
+{
+  "id" : "3b843495-4b43-4f5f-b67b-4f3b243e184e",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about breaking changes in Spring Framework 7\\n\\nContext information is below, surrounded by ---------------------\\n\\n---------------------\\nOpenRewrite integration: uses OpenRewrite recipes internally but hides the complexity. Developers review pull requests instead of finding and configuring recipes themselves. Synchronized multi-project upgrades: identifies Spring projects that must upgrade together. For example, an app using Spring Web 5.3.x with Spring Security 5.8 is upgraded so both move to 6.0.x together for a successful build. Incremental updates: enables continuous, small-scale dependency upgrades and API-breaking changes through regular pull requests, keeping systems current with minimal disruption. CI pipeline compatibility: generated pull requests fit into existing continuous integration workflows.\\nApplication Advisor automatically generates pull requests when new Spring dependency versions become available. Each pull request includes updates to both build configuration and Java source files, so it integrates into CI/CD pipelines without manual work.\\nAll committers for Spring Boot, Spring Framework, and the broader open-source Spring portfolio are part of the Tanzu team. Patches, including day-zero security fixes, come directly from the original authors of the code and are validated for compliance. This is the core security advantage of the subscription.\\nSpring Boot and related projects: In addition to 13 months of open-source support from release date, VMware Tanzu Spring provides a minimum of 1 additional year of support for minor versions. The final minor version of each major release receives an additional 5 years of enterprise support (7 years). OpenJDK: support follows the BellSoft Liberica distribution timelines. Tomcat: extended support for versions no longer maintained by Apache, including CVE fixes.\\n---------------------\\n\\nGiven the context and provided history information and not prior knowledge,\\nreply to the user comment. If the answer is not in the context, inform\\nthe user that you can't answer the question.\\n\\nYour response should be in JSON format.\\nDo not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.\\nDo not include markdown code blocks in your response.\\nRemove the ```json markdown from the output.\\nHere is the JSON Schema instance your output must adhere to:\\n```{\\n  \\\"$schema\\\" : \\\"https://json-schema.org/draft/2020-12/schema\\\",\\n  \\\"type\\\" : \\\"object\\\",\\n  \\\"properties\\\" : {\\n    \\\"answer\\\" : {\\n      \\\"type\\\" : \\\"string\\\",\\n      \\\"description\\\" : \\\"The helpful answer to the customer's question\\\"\\n    },\\n    \\\"category\\\" : {\\n      \\\"type\\\" : \\\"string\\\",\\n      \\\"enum\\\" : [ \\\"TECHNICAL\\\", \\\"BILLING\\\", \\\"SECURITY\\\", \\\"GENERAL\\\" ],\\n      \\\"description\\\" : \\\"The category of the support question: TECHNICAL, BILLING, SECURITY, or GENERAL\\\"\\n    }\\n  },\\n  \\\"required\\\" : [ \\\"answer\\\", \\\"category\\\" ],\\n  \\\"additionalProperties\\\" : false\\n}```\\n\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-E0mVXCxBvasN7xsfgUPTptHu4La0J\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783855171,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"answer\\\":\\\"I can’t answer that from the provided context. The context discusses upgrade support and tooling, but it does not describe specific breaking changes in Spring Framework 7. For official Spring documentation, see the Spring Framework reference docs: https://docs.spring.io/spring-framework/reference/\\\",\\\"category\\\":\\\"GENERAL\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 640,\n    \"completion_tokens\": 65,\n    \"total_tokens\": 705,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "237ms",
+      "set-cookie" : "__cf_bm=P9R.xWwfY9ZycOfXaeB_RmlASqmpP4UsJKe.lwpcQcI-1783855170.799603-1.0.1.1-x9U8efsad1IW8dVd_6b.w3G9pgvetaihBCo9kspq85giqwe_E0mDL3s1JNpmpiHWvSY1WOXRAGkau.OfRMVQWbufxdxyFBisHl7qTsbaMOobOGZZgaXxQi3rgfLntxdj; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Sun, 12 Jul 2026 11:49:31 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_09d426f2314847f39d27f12a6001cf0e",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a19fa7417b01296e-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199208",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Sun, 12 Jul 2026 11:19:31 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "740",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "3b843495-4b43-4f5f-b67b-4f3b243e184e",
+  "persistent" : true,
+  "insertionIndex" : 24
+}
