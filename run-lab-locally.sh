@@ -128,10 +128,16 @@ trap 'rm -rf "$STAGE_DIR"' EXIT
 for d in "${CONTENT_DIRS[@]}"; do
   cp -R "$LAB_DIR/$d" "$STAGE_DIR/$d"
 done
+# Drop Maven build output so it does not bloat the bundle (rm -rf is a no-op
+# when the target/ directory is absent).
+for app in sample-app spring-releases-mcp-server; do
+  rm -rf "$STAGE_DIR/$app/target"
+done
 while IFS= read -r -d '' f; do
   sed -i.bak \
     -e '/code-server --install-extension/d' \
     -e '/mvnw dependency:go-offline/d' \
+    -e '/docker pull grafana\/otel-lgtm:latest/d' \
     "$f"
   rm -f "$f.bak"
 done < <(find "$STAGE_DIR" -path '*/workshop/setup.d/*.sh' -print0)

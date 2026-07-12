@@ -7,3 +7,7 @@ jq ". + { \"editor.fontSize\": 14, \"files.exclude\": { \".**\": true}}" /home/e
 
 chmod +x sample-app/mvnw
 chmod +x spring-releases-mcp-server/mvnw
+
+code-server --install-extension redhat.java
+(cd sample-app && ./mvnw dependency:go-offline)
+(cd spring-releases-mcp-server && ./mvnw dependency:go-offline)

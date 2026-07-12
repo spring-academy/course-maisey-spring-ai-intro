@@ -2,13 +2,13 @@
 title: MCP Server
 ---
 
-Your Support Assistant already uses tool calling — but the `SupportTicketService` tools live **in the same process** as the assistant. The **Model Context Protocol (MCP)** standardizes how one process exposes tools, resources, and prompts so that an AI application in another process can consume them.
+Your support assistant already uses tool calling. But the `SupportTicketService` tools run **in the same process** as the assistant. The **Model Context Protocol (MCP)** is a standard way for one process to expose tools, resources, and prompts. An AI application in another process can then use them.
 
-In this lab, you'll build a small, separate **Spring Releases MCP server** that fetches live release data from `api.spring.io`, and then connect the Support Assistant to it as an MCP **client**. Questions like *"What's the latest release of Spring Boot?"* will then be answered from live data instead of the model's stale training knowledge.
+In this lab you build a small, separate **Spring Releases MCP server**. It fetches live release data from `api.spring.io`. Then you connect the Support Assistant to it as an MCP **client**. After that, a question like *"What's the latest release of Spring Boot?"* is answered from live data instead of the model's old training knowledge.
 
 ## Build the MCP Server
 
-The MCP server is a **second, separate** Spring Boot application. Scaffold it via Spring Initializr:
+The MCP server is a **second, separate** Spring Boot application. Create it with Spring Initializr.
 
 ```terminal:execute
 command: |-
@@ -19,20 +19,20 @@ command: |-
     -d artifactId=spring-releases-mcp-server \
     -d name=spring-releases \
     -d packageName=com.example.spring_releases \
-    -d javaVersion=25 \
+    -d javaVersion=21 \
     -o spring-releases-mcp-server.zip && \
   unzip spring-releases-mcp-server.zip -d ~/spring-releases-mcp-server
 session: 3
 ```
 
-Because `web` is selected alongside it, the Initializr id `spring-ai-mcp-server` resolves to the WebMVC starter `spring-ai-starter-mcp-server-webmvc`, which provides the HTTP/Streamable transport. Note that, unlike the Support Assistant, the server doesn't need a model provider starter (OpenAI, Anthropic, Amazon Bedrock, or Ollama) — it only *exposes* tools over the protocol and never calls an LLM itself.
+Because you also selected `web`, the Initializr id `spring-ai-mcp-server` resolves to the WebMVC starter `spring-ai-starter-mcp-server-webmvc`. That starter provides the HTTP Streamable transport. Unlike the support assistant, this server does not need a model provider starter such as OpenAI, Anthropic, Amazon Bedrock, or Ollama. It only *exposes* tools over the protocol and never calls an LLM itself.
 
 ### Configure the Server
 
 ```editor:select-matching-text
 file: ~/spring-releases-mcp-server/src/main/resources/application.properties
 text: "spring.application.name=spring-releases"
-description: "Apply - Configure the MCP server"
+description: "Configure the MCP server"
 before: 0
 after: 0
 cascade: true
@@ -52,11 +52,11 @@ text: |
   logging.level.io.modelcontextprotocol.server=DEBUG
 ```
 
-The server will be reachable at `http://localhost:8081/mcp`. The `STREAMABLE` protocol matches what the Support Assistant client will be configured to call, and the server name `spring-releases` is what clients see when they introspect the connection.
+The server will be reachable at `http://localhost:8081/mcp`. The `STREAMABLE` protocol matches what the support assistant client will call. The server name `spring-releases` is what clients see when they inspect the connection.
 
 ### The Domain Record
 
-Create a record that is a direct projection of what `api.spring.io` returns for a single release:
+Create a record that maps directly to what `api.spring.io` returns for a single release.
 
 ```editor:append-lines-to-file
 file: ~/spring-releases-mcp-server/src/main/java/com/example/spring_releases/SpringRelease.java
@@ -70,7 +70,7 @@ text: |
 
 ### The MCP Tool Service
 
-Now create the service that exposes the release lookup as an MCP tool:
+Now create the service that exposes the release lookup as an MCP tool.
 
 ```editor:append-lines-to-file
 file: ~/spring-releases-mcp-server/src/main/java/com/example/spring_releases/SpringReleasesInfoService.java
@@ -115,11 +115,11 @@ text: |
   }
 ```
 
-Three things worth flagging:
+Three things are worth noting.
 
-- **`@McpTool` / `@McpToolParam`**, from `org.springframework.ai.mcp.annotation`, are the **MCP-specific** annotations — not the in-process `@Tool` / `@ToolParam` used in `SupportTicketService`. The MCP server auto-discovers any bean with `@McpTool` methods and registers them with the protocol.
-- **`RestClient`** pulls live data from Spring's public release API. A real production tool would add error handling, caching, and retry; this version stays minimal so the protocol is what stands out.
-- **The inner `ReleasesResponse` / `Embedded` records** model HAL's `_embedded` envelope — just Jackson plumbing for the API response.
+- **`@McpTool` and `@McpToolParam`** come from `org.springframework.ai.mcp.annotation`. These are the **MCP-specific** annotations. They are not the in-process `@Tool` and `@ToolParam` you used in `SupportTicketService`. The MCP server finds every bean with `@McpTool` methods and registers them with the protocol.
+- **`RestClient`** pulls live data from Spring's public release API. A real production tool would add error handling, caching, and retries. This version stays simple so the protocol is what stands out.
+- **The inner `ReleasesResponse` and `Embedded` records** are only Jackson plumbing for the API response.
 
 ### Run It
 
@@ -132,7 +132,7 @@ You should see the embedded MCP server start on port 8081 and log one registered
 
 ## Test the MCP Server Directly
 
-The Streamable HTTP transport speaks JSON-RPC over HTTP. The first request must be `initialize`, which returns the session id in the `Mcp-Session-Id` response header; reuse that header on follow-up calls.
+The Streamable HTTP transport speaks JSON-RPC over HTTP. The first request must be `initialize`. It returns the session id in the `Mcp-Session-Id` response header. Reuse that header on the calls that follow.
 
 ```terminal:execute
 command: |-
@@ -154,7 +154,7 @@ command: |-
 session: 1
 ```
 
-List the tools the server advertises:
+List the tools the server advertises.
 
 ```terminal:execute
 command: |-
@@ -171,9 +171,9 @@ command: |-
 session: 1
 ```
 
-You should see one entry — `fetchReleasesInfo`, its description, and the JSON schema for the `projectSlug` parameter.
+You should see one entry. It is `fetchReleasesInfo`, with its description and the JSON schema for the `projectSlug` parameter.
 
-Call the tool directly:
+Call the tool directly.
 
 ```terminal:execute
 command: |-
@@ -193,8 +193,8 @@ command: |-
 session: 1
 ```
 
-You'll get back the current Spring Boot releases array from `api.spring.io`, wrapped in MCP's content envelope. For further exploration, the MCP Inspector (`npx @modelcontextprotocol/inspector`) handles session management and pretty-prints the protocol — much nicer than raw curl.
+You get back the current Spring Boot releases array from `api.spring.io`, wrapped in MCP's content envelope.
 
 ## Summary
 
-Your Spring Releases MCP server is up, exposing `fetchReleasesInfo` over the Streamable HTTP transport — and you've spoken the protocol to it directly. Keep it running: next, the Support Assistant connects to it as an MCP client.
+Your Spring Releases MCP server is running. It exposes `fetchReleasesInfo` over the Streamable HTTP transport, and you have spoken the protocol to it directly. Keep it running. Next, the Support Assistant connects to it as an MCP client.

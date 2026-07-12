@@ -6,3 +6,8 @@ set -eo pipefail
 jq ". + { \"editor.fontSize\": 14, \"files.exclude\": { \".**\": true}}" /home/eduk8s/.local/share/code-server/User/settings.json > /home/eduk8s/.local/share/code-server/User/settings.json.tmp && mv /home/eduk8s/.local/share/code-server/User/settings.json.tmp /home/eduk8s/.local/share/code-server/User/settings.json
 
 chmod +x sample-app/mvnw
+chmod +x spring-releases-mcp-server/mvnw
+
+code-server --install-extension redhat.java
+(cd sample-app && ./mvnw dependency:go-offline)
+(cd spring-releases-mcp-server && ./mvnw dependency:go-offline)

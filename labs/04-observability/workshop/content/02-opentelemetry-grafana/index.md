@@ -91,9 +91,15 @@ description: Capture every request in traces
 text: |2
 
   management.tracing.sampling.probability=1.0
+  management.otlp.metrics.export.step=5s
+  management.metrics.tags.application=${spring.application.name}
 ```
 
 `sampling.probability=1.0` captures every request. That is fine for development, but lower it to `0.1` or `0.01` before anything close to production traffic.
+
+`management.otlp.metrics.export.step=5s` pushes metrics every 5 seconds instead of the 1 minute default, so your token and latency numbers show up in Grafana almost right away. Keep the interval short for the workshop, and raise it again for production to cut down on data volume.
+
+`management.metrics.tags.application=${spring.application.name}` adds an `application` tag with the value `support-assistant` to every metric. Common tags like this let you filter and group in Grafana by application, which matters once more than one service pushes into the same stack.
 
 ## Start the App and Explore in Grafana
 
@@ -140,18 +146,67 @@ sum by (gen_ai_token_type, gen_ai_request_model) (
 
 In plain words this asks how many tokens per second you use across the last minute, broken down by whether they were input or output and by which model served them.
 
-## Disable the Stack by Default
+## Make Observability Opt-In With a Profile
 
-The otel-lgtm container is heavy and you do not want it on every run. Turn off the Compose management and the OTLP exporters by default, so the base application stays lightweight.
+The otel-lgtm container is heavy, and the verbose prompt and completion logging is a data volume and privacy risk. You do not want either on every run. Move all of it behind a profile so the default run stays lightweight, and you switch the full stack on only when you want it.
+
+First, gate the otel-lgtm service behind an `otel` Docker Compose profile, so Compose does not start it unless that profile is active.
 
 ```editor:append-lines-to-file
-file: ~/sample-app/src/main/resources/application.properties
-description: Disable the Compose stack and OTLP export by default
+file: ~/sample-app/compose.yaml
+description: Put otel-lgtm behind the otel compose profile
 text: |2
+      profiles:
+        - otel
+```
 
-  # Disabled by default, the observability stack is opt-in for local exploration
-  spring.docker.compose.enabled=false
+Now collect every opt-in setting in a profile-specific `application-local-observability.properties`. Spring Boot loads this file only when the `local-observability` profile is active, and its values override `application.properties`. The last line activates the `otel` Compose profile, so turning on the Spring profile also starts the otel-lgtm container.
+
+```editor:append-lines-to-file
+file: ~/sample-app/src/main/resources/application-local-observability.properties
+description: Create the local-observability profile with the opt-in configuration
+text: |
+  # Not recommended for production - high data volume and risk of exposing sensitive content
+  spring.ai.chat.client.observations.log-prompt=true
+  spring.ai.chat.client.observations.log-completion=true
+  spring.ai.chat.client.observations.include-error-logging=true
+  spring.ai.tools.observations.include-content=true
+  spring.ai.vectorstore.observations.log-query-response=true
+
+  management.otlp.metrics.export.enabled=true
+  management.otlp.metrics.export.step=5s
+  management.metrics.tags.application=${spring.application.name}
+
+  management.otlp.tracing.export.enabled=true
+  management.tracing.sampling.probability=1.0
+
+  spring.docker.compose.profiles.active=otel
+```
+
+Finally, take the same settings back out of `application.properties` and turn the exporters off by default, so nothing is exported and nothing sensitive is logged unless you ask for it.
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/resources/application.properties
+text: "# Not recommended for production - high data volume and risk of exposing sensitive content"
+description: Replace the inline observability config with disabled defaults
+after: 9
+cascade: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/resources/application.properties
+hidden: true
+text: |2
+  # The observability stack is opt-in, enable it with the local-observability profile
   management.otlp.metrics.export.enabled=false
   management.otlp.tracing.export.enabled=false
   management.otlp.logging.export.enabled=false
 ```
+
+Now the default run is lightweight, with no exporters and no otel-lgtm container. When you want the full stack again, start the application with the `local-observability` profile.
+
+```
+./mvnw spring-boot:run -Dspring-boot.run.profiles=local-observability
+```
+
+The profile turns the exporters back on and, through `spring.docker.compose.profiles.active=otel`, starts the otel-lgtm container again.
