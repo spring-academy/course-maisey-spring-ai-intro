@@ -2,7 +2,7 @@ So far you've used the `ChatClient` to send a prompt and shape the response, and
 
 Spring AI solves this with **advisors**. An advisor is the extension point that lets you add such cross-cutting behavior once and apply it to every call a `ChatClient` makes, while your prompting code stays the same fluent chain you already know.
 
-## The Advisor API
+## The Advisors API
 
 Interceptors are an essential part that enables programmers to control the execution by intercepting it. Spring also supports a variety of interceptors for different purposes, such as the `HandlerInterceptor` or `ClientHttpRequestInterceptor`.
 If you've used on of those, advisors will feel familiar. 
@@ -53,7 +53,7 @@ ChatClient chatClient = builder
     .build();
 ```
 
-Or you attach them **per request**, when a single call needs behavior the client's defaults don't include. This is also where you feed values into that shared context map, by passing a parameter to the advisor at call time.
+Or you attach them **per request**, when a single call needs behavior the client's defaults don't include. This is also where you feed dynamic values into that shared context map, by passing a parameter to the advisor at call time.
 
 ```java
 String answer = chatClient.prompt()
@@ -65,9 +65,7 @@ String answer = chatClient.prompt()
 
 ## Built-in Advisors
 
-Spring AI ships a set of built-in advisors for exactly these recurring patterns. The **chat-memory advisors** maintain conversation history, a **`SafeGuardAdvisor`** blocks unwanted content, a **`SimpleLoggerAdvisor`** logs the request and response, the **`ToolCallingAdvisor`** runs the tool-calling loop, and the **RAG advisors** ground answers in your own documents. You'll meet the tool-calling and RAG advisors in the advanced patterns module.
-
-The beauty of the pattern is that adding any of these is a configuration change on the `ChatClient`, while your prompting code stays the same fluent chain. And when none of the built-in advisors fits, you write your own by implementing `CallAdvisor` (and `StreamAdvisor` for streaming), exactly as the logging example above showed.
+Spring AI ships a set of built-in advisors for exactly these recurring patterns. The structured output parsing, which was introduced in the previous section, is implemented in the `ChatModelCallAdvisor` and configured by default. The **chat-memory advisors** maintain conversation history, a **`SafeGuardAdvisor`** blocks unwanted content, a **`SimpleLoggerAdvisor`** logs the request and response, the **`ToolCallingAdvisor`** runs the tool-calling loop, and the **RAG advisors** ground answers in your own documents. You'll meet the tool-calling and RAG advisors in the advanced patterns module.
 
 ## The Chat Memory Advisor
 
@@ -75,7 +73,7 @@ A language model has no memory of its own. Each call is stateless, so on its own
 
 Spring AI offers two variants. The **`MessageChatMemoryAdvisor`** retrieves the past messages and adds them to the prompt as real message objects, keeping the original user and assistant roles. The **`VectorStoreChatMemoryAdvisor`** stores the history in a `VectorStore` and pulls back only the most relevant pieces as text, which suits very long conversations where replaying everything would be wasteful. For most applications the message variant is the right default.
 
-Both advisors delegate the actual storage to a **`ChatMemory`**. The default implementation is **`MessageWindowChatMemory`**, a sliding window that keeps the most recent messages up to a limit (20 by default) and drops the oldest whole turns once the window is full. You build one and hand it to the advisor.
+Both advisors delegate the actual storage to a **`ChatMemory`**. The default implementation is **`MessageWindowChatMemory`**, a sliding window that keeps the most recent messages up to a limit (20 by default) and drops the oldest whole turns once the window is full. You create an instance and hand it to the advisor.
 
 ```java
 ChatMemory chatMemory = MessageWindowChatMemory.builder()
@@ -99,25 +97,23 @@ String answer = chatClient.prompt()
     .content();
 ```
 
-This id is required. If you leave it out the advisor throws at runtime, because it has no way to tell one user's conversation from another. In practice you derive it from something stable like the user or session, so each user keeps a separate history. You can read more in the [Chat Memory reference](https://docs.spring.io/spring-ai/reference/api/chat-memory.html).
+This id is required. If you leave it out the advisor throws at runtime, because it has no way to tell one user's conversation from another. In practice you derive it from something stable like the user or session, so each user keeps a separate history.
 
 ## Recursive Advisors
 
-Every advisor so far calls `chain.nextCall(request)` exactly once, so the request travels down the chain a single time. Some patterns need to reach the model more than once for one user call. Tool calling asks the model, runs the tools it requested, sends the results back for another round, and repeats until the model is done. Validating structured output means checking the answer against a schema and asking again when it does not fit.
+Every advisor so far calls `chain.nextCall(request)` exactly once, so the request travels down the chain a single time. Some patterns need to reach the model more than once for one user call. Validating structured output, for example, means checking the answer against a schema and asking again when it does not fit.
 
 A **recursive advisor** handles this by looping the downstream part of the chain. Instead of calling `nextCall` once, it takes a copy of the chain that holds only the advisors after itself, with `chain.copy(this)`, and invokes that sub-chain as many times as it needs. Working on a copy keeps the ordering correct and makes sure the advisors before it do not run again on every loop.
 
 ```java
 CallAdvisorChain downstream = chain.copy(this); // only the advisors after this one
 ChatClientResponse response = downstream.nextCall(request);
-while (needsAnotherRound(response)) {
-    request = updateRequest(request, response);   // e.g. add the tool results
-    response = downstream.nextCall(request);      // call the model again
+int attempt = 1;
+while (!matchesSchema(response) && attempt < maxAttempts) {
+    request = mutateRequestWithFeedback(request, response); // point out how the JSON broke the schema
+    response = downstream.nextCall(request);           // let the model correct itself
+    attempt++;
 }
 ```
 
-Spring AI ships two recursive advisors you will use later. The **`ToolCallingAdvisor`** runs the tool-calling loop until the model asks for no more tools, and the **`StructuredOutputValidationAdvisor`** validates the response and retries a few times when it does not match your type. One thing to keep in mind is that memory advisors usually sit outside such a loop. You can read more in the [Recursive Advisors reference](https://docs.spring.io/spring-ai/reference/api/advisors-recursive.html).
-
-## What's Next
-
-You now understand how advisors wrap a `ChatClient` call, how they chain together, and how the built-in ones let you add features with a single line on the builder. In the next section you'll put this into practice in a hands-on lab, first building your own logging advisor step by step, then swapping it for the built-in `SimpleLoggerAdvisor`.
+Examples for recursive advisors Spring AI ships are the **`StructuredOutputValidationAdvisor`** that validates the response and retries a few times when it does not match your type and the  **`ToolCallingAdvisor`**, that runs the tool-calling loop until the model asks for no more tools, you will use later.

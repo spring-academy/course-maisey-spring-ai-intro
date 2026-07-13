@@ -1,2 +1,3 @@
 - Provide (additional) and display images correctly
 - Add Multimodality to lab
+- Formatting of lists in articles

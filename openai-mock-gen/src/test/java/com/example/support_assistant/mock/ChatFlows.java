@@ -2,6 +2,7 @@ package com.example.support_assistant.mock;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import org.jspecify.annotations.Nullable;
+import org.springframework.ai.chat.client.AdvisorParams;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
@@ -95,7 +96,13 @@ final class ChatFlows {
         // Build through mutate() so the shared chatClientBuilder keeps no default system prompt.
         // The Lab 04 RelevancyEvaluator reuses chatClientBuilder, and the sample-app injects a
         // fresh builder there, so it must stay free of a system message for the fixtures to match.
-        var chatClientWithSystemPrompt = chatClientBuilder.build().mutate().defaultSystem(systemPrompt).build();
+        // The sample-app enables native structured output as a default advisor from the
+        // structured-output lab onward, so every .entity() call below records with it too.
+        // (It is a no-op for the .content() and .stream() calls, which do no structured conversion.)
+        var chatClientWithSystemPrompt = chatClientBuilder.build().mutate()
+                .defaultSystem(systemPrompt)
+                .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
+                .build();
 
         assertNotBlank(chatClientWithSystemPrompt.prompt()
                 .user("Answer the following question with a short, well-structured explanation: Tell me about Spring AI")

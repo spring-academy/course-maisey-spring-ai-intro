@@ -138,6 +138,53 @@ text: |2
       }
 ```
 
+### Enable Native Structured Output
+
+The `.entity(...)` call so far is **prompt-based**. Spring AI adds the format instructions to the prompt and trusts the model to follow them. Many providers, OpenAI among them, can do better and enforce the shape at the API level, a feature called **native structured output**. You turn it on once on the `ChatClient` bean, and every `.entity(...)` call then uses it.
+
+Update the bean in `SupportAssistantConfiguration`:
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+text: ".defaultSystem(systemPrompt)"
+before: 0
+after: 0
+description: Enable native structured output on the ChatClient
+cascade: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+hidden: true
+cascade: true
+text: |2
+                  .defaultSystem(systemPrompt)
+                  .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
+```
+
+Note that `AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT` is not an advisor. It is a `Consumer<ChatClient.AdvisorSpec>` that sets an advisor parameter which switches native output on. That is why it goes through the consumer form of `defaultAdvisors(...)` and stays in its own call, separate from the advisor instances you register later, such as the logging and memory advisors in the next section.
+
+Add the import for it:
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+text: "import org.springframework.ai.chat.client.ChatClient;"
+before: 0
+after: 0
+hidden: true
+cascade: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+hidden: true
+text: |
+  import org.springframework.ai.chat.client.ChatClient;
+  import org.springframework.ai.chat.client.AdvisorParams;
+```
+
+With native output on, Spring AI sends your type's JSON schema to the provider and the provider constrains the model to match it, instead of only asking in the prompt. One caveat to remember: OpenAI's native mode does not allow a top-level array, so a method that returns a `List` directly needs a record that wraps the list instead.
+
 The same `curl` now returns JSON:
 ```execute
 curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"

@@ -312,8 +312,3 @@ String answer = chatClient.prompt()
 ```
 
 Which modalities actually work depends on the provider and the specific model. Image understanding is the most widely supported, offered on the vision-capable models from providers such as OpenAI, Anthropic, Google Gemini, Amazon Bedrock, Mistral, and Ollama, with audio and video available on a smaller subset.
-
-
-## What's Next
-
-You now have the core mental model: models are REST APIs, `ChatModel` is the portable contract over them, `ChatClient` is the fluent, batteries-included API you'll reach for in everyday application code, and structured output turns model responses into type-safe domain objects. In the next section you'll learn more about the **Advisors** API, the mechanism Spring AI uses to add cross-cutting behavior around every call, like the structured output parsing.

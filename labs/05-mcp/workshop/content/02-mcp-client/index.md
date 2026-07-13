@@ -57,7 +57,7 @@ file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantC
 text: "public ChatClient chatClient(ChatClient.Builder builder,"
 description: "Register the MCP tools as default tools"
 before: 1
-after: 9
+after: 10
 cascade: true
 ```
 
@@ -73,6 +73,7 @@ text: |2
                                    ToolCallbackProvider tools) {
           return builder
                   .defaultSystem(systemPrompt)
+                  .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
                   .defaultAdvisors(
                           new SimpleLoggerAdvisor(Ordered.LOWEST_PRECEDENCE),
                           MessageChatMemoryAdvisor.builder(chatMemory).build())

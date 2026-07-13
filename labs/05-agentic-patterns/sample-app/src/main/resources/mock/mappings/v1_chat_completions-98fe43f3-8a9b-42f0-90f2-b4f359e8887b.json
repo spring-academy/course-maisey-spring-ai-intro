@@ -1,0 +1,48 @@
+{
+  "id" : "98fe43f3-8a9b-42f0-90f2-b4f359e8887b",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-E15oRR8wu4W9fEWLiOIBstBGsnJy1\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783929379,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"Spring AI is Spring’s project for building AI-powered applications in the Spring ecosystem. It provides a consistent, Spring-style abstraction over different AI providers and model types, so you can integrate things like chat models, embeddings, image generation, and vector stores without tying your app too closely to one vendor.\\n\\n### What it helps with\\n- **Chat and text generation** with LLMs\\n- **Embeddings** for semantic search and retrieval\\n- **Vector store integration** for RAG-style apps\\n- **Prompt and message handling** in a Spring-friendly way\\n- **Tool/function calling** support, depending on the provider\\n\\n### Why use it\\n- Fits naturally into **Spring Boot** applications\\n- Reduces provider-specific boilerplate\\n- Makes it easier to switch or combine AI backends\\n- Works well for building **RAG**, assistants, and AI-enhanced business apps\\n\\n### Official docs\\n- Spring AI reference documentation: https://docs.spring.io/spring-ai/reference/\\n\\nIf you want, I can also give you a quick “Spring AI in 5 minutes” overview or show a simple example.\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 59,\n    \"completion_tokens\": 228,\n    \"total_tokens\": 287,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "20ms",
+      "set-cookie" : "__cf_bm=Fs.DfmnPn0aATd4xvGeFU8w4sXzje_pUdF0XqfEIElw-1783929378.8991506-1.0.1.1-F1vdVhAnJxCLAznoXwlcB4KWxDYPxOMqpyWU0gqVADDMA14B57jnFfcqywaHnQAn03cNfwJuckObqieWEPq0RZt3bZuh7UW.yT1rzorffTwkctrd29PPKKLcj7g8CM.m; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 13 Jul 2026 08:26:21 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_c6ab7b4abe7a4fbfb61c94e5179af582",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a1a6bafa1d03a60f-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199932",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Mon, 13 Jul 2026 07:56:21 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "2161",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "98fe43f3-8a9b-42f0-90f2-b4f359e8887b",
+  "persistent" : true,
+  "insertionIndex" : 125
+}

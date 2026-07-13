@@ -94,7 +94,7 @@ file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantC
 text: "public ChatClient chatClient(ChatClient.Builder builder,"
 description: "Add the Tool Search advisor to the ChatClient"
 before: 1
-after: 11
+after: 12
 cascade: true
 ```
 
@@ -116,6 +116,7 @@ text: |2
 
           return builder
                   .defaultSystem(systemPrompt)
+                  .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
                   .defaultAdvisors(
                           new SimpleLoggerAdvisor(Ordered.LOWEST_PRECEDENCE),
                           MessageChatMemoryAdvisor.builder(chatMemory).build(),

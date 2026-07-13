@@ -1,0 +1,48 @@
+{
+  "id" : "8f1bffb8-2092-4a22-8118-371dce358340",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about Spring AI\",\"role\":\"user\"},{\"role\":\"assistant\",\"content\":\"{\\\"answer\\\":\\\"Spring AI is a Spring project for building AI-powered applications in Java. It provides a consistent, Spring-friendly way to work with generative AI models, embeddings, chat, prompt management, and vector stores, while integrating with the broader Spring ecosystem. Official docs: https://docs.spring.io/spring-ai/reference/\\\",\\\"category\\\":\\\"GENERAL\\\"}\"},{\"content\":\"Answer the following question with a short, well-structured explanation: What did I just ask you about?\\nYour response should be in JSON format.\\nDo not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.\\nDo not include markdown code blocks in your response.\\nRemove the ```json markdown from the output.\\nHere is the JSON Schema instance your output must adhere to:\\n```{\\n  \\\"$schema\\\" : \\\"https://json-schema.org/draft/2020-12/schema\\\",\\n  \\\"type\\\" : \\\"object\\\",\\n  \\\"properties\\\" : {\\n    \\\"answer\\\" : {\\n      \\\"type\\\" : \\\"string\\\",\\n      \\\"description\\\" : \\\"The helpful answer to the customer's question\\\"\\n    },\\n    \\\"category\\\" : {\\n      \\\"type\\\" : \\\"string\\\",\\n      \\\"enum\\\" : [ \\\"TECHNICAL\\\", \\\"BILLING\\\", \\\"SECURITY\\\", \\\"GENERAL\\\" ],\\n      \\\"description\\\" : \\\"The category of the support question: TECHNICAL, BILLING, SECURITY, or GENERAL\\\"\\n    }\\n  },\\n  \\\"required\\\" : [ \\\"answer\\\", \\\"category\\\" ],\\n  \\\"additionalProperties\\\" : false\\n}```\\n\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 4)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-E15ocFMyZ1AbFMrHR5QGNX2VmmmB1\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783929390,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"answer\\\":\\\"You asked about Spring AI, which is Spring’s project for building AI-powered applications in Java. Official docs: https://docs.spring.io/spring-ai/reference/\\\",\\\"category\\\":\\\"GENERAL\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 377,\n    \"completion_tokens\": 43,\n    \"total_tokens\": 420,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "119ms",
+      "set-cookie" : "__cf_bm=a7UbMvA8bW4DKHmCW2_K3ms2pPdHxGFVluRgS7vIJbw-1783929390.0805151-1.0.1.1-fdAKc_.xqg8BiTtlP8J2inMp.uvaXWjwnGFpXxiw1.Lij6ZeVKsUiEAf4_hZcZjhNJh1SQG6kPGLU2HS9NCNwiCTQdjYzpi1pLnt1dLxlEzq1pL3HTeR9s7UJ6Ud_QZv; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 13 Jul 2026 08:26:30 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_4969bd8e34284ce0ab18c4cd75f0de43",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a1a6bb3ffd7e2cf5-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199603",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Mon, 13 Jul 2026 07:56:30 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "695",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "8f1bffb8-2092-4a22-8118-371dce358340",
+  "persistent" : true,
+  "insertionIndex" : 122
+}

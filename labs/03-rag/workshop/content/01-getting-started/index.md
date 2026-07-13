@@ -54,7 +54,7 @@ As already mentioned, this lab uses the in memory `SimpleVectorStore`. This stor
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
 description: Add the SimpleVectorStore bean
 cascade: true
-line: 17
+line: 18
 text: |2
 
       @ConditionalOnMissingBean(VectorStore.class)
