@@ -126,7 +126,10 @@ final class ChatFlows {
         assertTrue(jsonStringResponse.contains("category") && jsonStringResponse.contains("answer"), "json content contains relevant attributes");
 
         var chatMemory = MessageWindowChatMemory.builder().build();
+        // mutate() does not carry over the native structured-output advisor param, so re-apply it
+        // here to match the sample-app's config bean (which enables it on every call).
         var memoryClient = chatClientWithSystemPrompt.mutate()
+                .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
         var conversationId = "123e4567-e89b-12d3-a456-426614174000";
@@ -265,6 +268,7 @@ final class ChatFlows {
         // fetchReleasesInfo, without a connection prefix). The recorder strips tool-result content
         // from the request matcher, so a canned return value is enough for the fixtures to match.
         var mcpChatClient = chatClientWithSystemPrompt.mutate()
+                .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
                 .defaultTools(springReleasesToolCallback())
                 .build();
         for (var mcpQuestion : List.of(

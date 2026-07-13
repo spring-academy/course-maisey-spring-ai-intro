@@ -6,14 +6,14 @@ In this lab you will start building a **support assistant** that answers custome
 
 ## Scaffold the Application
 
-Before we write any code we need a Spring Boot application to build on. Every Spring Boot project starts from a small set of dependencies, and for this lab we need four of them.
+Before you write any code you need a Spring Boot application to build on. Every Spring Boot project starts from a small set of dependencies. For this lab you need four of them.
 
-- **Spring Web** lets us expose a REST API so clients can send their questions over HTTP.
-- **Spring Boot Actuator** adds health and monitoring endpoints so we can check that the application is running.
-- The **Spring AI starter** brings in the client that talks to our AI provider.
-- **Spring Boot DevTools** restarts the running application automatically when the compiled classes change, so we can iterate quickly without stopping and starting the app by hand.
+- **Spring Web** lets you expose a REST API, so clients can send their questions over HTTP.
+- **Spring Boot Actuator** adds health and monitoring endpoints, so you can check that the application is running.
+- The **Spring AI starter** brings in the client that talks to your AI provider.
+- **Spring Boot DevTools** restarts the running application automatically when the compiled classes change, so you can work quickly without stopping and starting the app by hand.
 
-We generate the project with the [Spring Initializr](https://start.spring.io). The command below asks the Initializr for exactly those dependencies and downloads the project as a zip file.
+You generate the project with the [Spring Initializr](https://start.spring.io). The command below asks the Initializr for exactly those dependencies and downloads the project as a zip file.
 
 {{< note >}}
 You don't have to run this. The generated project is already prepared for you in `~/sample-app`, and the rest of this lab edits the files in that folder.
@@ -32,7 +32,7 @@ curl https://start.spring.io/starter.zip \
 
 This workshop uses an **OpenAI compatible mock API**, but Spring AI ships a starter for every common provider. Swapping `spring-ai-openai` for `spring-ai-anthropic`, `spring-ai-ollama`, or `spring-ai-bedrock-converse` would pull the matching starter instead.
 
-Let's look at what the starter added to the project. First the provider-specific dependency.
+Now look at what the starter added to the project. First the provider-specific dependency.
 
 ```editor:select-matching-text
 file: ~/sample-app/pom.xml
@@ -63,7 +63,7 @@ before: 0
 after: 2
 ```
 
-The three `spring.mvc.apiversion.*` lines enable path-segment API versioning. This is a new feature in Spring Framework 7 and Spring Boot 4 that we will use for our REST endpoints such as `/api/v1/...`.
+The three `spring.mvc.apiversion.*` lines enable path-segment API versioning. This is a new feature in Spring Framework 7 and Spring Boot 4. You will use it for your REST endpoints, such as `/api/v1/...`.
 
 You will also notice the `spring.devtools.restart.enabled=true` line.
 
@@ -118,7 +118,3 @@ curl http://localhost:8080/actuator/health
 You should see `{"status":"UP"}`.
 
 Keep the app running in the second terminal. From here on each step is a small edit and a `curl`. You do not restart the app by hand.
-
-## Summary
-
-We scaffolded the support assistant project, explored the Spring AI starter and BOM, configured the OpenAI provider declaratively, and verified that the application starts. Now it is time to talk to the model.

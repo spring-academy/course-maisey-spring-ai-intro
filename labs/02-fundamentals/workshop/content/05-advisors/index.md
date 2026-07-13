@@ -2,7 +2,7 @@
 title: Advisors
 ---
 
-In the article you met the **advisor**, an interceptor that wraps a `ChatClient` call. It runs *before* the request reaches the model and *after* the response comes back, and several advisors form a chain. In this section you'll first build your own logging advisor by hand, so the mechanics are clear, and then replace it with the built-in `SimpleLoggerAdvisor`.
+In the article you met the **advisor**, an interceptor that wraps a `ChatClient` call. It runs *before* the request reaches the model and *after* the response comes back, and several advisors form a chain. 
 
 ## Write a Custom Logging Advisor
 
@@ -119,7 +119,7 @@ text: |
   import org.springframework.core.Ordered;
 ```
 
-The `SimpleLoggerAdvisor` logs at `DEBUG` level, so it stays quiet in production by default. Turn on `DEBUG` for the advisor package so we can see its output:
+The `SimpleLoggerAdvisor` logs at `DEBUG` level, so it stays quiet in production by default. Turn on `DEBUG` for the advisor package so you can see its output:
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/resources/application.properties
@@ -254,7 +254,7 @@ text: |2
 
 ## Provide or Generate a Conversation Id
 
-The conversation id comes from the client. Let the endpoint read it from an optional `X-Conversation-Id` request header. When the client sends one, we reuse it and continue that conversation. When it does not, we generate a fresh id. Either way we return the id in the `X-Conversation-Id` response header, so the client knows which value to send back on the next request. The same header name carries the id in both directions.
+The conversation id comes from the client. Let the endpoint read it from an optional `X-Conversation-Id` request header. When the client sends one, you reuse it and continue that conversation. When it does not, you generate a fresh id. Either way you return the id in the `X-Conversation-Id` response header, so the client knows which value to send back on the next request. The same header name carries the id in both directions.
 
 Update the chat endpoint:
 ```editor:select-matching-text
@@ -321,8 +321,3 @@ curl -G "http://localhost:8080/api/v1/chat" -H "X-Conversation-Id: 123e4567-e89b
 
 Now look at the application logs in the second terminal. On the second call the `request:` line logged by `SimpleLoggerAdvisor` contains the earlier question and answer as well as the new question. The memory advisor added that history, which is exactly what lets the model follow up.
 
-## Summary
-
-You started with a custom `CallAdvisor`, replaced it with the built-in `SimpleLoggerAdvisor`, and then added conversation memory with `MessageChatMemoryAdvisor`, passing a conversation id per call and returning it to the client. Every one of these was a change on the `ChatClient` and the endpoint, while your prompting code stayed the same fluent chain. That is the whole point of the advisor pattern.
-
-In the advanced patterns module you'll meet more powerful advisors, including the ones that add tool calling and retrieval augmented generation.

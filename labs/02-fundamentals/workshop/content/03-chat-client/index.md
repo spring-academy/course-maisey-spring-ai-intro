@@ -6,7 +6,7 @@ title: The Fluent ChatClient API
 
 ## Switch to ChatClient
 
-Spring Boot auto-configures a `ChatClient.Builder` but not a `ChatClient` itself, so first we expose one as a bean:
+Spring Boot auto-configures a `ChatClient.Builder` but not a `ChatClient` itself, so first you expose one as a bean.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
@@ -28,7 +28,7 @@ text: |
   }
 ```
 
-Now replace the `ChatModel` in our service with `ChatClient`:
+Now replace the `ChatModel` in your service with `ChatClient`.
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
@@ -114,7 +114,7 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 Models generate text token by token. Swap `.call()` for `.stream()` to get a reactive `Flux<String>` and stream tokens to the client as soon as they arrive. This is what powers the "typewriter" effect in chatbots.
 
-To keep this focused, we add the whole streaming call as a throwaway endpoint directly in the controller and remove it again at the end of this section. The rest of the lab stays on the blocking `.call()`. 
+To keep this focused, you add the whole streaming call as a throwaway endpoint directly in the controller, and remove it again at the end of this section. The rest of the lab stays on the blocking `.call()`. 
 
 Inject the `ChatClient` into the controller so the streaming method can use it directly.
 
@@ -469,9 +469,3 @@ Test, then check the logs in the second terminal for the full `ChatResponse` wit
 ```execute
 curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
 ```
-
-## Summary
-
-You've switched to the fluent `ChatClient`, a configured bean with shared defaults (`defaultSystem`), inline user/system prompts, a quick look at streaming, and access to the full `ChatResponse`.
-
-One more feature to go, the structured output parsing.

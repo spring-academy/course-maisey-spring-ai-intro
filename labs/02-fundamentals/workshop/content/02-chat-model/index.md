@@ -2,11 +2,11 @@
 title: The Low-Level ChatModel API
 ---
 
-`ChatModel` is the foundational interface that every chat provider implements (`OpenAiChatModel`, `AnthropicChatModel`, `OllamaChatModel`, ...). Thanks to the starter's auto-configuration, it is already available as a Spring bean. Let's use it.
+`ChatModel` is the foundational interface that every chat provider implements (`OpenAiChatModel`, `AnthropicChatModel`, `OllamaChatModel`, ...). Thanks to the starter's auto-configuration, it is already available as a Spring bean. Now use it.
 
 ## Create the Service
 
-Create a service that delegates the user's query to the model. `call(String)` is the convenience overload, Spring AI wraps the string in a `Prompt` for you and unwraps the response back to a `String`:
+Create a service that passes the user's query to the model. `call(String)` is the convenient overload. Spring AI wraps the string in a `Prompt` for you and unwraps the response back to a `String`.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
@@ -34,7 +34,7 @@ text: |
 
 ## Create the Controller
 
-Expose the service via a versioned REST endpoint. The `v{version}` path segment is resolved by the API versioning we saw in `application.properties`:
+Expose the service through a versioned REST endpoint. The `v{version}` path segment is resolved by the API versioning you saw in `application.properties`.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
@@ -68,11 +68,11 @@ Try it:
 curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
 ```
 
-You should get back a plain-text answer. Everything from here on is changes to `generateResponse` (and a few extras).
+You should get back a plain-text answer. From here on you only change `generateResponse`, with a few extras.
 
 ## Add a System Message
 
-A raw `String` hides the message roles. Under the hood, a `Prompt` holds an ordered list of `Message` objects with roles: the **system** role shapes the model's tone and scope, the **user** role carries the question. Let's steer the model with a `SystemMessage` using the multi-message overload:
+A raw `String` hides the message roles. Under the hood, a `Prompt` holds an ordered list of `Message` objects, each with a role. The **system** role shapes the model's tone and scope. The **user** role carries the question. Now steer the model with a `SystemMessage`, using the multi-message overload.
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "return chatModel.call(query);"
@@ -108,7 +108,7 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 ## Use a PromptTemplate for the User Message
 
-In real apps the user message is rarely a raw string, it's a template filled with runtime data. `PromptTemplate` lets you write a message with `{placeholder}` variables and fill them in at call time, keeping the wording in one place:
+In real apps the user message is rarely a raw string. It is usually a template filled with runtime data. `PromptTemplate` lets you write a message with `{placeholder}` variables and fill them in at call time, so the wording stays in one place.
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
@@ -149,7 +149,7 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 ## Full Prompt with ChatOptions and ChatResponse
 
-Sometimes you need to override the model or sampling for a single call, or you want the metadata that comes back with the answer. Wrap the messages in a `Prompt` together with `ChatOptions`, and unwrap the full `ChatResponse`:
+Sometimes you need to override the model or the sampling for a single call, or you want the metadata that comes back with the answer. For that, wrap the messages in a `Prompt` together with `ChatOptions`, and read the full `ChatResponse`.
 
 > **Note:** Since Spring AI 2.0, the low-level `ChatModel` API requires provider-specific options. Use the provider's builder such as `OpenAiChatOptions.builder()` instead of the portable `ChatOptions.builder()`. 
 
@@ -213,9 +213,3 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 ```
 
 The application logs in the second terminal now include the full `ChatResponse`, with metadata such as the model that served the request and the token usage. Providers bill per token, so `chatResponse.getMetadata().getUsage()` is the foundation for cost monitoring.
-
-## Summary
-
-You've used the low-level `ChatModel` API: plain string calls, explicit `SystemMessage`/`UserMessage` roles, reusable `PromptTemplate`s, and the full `Prompt`/`ChatOptions`/`ChatResponse` round trip.
-
-`ChatModel` gives you full, explicit control, but everyday code reads better with the fluent `ChatClient`. That's next.

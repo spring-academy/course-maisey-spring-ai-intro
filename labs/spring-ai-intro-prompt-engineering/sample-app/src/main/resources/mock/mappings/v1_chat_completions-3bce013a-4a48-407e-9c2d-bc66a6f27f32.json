@@ -1,0 +1,48 @@
+{
+  "id" : "3bce013a-4a48-407e-9c2d-bc66a6f27f32",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream == true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 1)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "v1_chat_completions-3bce013a-4a48-407e-9c2d-bc66a6f27f32.txt",
+    "headers" : {
+      "x-request-id" : "req_fb2e6049ae7b4be588e913026ad34d54",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "Server" : "cloudflare",
+      "CF-Ray" : "a1a718684efae0d7-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199992",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Mon, 13 Jul 2026 09:00:06 GMT",
+      "x-ratelimit-reset-tokens" : "2ms",
+      "access-control-expose-headers" : [ "X-Request-ID", "CF-Ray", "CF-Ray" ],
+      "set-cookie" : "__cf_bm=Es0vgUEtiAgR_YTUrZeYDhMVYsXpPkPVKnpp8fkFwS4-1783933205.807872-1.0.1.1-fw6Tm5GwIOusXBCyX8thdL5wcZlzuU.yU1UKe.up24j0yQbfq0FSwFoGAhOGtz19I8hvcU._F8pblzc4XRMBTxJwTyU8BN3Vv.venQ4_d31UFoFPQrDVh3261FDydUXF; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 13 Jul 2026 09:30:06 GMT",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "232",
+      "alt-svc" : "h3=\":443\"; ma=86400",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "text/event-stream; charset=utf-8"
+    }
+  },
+  "uuid" : "3bce013a-4a48-407e-9c2d-bc66a6f27f32",
+  "persistent" : true,
+  "insertionIndex" : 127
+}

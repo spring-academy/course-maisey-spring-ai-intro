@@ -2,13 +2,13 @@
 title: Structured Output
 ---
 
-The model only ever returns text. Getting reliable, structured data out of it comes down to two things, how you ask and how you read the answer. Let's first do both by hand, then let Spring AI take over.
+The model only ever returns text. To get reliable, structured data out of it, you need to get two things right, how you ask and how you read the answer. First you do both by hand. Then you let Spring AI take over.
 
 ## Prompt Engineering and Few-Shot Prompting
 
 Prompt engineering is the practice of shaping the prompt so the model returns what you need. One of the most effective techniques is few-shot prompting, where you show the model a few examples of the exact output you want and it follows the pattern.
 
-Now we will make the model return JSON ourselves. We write the format rules and two examples in the system prompt. We send the question as the user message. The prompt has `{` and `}` characters in it. Spring AI normally reads `{...}` as a template variable, so we use the plain `.system(String)` method. This way the braces stay as normal text. Update `generateResponse`:
+Now you make the model return JSON yourself. You write the format rules and two examples in the system prompt, and you send the question as the user message. The prompt has `{` and `}` characters in it. Spring AI normally reads `{...}` as a template variable, so you use the plain `.system(String)` method. This way the braces stay as normal text. Update `generateResponse`.
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
@@ -196,9 +196,3 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
   "answer": "..."
 }
 ```
-
-## Recap
-
-You now have the core mental model in practice. `ChatModel` is the portable contract over provider REST APIs, and `ChatClient` is the fluent, batteries-included API you'll reach for in everyday application code.
-
-One more building block to go, the advisor, which lets you add behavior around every call.
