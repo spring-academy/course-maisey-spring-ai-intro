@@ -242,6 +242,47 @@ Behind the scenes, Spring AI does the same thing you just did by hand: it append
 
 The `.entity(...)` method isn't limited to flat records. It handles nested types, and collections such as a `List` of your domain objects, too.
 
+### Native structured output
+
+The approach above is **prompt-based**. Spring AI appends the format instructions to your prompt and trusts the model to follow them. It works with every model, but it is still only a request, so a model can sometimes return text that does not parse.
+
+Many providers now offer a stronger guarantee called **native structured output**. Instead of asking in the prompt, Spring AI sends your type's JSON schema to the provider's own structured-output API, and the provider constrains the model so the response is always valid JSON that matches the schema. This is more reliable, and it keeps the format instructions out of the prompt. OpenAI, Anthropic, Google Gemini, Mistral, and Ollama all support it on their newer models, each through its own API.
+
+Because that support varies by provider and model, it is **not enabled by default**. There are also provider-specific limitations to keep in mind. OpenAI's native mode, for example, does not allow a top-level array, so return a record that wraps the `List` instead of a `List` directly. And not every Ollama model honors the schema reliably.
+
+You enable it in one of two ways.
+
+The first way is through the `.entity(...)` spec. Add `validateSchema()`, which is not supported for streaming, if you also want Spring AI to check the result against the schema and retry when a model still returns something malformed.
+
+```java
+SupportResponse answer = chatClient.prompt()
+    .user("Tell me about Spring AI")
+    .call()
+    .entity(SupportResponse.class, spec -> spec
+        .useProviderStructuredOutput()
+        .validateSchema());
+```
+
+The structured output support of Spring AI is based on the Advisors API, you'll learn about in the next section, which brings us to the second option to enable native structure output in this example, via the `ChatClient` bean:
+
+The second way uses the Advisors API, the structured output support of Spring AI is based on and which you will learn more about in the next section. You can either, like here, configure it as a default on the `ChatClient` bean, or on every request. 
+
+```java
+ChatClient chatClient(ChatClient.Builder builder) {
+    return builder
+        .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
+        .build();
+}
+```
+
+```java
+SupportResponse answer = chatClient.prompt()
+    .user("Tell me about Spring AI")
+    .advisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
+    .call()
+    .entity(SupportResponse.class);
+```
+
 ## Multimodality
 
 Everything so far has treated a prompt as text. Many modern models are **multimodal**, which means that they can take in more than one kind of content at once, most commonly text together with images, and some also accept audio or video. For a support assistant this is immediately useful, since a user can attach a screenshot of an error dialog and ask what went wrong instead of trying to put it into words.
@@ -275,4 +316,4 @@ Which modalities actually work depends on the provider and the specific model. I
 
 ## What's Next
 
-You now have the core mental model: models are REST APIs, `ChatModel` is the portable contract over them, `ChatClient` is the fluent, batteries-included API you'll reach for in everyday application code, and structured output turns model responses into type-safe domain objects. In the next section you'll meet the **advisor**, the mechanism Spring AI uses to add cross-cutting behavior around every call.
+You now have the core mental model: models are REST APIs, `ChatModel` is the portable contract over them, `ChatClient` is the fluent, batteries-included API you'll reach for in everyday application code, and structured output turns model responses into type-safe domain objects. In the next section you'll learn more about the **Advisors** API, the mechanism Spring AI uses to add cross-cutting behavior around every call, like the structured output parsing.
