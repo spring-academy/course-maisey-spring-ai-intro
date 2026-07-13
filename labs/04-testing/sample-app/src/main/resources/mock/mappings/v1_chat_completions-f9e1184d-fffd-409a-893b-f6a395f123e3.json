@@ -1,0 +1,50 @@
+{
+  "id" : "f9e1184d-fffd-409a-893b-f6a395f123e3",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Use the following retrieved context to answer the user's question. Follow these rules:\\n\\n1. If the answer can be found in the context, base your answer strictly on that context.\\n2. If the context does not contain the information needed to answer, rely on your own general knowledge to answer, and explicitly note that the answer is not drawn from the provided context.\\n3. If you are unsure or the question cannot be answered from either the context or your own knowledge, say so clearly rather than guessing.\\n4. Do not fabricate facts, sources, or citations.\\n\\n---\\nContext:\\nhttps://enterprise.spring.io/spring-application-advisorA tool that streamlines Spring application upgrades by reducing complexity across the whole upgrade lifecycle, from assessment to completion.\\nSpring Boot and related projects: In addition to 13 months of open-source support from release date, VMware Tanzu Spring provides a minimum of 1 additional year of support for minor versions. The final minor version of each major release receives an additional 5 years of enterprise support (7 years). OpenJDK: support follows the BellSoft Liberica distribution timelines. Tomcat: extended support for versions no longer maintained by Apache, including CVE fixes.\\nDevelopment teams can upgrade Spring applications at scale with reduced effort.Documentation: https://techdocs.broadcom.com/us/en/vmware-tanzu/spring/application-advisor/1-5/app-advisor/what-is-app-advisor.html\\nApplication Advisor automatically generates pull requests when new Spring dependency versions become available. Each pull request includes updates to both build configuration and Java source files, so it integrates into CI/CD pipelines without manual work.\\n---\\n\\nQuestion:\\nAnswer the following question with a short, well-structured explanation: What is the latest release of Spring Boot? Please also open a high-priority ticket to request access to Spring Application Advisor to accelerate upgrading our application to that version.\\n\",\"role\":\"user\"},{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"id\":\"call_XtJgZHF3vdGncqg8DUiWSVGQ\",\"function\":{\"arguments\":\"{\\\"projectSlug\\\":\\\"spring-boot\\\"}\",\"name\":\"fetchReleasesInfo\"},\"type\":\"function\"}]},{\"role\":\"tool\",\"tool_call_id\":\"call_XtJgZHF3vdGncqg8DUiWSVGQ\"}],\"response_format\":{\"json_schema\":{\"name\":\"json_schema\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"answer\":{\"type\":\"string\",\"description\":\"The helpful answer to the customer's question\"},\"category\":{\"type\":\"string\",\"enum\":[\"TECHNICAL\",\"BILLING\",\"SECURITY\",\"GENERAL\"],\"description\":\"The category of the support question: TECHNICAL, BILLING, SECURITY, or GENERAL\"}},\"required\":[\"answer\",\"category\"],\"additionalProperties\":false},\"strict\":true},\"type\":\"json_schema\"},\"tools\":[{\"function\":{\"name\":\"fetchReleasesInfo\",\"description\":\"Get all releases for a Spring project, including version and support status.\",\"parameters\":{\"type\":\"object\",\"properties\":{\"projectSlug\":{\"type\":\"string\"}},\"strict\":true}},\"type\":\"function\"},{\"function\":{\"name\":\"createTicket\",\"description\":\"Create a new support ticket. Use this when the user explicitly requests to create, open, or file a support ticket.\",\"parameters\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"summary\":{\"type\":\"string\",\"description\":\"Brief summary of the issue (max 100 chars)\"},\"category\":{\"type\":\"string\",\"enum\":[\"TECHNICAL\",\"BILLING\",\"SECURITY\",\"GENERAL\"],\"description\":\"The category of the issue\"},\"priority\":{\"type\":\"string\",\"enum\":[\"LOW\",\"MEDIUM\",\"HIGH\",\"CRITICAL\"],\"description\":\"The priority of the support ticket\"}},\"required\":[\"summary\",\"category\",\"priority\"],\"additionalProperties\":false,\"strict\":true}},\"type\":\"function\"},{\"function\":{\"name\":\"retrieveTickets\",\"description\":\"List all support tickets\",\"parameters\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{},\"required\":[],\"additionalProperties\":false,\"strict\":true}},\"type\":\"function\"},{\"function\":{\"name\":\"retrieveOpenTickets\",\"description\":\"List all support tickets that are not yet resolved\",\"parameters\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{},\"required\":[],\"additionalProperties\":false,\"strict\":true}},\"type\":\"function\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 4)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-E19GvMscIbSodisVmiQVcN2iKwqrU\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783942677,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": null,\n        \"tool_calls\": [\n          {\n            \"id\": \"call_np1r4AMzcWQ735jotURxKVeD\",\n            \"type\": \"function\",\n            \"function\": {\n              \"name\": \"createTicket\",\n              \"arguments\": \"{\\\"summary\\\":\\\"Request access to Spring Application Advisor for Spring Boot upgrade\\\",\\\"category\\\":\\\"TECHNICAL\\\",\\\"priority\\\":\\\"HIGH\\\"}\"\n            }\n          }\n        ],\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"tool_calls\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 813,\n    \"completion_tokens\": 36,\n    \"total_tokens\": 849,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "167ms",
+      "set-cookie" : "__cf_bm=O47sVmvrAnaApqWncK8qu5VjjQHl9WhkeFbOpanLNBs-1783942677.0356207-1.0.1.1-Dtehm.hwtxs0wUIXcYjKCR4eUfYFXbqoQpBJDrC.G5VhIieqTZ9m1yNBR3GWTScVPZTlLkM.BW7eU9KjhVc7iyRBdgah6tQgRxYvjsrOPkEeu5C1dTFvrZ8.31sDBcNg; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 13 Jul 2026 12:07:57 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_afcd1341fa4b4445b991696130cfc195",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a1a7ffa37985170e-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199443",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Mon, 13 Jul 2026 11:37:57 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "716",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "f9e1184d-fffd-409a-893b-f6a395f123e3",
+  "persistent" : true,
+  "insertionIndex" : 69
+}

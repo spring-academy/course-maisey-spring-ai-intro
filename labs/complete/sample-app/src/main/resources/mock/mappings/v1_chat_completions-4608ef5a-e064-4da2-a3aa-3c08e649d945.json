@@ -1,0 +1,50 @@
+{
+  "id" : "4608ef5a-e064-4da2-a3aa-3c08e649d945",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"What are the key features of VMware Tanzu Spring?\\n\\nContext information is below, surrounded by ---------------------\\n\\n---------------------\\nCommercial offering for Spring from Broadcom/VMware. Source: https://enterprise.spring.ioTanzu Spring is the commercial subscription that adds enterprise support, extended releases, security, compliance, and productivity tooling on top of the open-source Spring portfolio, OpenJDK, and Apache Tomcat.\\nTanzu Spring bundles the following offerings: Enterprise Releases and Support (/lts-releases) Application Advisor (/spring-application-advisor) Enterprise-grade Spring Boot Extensions (/enterprise-extensions) Tanzu tc Server (/tcserver) Enterprise Spring Cloud Components (/enterprise-components)\\nAll committers for Spring Boot, Spring Framework, and the broader open-source Spring portfolio are part of the Tanzu team. Patches, including day-zero security fixes, come directly from the original authors of the code and are validated for compliance. This is the core security advantage of the subscription.\\nThe VMware Tanzu Spring Boot Governance Starter addresses regulatory audit requirements by validating application dependencies against standards such as: FIPS 140-3 (Federal Information Processing Standards) NIST 800-53 PCI-DSS v4 (Payment Card Industry Data Security Standard) Other regulatory standards\\n---------------------\\n\\nGiven the context and provided history information and not prior knowledge,\\nreply to the user comment. If the answer is not in the context, inform\\nthe user that you can't answer the question.\\n\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-E19GpPsri1x5IC43HkVdpwVzLtF2N\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783942671,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"VMware Tanzu Spring is a **commercial subscription for Spring** that adds several enterprise-focused features on top of the open-source Spring portfolio, OpenJDK, and Apache Tomcat.\\n\\n### Key features\\n- **Enterprise support**\\n- **Extended releases** for Spring\\n- **Security updates**, including **day-zero security fixes**\\n- **Compliance validation** for regulated environments\\n- **Productivity tooling**\\n- Bundled offerings such as:\\n  - **Enterprise Releases and Support**\\n  - **Application Advisor**\\n  - **Enterprise-grade Spring Boot Extensions**\\n  - **Tanzu tc Server**\\n  - **Enterprise Spring Cloud Components**\\n\\n### Security and compliance highlights\\n- Patches come from the **original Spring committers**\\n- Fixes are **validated for compliance**\\n- The **Tanzu Spring Boot Governance Starter** helps with regulatory audit requirements by validating dependencies against standards like:\\n  - **FIPS 140-3**\\n  - **NIST 800-53**\\n  - **PCI-DSS v4**\\n\\nOfficial docs: https://enterprise.spring.io\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 328,\n    \"completion_tokens\": 216,\n    \"total_tokens\": 544,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "130ms",
+      "set-cookie" : "__cf_bm=vt1kZx8xuS60NYCvLpvH0Gz0yDvN6tw7hnfB6MLYguQ-1783942671.1802561-1.0.1.1-xVHch6zdbR9pDXFkSGD72usCVadvk_QvFGuyl48yfUlRSoe15AulpKt4vr0aysw0Hm1.XEiwY5UN9tTKKjqpgGPNM2yw7UzHJJ14foPPClVzRpasL8RVjn2ruYgQyaZ0; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 13 Jul 2026 12:07:52 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_da7c983b61ad45f08ec63180a8f6c09c",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a1a7ff7edcaf971c-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199565",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Mon, 13 Jul 2026 11:37:52 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "1527",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "4608ef5a-e064-4da2-a3aa-3c08e649d945",
+  "persistent" : true,
+  "insertionIndex" : 74
+}

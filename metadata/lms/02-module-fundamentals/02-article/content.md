@@ -127,7 +127,7 @@ If the default placeholder syntax conflicts with your data, you can [configure a
 
 A `Prompt` is more than its messages, though. It also carries a set of **`ChatOptions`** such as the model name, and `maxTokens`. You can define these as defaults in configuration and then override them on an individual call, so, for example, you can change the model for one request without changing anything globally.
 
-> Since Spring AI 2.0, the low-level ChatModel API requires provider-specific options. Use the provider’s builder such as OpenAiChatOptions.builder() instead of the portable ChatOptions.builder().
+**Note:** Since Spring AI 2.0, the low-level ChatModel API requires provider-specific options. Use the provider’s builder such as OpenAiChatOptions.builder() instead of the portable ChatOptions.builder().
 
 ```java
 ChatResponse response = chatModel.call(new Prompt(

@@ -1,5 +1,5 @@
 ---
-title: Advisors
+title: The Advisors API
 ---
 
 In the article you met the **advisor**, an interceptor that wraps a `ChatClient` call. It runs *before* the request reaches the model and *after* the response comes back, and several advisors form a chain. 
@@ -100,7 +100,6 @@ text: |2
                   .defaultAdvisors(new SimpleLoggerAdvisor(Ordered.LOWEST_PRECEDENCE))
 ```
 
-Add the import for it:
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
 text: "import org.springframework.ai.chat.client.ChatClient;"
@@ -145,7 +144,7 @@ Check the second terminal again. This time the `request:` and `response:` lines 
 
 Each call so far has been stateless. The model has no idea what was asked before, so it cannot follow up on an earlier answer. The built-in **`MessageChatMemoryAdvisor`** fixes that. It stores the messages of a conversation and adds the earlier turns back into the prompt on the next call, so the model can see the history.
 
-The advisor needs somewhere to keep the messages, a `ChatMemory`. Spring AI auto-configures an in-memory `ChatMemory` bean for you, so there is nothing to set up. Inject it into the configuration and register the advisor next to the logger.
+The advisor needs somewhere to keep the messages, a `ChatMemory`. Spring AI auto-configures an in-memory `ChatMemory` bean for you, so there is nothing to set up for this demo application. Inject it into the configuration and register the advisor next to the logger.
 
 Inject the `ChatMemory` bean into the method:
 ```editor:select-matching-text

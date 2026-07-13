@@ -165,6 +165,7 @@ class OpenAiRecordingTest {
                 throws IOException {
             List<ContentPattern<?>> newPatterns = new ArrayList<>();
             Boolean streaming = null;
+            Boolean hasResponseFormat = null;
             int messageCount = -1;
             for (ContentPattern<?> pattern : bodyPatterns) {
                 if (!(pattern instanceof EqualToJsonPattern jsonPattern)) {
@@ -175,6 +176,11 @@ class OpenAiRecordingTest {
                 if (body.has("messages")) {
                     streaming = body.path("stream").asBoolean(false);
                     messageCount = body.get("messages").size();
+                    // Native structured output drops the prompt-appended format instructions, so a
+                    // native .entity() request has the same messages as a plain .content() request
+                    // and only differs by response_format. Match on its presence/absence so the two
+                    // do not collide under the matcher's ignoreExtraElements.
+                    hasResponseFormat = body.has("response_format");
                     stripToolMessageContent((ArrayNode) body.get("messages"));
                 }
                 MatchesJsonPathPattern embeddingMatcher = embeddingInputMatcher(body);
@@ -191,6 +197,10 @@ class OpenAiRecordingTest {
             }
             if (messageCount >= 0) {
                 newPatterns.add(new MatchesJsonPathPattern("$[?(@.messages.length() == " + messageCount + ")]"));
+            }
+            if (hasResponseFormat != null) {
+                newPatterns.add(new MatchesJsonPathPattern(
+                        hasResponseFormat ? "$[?(@.response_format)]" : "$[?(!@.response_format)]"));
             }
 
             RequestPatternBuilder builder = newRequestPattern(request.getMethod(), request.getUrlMatcher());

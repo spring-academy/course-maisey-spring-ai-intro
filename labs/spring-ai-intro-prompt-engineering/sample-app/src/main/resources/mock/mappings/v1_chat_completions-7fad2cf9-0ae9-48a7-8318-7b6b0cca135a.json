@@ -1,0 +1,50 @@
+{
+  "id" : "7fad2cf9-0ae9-48a7-8318-7b6b0cca135a",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 1)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-E19G1u3TxF3ycrSN3drtOxVjfULNy\",\n  \"object\": \"chat.completion\",\n  \"created\": 1783942621,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"Spring AI is a Spring ecosystem project for building AI-powered applications in Java and Kotlin. It gives you a consistent, Spring-style API for working with:\\n\\n- **LLMs** like OpenAI, Anthropic, Azure OpenAI, Ollama, Mistral, and others\\n- **Chat and text generation**\\n- **Embeddings**\\n- **Vector stores** for retrieval-augmented generation (RAG)\\n- **Tool/function calling**\\n- **Prompt templates**\\n- **Structured output**\\n- **Observability and integration with Spring Boot**\\n\\n## What it’s for\\nSpring AI helps you add AI features to Spring apps without binding your code too tightly to one vendor. The idea is similar to Spring’s usual abstraction approach: you write against Spring AI interfaces, then swap providers with minimal changes.\\n\\n## Main capabilities\\n\\n### 1. Chat models\\nYou can send prompts to an LLM and receive responses through a unified API.\\n\\n### 2. Embeddings\\nConvert text into vectors for similarity search, classification, or RAG.\\n\\n### 3. Vector stores\\nStore and query embeddings using databases or services such as:\\n- PostgreSQL/pgvector\\n- Redis\\n- Elasticsearch\\n- Pinecone\\n- Milvus\\n- More, depending on support\\n\\n### 4. RAG\\nSpring AI makes it easier to:\\n- ingest documents\\n- chunk text\\n- create embeddings\\n- retrieve relevant context\\n- feed that context into the model\\n\\n### 5. Tool calling\\nModels can call Java methods or services to fetch data, perform actions, or use external APIs.\\n\\n### 6. Prompt engineering support\\nIt includes prompt templates and message abstractions for system/user/assistant roles.\\n\\n### 7. Structured output\\nYou can ask models to return JSON or map results into Java objects.\\n\\n## Typical use cases\\n- Chatbots and assistants\\n- Document Q&A\\n- Internal knowledge search\\n- Code assistants\\n- Workflow automation with AI tools\\n- Semantic search\\n\\n## Example idea\\nA common Spring AI flow looks like:\\n\\n1. User asks a question\\n2. Your app retrieves relevant documents from a vector store\\n3. Spring AI sends the question plus context to an LLM\\n4. The model returns an answer grounded in your data\\n\\n## Why people use it\\n- Fits naturally into Spring Boot apps\\n- Reduces vendor lock-in\\n- Good for enterprise Java teams\\n- Makes RAG and AI integration more structured\\n\\n## Status\\nSpring AI is actively developed and intended for modern Spring Boot applications. The exact API shape can evolve, so it’s a good idea to check the version docs for your chosen release.\\n\\nIf you want, I can also show:\\n- a **hello-world Spring AI example**\\n- how to do **RAG with Spring AI**\\n- how Spring AI compares to **LangChain/LangChain4j**\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 11,\n    \"completion_tokens\": 580,\n    \"total_tokens\": 591,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "2ms",
+      "set-cookie" : "__cf_bm=.oxEd0f9XWFzRSo1LIYdedU6uyptmmZpGUpJF.GaqmE-1783942621.2505322-1.0.1.1-jipRIiYE3YAGL7pzBm8YmvBECyUmd2Gtksksxxc2.xm25ZVjWkqUHDyF.meLEj16uBG9QjGDJkIwVt3SsooHB9jvRjVSeXwTwDT2ybiRe7G0dWl8YDhg9HkhtvXtMQqH; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 13 Jul 2026 12:07:05 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_3dcc6953b3fb4c1c82a06b1c02a21a85",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a1a7fe46c805c679-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199992",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Mon, 13 Jul 2026 11:37:05 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "4351",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "7fad2cf9-0ae9-48a7-8318-7b6b0cca135a",
+  "persistent" : true,
+  "insertionIndex" : 132
+}

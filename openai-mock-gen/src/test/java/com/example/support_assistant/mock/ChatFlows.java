@@ -125,6 +125,18 @@ final class ChatFlows {
         assertNotNull(jsonStringResponse, "json content");
         assertTrue(jsonStringResponse.contains("category") && jsonStringResponse.contains("answer"), "json content contains relevant attributes");
 
+        // Lab 04 structured output, the "Return the Record" step, before native output is enabled.
+        // The ChatClient has only a default system prompt, so .entity() is prompt-based here.
+        var promptBasedEntityClient = chatClientBuilder.build().mutate().defaultSystem(systemPrompt).build();
+        SupportResponse promptBasedResponse = promptBasedEntityClient.prompt()
+                .user(u -> u
+                        .text("Answer the following question with a short, well-structured explanation: {question}")
+                        .param("question", "Tell me about Spring AI"))
+                .call()
+                .entity(SupportResponse.class);
+        assertNotNull(promptBasedResponse, "prompt-based structured response");
+        assertNotBlank(promptBasedResponse.answer());
+
         var chatMemory = MessageWindowChatMemory.builder().build();
         // mutate() does not carry over the native structured-output advisor param, so re-apply it
         // here to match the sample-app's config bean (which enables it on every call).
