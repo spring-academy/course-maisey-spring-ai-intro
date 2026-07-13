@@ -1,0 +1,1 @@
+- Provide (additional) and display images correctly

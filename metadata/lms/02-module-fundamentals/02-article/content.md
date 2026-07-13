@@ -84,7 +84,7 @@ spring.ai.model.chat=ollama
 spring.ai.model.image=openai
 ```
 
-You can also vary providers across environments using Spring profiles (e.g. a local model in `application-dev.properties`, a hosted one in `application-prod.properties`).
+You can also vary providers across environments with Spring profiles, for example a local model in `application-dev.properties` and a hosted one in `application-prod.properties`. And when you need full control, you can switch off the auto-configuration and wire the model beans yourself.
 
 ## The low-level `ChatModel` API
 
@@ -197,7 +197,7 @@ ChatResponse response = chatClient.prompt()
 
 ## Structured Output: From Text to Java Objects
 
-So far, every response has come back as plain text. That's fine for a chatbot, but in an enterprise application you usually want to *do* something with the model's answer: store it, validate it, render it in a UI, or pass it to other business logic. Free-form prose is a poor fit for that, which is why structured output is one of Spring AI's most important features, and one you'll likely use in almost every real application.
+So far, every response has come back as plain text. That's fine for a chatbot, but in an enterprise application you usually want to *do* something with the model's answer: store it, validate it, render it in a UI, or pass it to other business logic. Free-form text is a poor fit for that. This is why structured output is one of Spring AI's most important features. You will probably use it in almost every real application.
 
 ### A short excursus: Prompt Engineering
 
@@ -241,6 +241,37 @@ SupportResponse answer = chatClient.prompt()
 Behind the scenes, Spring AI does the same thing you just did by hand: it appends format instructions to your prompt that tell the model to respond as JSON matching your type's structure, except that these instructions are generated from the Java type itself, and then deserializes the result into the object for you. You get structured, type-safe data your application can use directly, with no manual parsing and no brittle string handling. The boundary between "AI code" and the rest of your Spring application disappears: the model becomes just another collaborator that returns domain objects.
 
 The `.entity(...)` method isn't limited to flat records. It handles nested types, and collections such as a `List` of your domain objects, too.
+
+## Multimodality
+
+Everything so far has treated a prompt as text. Many modern models are **multimodal**, which means that they can take in more than one kind of content at once, most commonly text together with images, and some also accept audio or video. For a support assistant this is immediately useful, since a user can attach a screenshot of an error dialog and ask what went wrong instead of trying to put it into words.
+
+Spring AI supports this by adding a `media` field to `UserMessage`. The text stays in the usual content, and any images, audio, or other attachments go alongside it as one or more **`Media`** objects. Each `Media` pairs the raw content, either a `Resource` or a `URI`, with a `MimeType` that tells the provider what kind of data it is. Media is only allowed on user messages, since it represents human input, system and assistant messages stay text-only.
+
+With the low-level `ChatModel` API you build the `UserMessage` yourself and hand it to a `Prompt`:
+```java
+var screenshot = new ClassPathResource("/error-dialog.png");
+
+var userMessage = UserMessage.builder()
+    .text("What does this error mean, and how do I fix it?")
+    .media(new Media(MimeTypeUtils.IMAGE_PNG, screenshot))
+    .build();
+
+ChatResponse response = chatModel.call(new Prompt(userMessage));
+```
+
+The fluent `ChatClient` API exposes the same capability through its user-message builder, so you attach media inline without constructing the message by hand:
+```java
+String answer = chatClient.prompt()
+    .user(u -> u
+        .text("What does this error mean, and how do I fix it?")
+        .media(MimeTypeUtils.IMAGE_PNG, new ClassPathResource("/error-dialog.png")))
+    .call()
+    .content();
+```
+
+Which modalities actually work depends on the provider and the specific model. Image understanding is the most widely supported, offered on the vision-capable models from providers such as OpenAI, Anthropic, Google Gemini, Amazon Bedrock, Mistral, and Ollama, with audio and video available on a smaller subset.
+
 
 ## What's Next
 
