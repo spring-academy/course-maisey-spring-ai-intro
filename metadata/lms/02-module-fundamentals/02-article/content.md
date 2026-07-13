@@ -125,12 +125,14 @@ ChatResponse response = chatModel.call(promptTemplate.create());
 ```
 If the default placeholder syntax conflicts with your data, you can [configure a custom template renderer](https://docs.spring.io/spring-ai/reference/api/prompt.html#_using_a_custom_template_renderer) to use a different delimiter.
 
-A `Prompt` is more than its messages, though. It also carries a set of **`ChatOptions`** such as the model name, and `maxTokens`. You can define these as defaults in configuration and then override them on an individual call, so, for example, you can change the model for one request without changing anything globally:
+A `Prompt` is more than its messages, though. It also carries a set of **`ChatOptions`** such as the model name, and `maxTokens`. You can define these as defaults in configuration and then override them on an individual call, so, for example, you can change the model for one request without changing anything globally.
+
+> Since Spring AI 2.0, the low-level ChatModel API requires provider-specific options. Use the provider’s builder such as OpenAiChatOptions.builder() instead of the portable ChatOptions.builder().
 
 ```java
 ChatResponse response = chatModel.call(new Prompt(
     "Tell me about Spring AI",
-    ChatOptions.builder().model("gpt-5.4-mini").build()));
+    ChatOptiOpenAiChatOptions.builder().model("gpt-5.4-mini").build()));
 ```
 
 The `ChatResponse` that comes back wraps one or more **`Generation`** objects. A `Generation` is a single candidate completion, the assistant's message together with metadata such as its finish reason. Most requests return exactly one, which is why the `getResult()` shortcut above is so common, but a model can be asked to produce several alternatives.

@@ -114,7 +114,9 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 Models generate text token by token. Swap `.call()` for `.stream()` to get a reactive `Flux<String>` and stream tokens to the client as soon as they arrive. This is what powers the "typewriter" effect in chatbots.
 
-To keep this focused, we add the whole streaming call as a throwaway endpoint directly in the controller and remove it again at the end of this section. The rest of the lab stays on the blocking `.call()`. Inject the `ChatClient` into the controller so the streaming method can use it directly.
+To keep this focused, we add the whole streaming call as a throwaway endpoint directly in the controller and remove it again at the end of this section. The rest of the lab stays on the blocking `.call()`. 
+
+Inject the `ChatClient` into the controller so the streaming method can use it directly.
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
