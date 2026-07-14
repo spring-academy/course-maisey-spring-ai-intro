@@ -48,7 +48,7 @@ EvaluationResponse response = evaluator.evaluate(request);
 assertThat(response.isPass()).isTrue();
 ```
 
-In a real RAG test, `retrievedDocuments` come straight from the context the advisor surfaced, so you evaluate the same documents the model saw. If the default judging prompt does not fit your domain, override it with `.promptTemplate(...)`, as long as it keeps the `{query}`, `{response}`, and `{context}` placeholders the evaluator fills in.
+In a real RAG test, `retrievedDocuments` come straight from the context the advisor surfaced (`chatResponse.getMetadata().get(RetrievalAugmentationAdvisor.DOCUMENT_CONTEXT)`), so you evaluate the same documents the model saw. If the default judging prompt does not fit your domain, override it with `.promptTemplate(...)`, as long as it keeps the `{query}`, `{response}`, and `{context}` placeholders the evaluator fills in.
 
 ## `FactCheckingEvaluator`, Did the Model Make Things Up?
 
@@ -90,7 +90,7 @@ class SupportAssistantIT {
 }
 ```
 
-Spring AI provides these service connections for the model and vector store services you are likely to use in tests. That includes Ollama for running models locally and vector stores such as Chroma, Qdrant, Milvus, Weaviate, and others. The result is a self contained integration test. A real model, a real vector store, and your real RAG and tool code all start fresh and get judged by an evaluator, with nothing to install or configure by hand.
+Spring AI provides these service connections for the model and vector store services you are likely to use in tests. That includes Ollama for running models locally and vector stores such as Chroma, Qdrant, Milvus, Weaviate, and others. The result is a self contained integration test.
 
 ## Living With Non-Determinism
 
@@ -100,7 +100,3 @@ A few realities are worth keeping in mind, because they shape how you write and 
 - **Separate the two test tiers** Mock based unit tests are fast and deterministic, so run them constantly. Evaluator and Testcontainers tests are slower and heavier, so run them deliberately in a dedicated integration phase, in CI, or before a release, not on every save.
 - **Pick the right model for each job** The model you ship is not always the best judge. A different and even smaller model may evaluate more reliably and cheaply.
 - **Assert on properties, never on exact strings** Relevance, groundedness, the presence of a required field, and the absence of a forbidden claim all survive the model's natural variation. A hard coded sentence does not.
-
-## What's Next
-
-Testing AI applications comes down to one clear line. You test the deterministic code around the model in the conventional way with a mocked `ChatModel`. You test the probabilistic output by asserting *qualities* of the answer rather than its exact words. Spring AI gives you **evaluators** for those quality assertions, `RelevancyEvaluator` for on topic answers and `FactCheckingEvaluator` for grounded ones. It also gives you **Testcontainers** support to run the whole thing against a real model and vector store in throwaway Docker containers. In the next section you will put this to work with a basic response quality test that checks your support assistant's answers are both relevant and free of hallucination.
