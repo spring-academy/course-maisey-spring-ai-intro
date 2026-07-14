@@ -1,5 +1,3 @@
-## From Single Calls to Systems That Decide
-
 Every technique so far has been a single step. You send a prompt and get an answer. RAG enriched that step with context, and tools let it reach outside, but it was still one model call wrapped in your code. Real problems are rarely one step. "Triage this support ticket, research the customer's history, draft a reply, and check it's accurate before sending" is a sequence of decisions, and the system should make some of them on its own.
 
 Systems that use a model to do multi-step work are called **agentic**. The word covers a wide range of designs, and the most important skill in this space is not building the most advanced agent. It is knowing how much agency a task actually needs. Spring AI follows the advice from Anthropic's "Building Effective Agents" guide. Start simple, and add autonomy only when it provides clear value.
@@ -8,10 +6,10 @@ Systems that use a model to do multi-step work are called **agentic**. The word 
 
 This advice is based on an important distinction.
 
-- **Workflows** are systems where "LLMs and tools are orchestrated through predefined code paths." You decide the steps, and the model provides the intelligence at each one. The control flow lives in your Java code, so it is predictable, testable, and repeatable.
-- **Agents** are systems where "LLMs dynamically direct their own processes and tool usage." The model decides what to do next, which tool to call, and whether it is finished. This is more flexible, but less predictable.
+- **Workflows** are systems where LLMs and tools are orchestrated through predefined code paths. You decide the steps, and the model provides the intelligence at each one. The control flow lives in your Java code, so it is predictable, testable, and repeatable.
+- **Pure Agents** are systems where LLMs dynamically direct their own processes and tool usage. The model decides what to do next, which tool to call, and whether it is finished. This is more flexible, but less predictable.
 
-Many developers want to start with a fully autonomous agent. The documentation explains why you usually should not. "While fully autonomous agents might seem appealing, workflows often provide better predictability and consistency for well-defined tasks. This aligns perfectly with enterprise requirements where reliability and maintainability are crucial." For most enterprise problems, a workflow you can reason about is better than an agent you can only hope works.
+Many developers want to start with a fully autonomous agent. But, while fully autonomous agents might seem appealing, workflows often provide better predictability and consistency for well-defined tasks. This aligns perfectly with enterprise requirements where reliability and maintainability are crucial.
 
 Spring AI does not give you a heavy "agent framework" for any of this. Everything agentic is built from the building blocks you already know, such as the `ChatClient`, structured output, tools, and advisors. An agentic system is therefore just ordinary Spring code that you can debug.
 
