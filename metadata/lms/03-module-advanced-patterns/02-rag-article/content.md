@@ -1,5 +1,3 @@
-## From Theory to Spring AI
-
 In the foundations section you saw what RAG is and why it works. Models only know their training data, so you retrieve relevant facts, augment the prompt, and let the model generate a grounded answer. That rests on embeddings, a vector store, and an ETL pipeline that reads, chunks, and loads your documents. This section shows how Spring AI gives you each of those pieces, and how an advisor ties them together at query time.
 
 ## The `EmbeddingModel`
@@ -7,7 +5,7 @@ In the foundations section you saw what RAG is and why it works. Models only kno
 Just as `ChatModel` is the portable contract over chat providers, Spring AI defines **`EmbeddingModel`** as the portable contract over embedding providers (OpenAI, Ollama, and others). You hand it text and it returns vectors.
 
 ```java
-float[] vector = embeddingModel.embed("How do I reset my password?");
+float[] vector = embeddingModel.embed("Does VMware Tanzu Spring provide commercial support for Micrometer?");
 List<float[]> vectors = embeddingModel.embed(List.of("first text", "second text"));
 ```
 
@@ -29,8 +27,8 @@ The store works with the **`Document`** abstraction, a piece of text plus arbitr
 
 ```java
 Document doc = new Document(
-    "To reset your password, open Settings and choose 'Security'.",
-    Map.of("source", "support-guide.pdf", "category", "account"));
+    "VMware Tanzu Spring includes commercial support for Micrometer.",
+    Map.of("source", "tanzu-spring-support.pdf", "type", "Spring"));
 ```
 
 Adding documents is deliberately simple. You hand the store a list of `Document` objects, and it **computes the embeddings for you** (using your configured `EmbeddingModel`) before persisting the vector alongside the text and metadata.
@@ -44,13 +42,13 @@ Searching is just as direct. You describe what you want with a **`SearchRequest`
 ```java
 List<Document> results = vectorStore.similaritySearch(
     SearchRequest.builder()
-        .query("I forgot my login")
+        .query("Does VMware Tanzu Spring provide commercial support for Micrometer?")
         .topK(5)                  // return at most 5 matches
         .similarityThreshold(0.7) // ignore weak matches (0..1)
         .build());
 ```
 
-The `topK` and `similarityThreshold` settings are the same two knobs you met in the foundations section. You pass a plain-text `query` here, and the store embeds it for you before comparing it against the stored vectors.
+The `topK` and `similarityThreshold` settings are the same you met in the foundations section. You pass a plain-text `query` here, and it will be embedded for you before comparing it against the stored vectors.
 
 ### Filtering by metadata
 
@@ -59,12 +57,12 @@ The metadata you attached to each `Document` is searchable through a **portable 
 ```java
 List<Document> results = vectorStore.similaritySearch(
     SearchRequest.builder()
-        .query("how do I upgrade?")
-        .filterExpression("category == 'billing' && version >= 2")
+        .query("Does VMware Tanzu Spring provide commercial support for Micrometer?")
+        .filterExpression("type == 'Spring'")
         .build());
 ```
 
-You can also build these filters programmatically with `FilterExpressionBuilder` when the criteria are dynamic, for example when restricting results to the current user's tenant.
+You can also build these filters programmatically with `FilterExpressionBuilder` when the criteria are dynamic, for example when restricting results to the project the user is asking about.
 
 ## The ETL Pipeline in Spring AI
 
@@ -83,7 +81,7 @@ List<Document> documents = reader.read();
 TokenTextSplitter splitter = TokenTextSplitter.builder()
     .withChunkSize(800)   // target chunk size in tokens
     .build();
-List<Document> chunks = splitter.apply(documents);
+List<Document> chunks = splitter.split(documents);
 ```
 
 Other transformers can enrich documents before storage. For instance `KeywordMetadataEnricher` and `SummaryMetadataEnricher` use a chat model to attach keywords or summaries as metadata, giving you more to filter and match on later.
@@ -91,7 +89,7 @@ Other transformers can enrich documents before storage. For instance `KeywordMet
 **Load** is handled by a **`DocumentWriter`**, and here's the neat part. `VectorStore` itself *is* a `DocumentWriter`. So the store you search at query time is also the sink at the end of your pipeline. Because each stage is a standard Java functional interface (`Supplier`, `Function`, `Consumer`), the whole pipeline composes into a single readable line.
 
 ```java
-vectorStore.write(splitter.split(reader.read()));
+vectorStore.add(splitter.split(reader.read()));
 ```
 
 You run this once, and again whenever your documents change, to populate the store. With indexing done, everything is in place for the query-time phase.
@@ -106,30 +104,44 @@ RAG is just one more advisor in that chain. A RAG advisor retrieves matching doc
 
 ## Bringing It Together with the `QuestionAnswerAdvisor`
 
-The **`QuestionAnswerAdvisor`** is the advisor that turns a plain `ChatClient` into a RAG application. In its *before* phase it takes the user's question, runs a similarity search against the vector store, and injects the matching documents into the prompt as context; the call then proceeds to the model, which answers grounded in that context. You attach it to a `ChatClient` and otherwise prompt exactly as you did in the previous module.
-
+The **`QuestionAnswerAdvisor`** is the advisor that turns a plain `ChatClient` into a RAG application. In its *before* phase it takes the user's question, runs a similarity search against the vector store, and injects the matching documents into the prompt as context. The call then proceeds to the model, which answers grounded in that context. 
 ```java
-ChatClient chatClient = builder
-    .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore).build())
-    .build();
-
 String answer = chatClient.prompt()
-    .user("How do I reset my password?")
+    .user("Does VMware Tanzu Spring provide commercial support for Micrometer?")
+    .advisors(QuestionAnswerAdvisor.builder(vectorStore).build())
     .call()
     .content();
 ```
 
-That's a complete RAG application. The advisor retrieves the relevant support documents and grounds the answer in them, without you writing any retrieval code in the call itself. You can tune what it retrieves by giving it a `SearchRequest` (the same `topK` and `similarityThreshold` knobs as before), supply a custom prompt template to control how the context is framed, or pass a filter expression per request.
+That's a complete RAG application. The advisor retrieves the relevant support documents and grounds the answer in them, without you writing any retrieval code in the call itself. You can tune what it retrieves by giving it a `SearchRequest`, supply a custom prompt template to control how the context is framed, or pass a filter expression per request.
 
 ```java
-ChatClient chatClient = builder
-    .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore)
-        .searchRequest(SearchRequest.builder().topK(6).similarityThreshold(0.8).build())
-        .build())
-    .build();
+var searchRequest = SearchRequest.builder().topK(6).similarityThreshold(0.8).build();
+var promptTemplate = new PromptTemplate("""
+			{query}
+
+			Context information is below, surrounded by ---------------------
+
+			---------------------
+			{question_answer_context}
+			---------------------
+
+			Given the context and provided history information and not prior knowledge,
+			reply to the user comment. If the answer is not in the context, inform
+			the user that you can't answer the question.
+			""");
+
+String answer = chatClient.prompt()
+    .user("Does VMware Tanzu Spring provide commercial support for Micrometer?")
+    .advisors(QuestionAnswerAdvisor.builder(vectorStore).searchRequest(searchRequest).promptTemplate(promptTemplate).build())
+    .advisors(a -> a.param(QuestionAnswerAdvisor.FILTER_EXPRESSION, "type == 'Spring'"))
+    .call()
+    .content();
 ```
 
-Because the advisor is configured on the `ChatClient`, the rest of your application code stays the same fluent chain you already know, and retrieval just becomes part of how that particular client behaves. This pairs naturally with the structured-output and system-prompt techniques from earlier. A support assistant might use a system prompt to set its tone, the `QuestionAnswerAdvisor` to ground its facts, and `.entity(...)` to return a typed answer.
+The QuestionAnswerAdvisor is using the same prompt template as default to augment the user question with the retrieved documents, as the one configured in the example as custom prompt template.
+The important requirement for a is that a custom template must contain a `{query}` placeholder for the user question, and a `{question_answer_context}` placeholder for the retrieved context.
+
 
 ## Modular RAG with the `RetrievalAugmentationAdvisor`
 
@@ -150,7 +162,3 @@ Advisor ragAdvisor = RetrievalAugmentationAdvisor.builder()
 Each stage has ready-made components. **Query transformers** reshape the question before searching. `CompressionQueryTransformer` folds conversation history into a standalone query, `RewriteQueryTransformer` rephrases an awkward question for better search results, and `TranslationQueryTransformer` translates it into your documents' language. **Query expanders** like `MultiQueryExpander` turn one question into several variations to widen the net. The **`VectorStoreDocumentRetriever`** does the actual search, and a **`ContextualQueryAugmenter`** controls generation, including whether to allow an answer when no context was found.
 
 You don't need these on day one, and the lab uses the simpler `QuestionAnswerAdvisor`. But it's worth knowing the modular path exists. When your support assistant outgrows naive retrieval, you can reach for these components without abandoning the programming model.
-
-## What's Next
-
-You've now seen how Spring AI implements the RAG concepts from the foundations section. `EmbeddingModel` and `VectorStore` give you embeddings and similarity search, the ETL interfaces give you indexing, and the **`QuestionAnswerAdvisor`** ties retrieval into a `ChatClient` call, with **modular RAG** waiting for when you need finer control. In the next section you'll build exactly this, a support assistant that indexes real documentation and answers questions from it.

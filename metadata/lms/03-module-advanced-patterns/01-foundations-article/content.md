@@ -1,12 +1,10 @@
-## A Model Only Knows What It Learned
-
 A language model is a snapshot of the data it was trained on. Its knowledge is frozen at the moment that training data was collected, and that data is whatever was publicly available back then. If you ask about a framework that was released last mont, the model has no way to know. Models also rarely admit the gap. Instead of saying that they do not know, they tend to produce a confident answer that sounds right but is wrong - which is called hallucination.
 
 For an assistant that answers questions about your own product, this is a serious problem. The whole point is to answer using your own documentation, including content the model has never seen and that changes over time.
 
 One way to solve this is to fine tune a model on your data. That is expensive, slow to update, and has to be repeated every time the data changes. Another way is the prompt engineering you already met earlier, where you paste the relevant information straight into the prompt by hand. That works for a small and stable amount of text, but it breaks down fast. A model can only read so much at once, since every prompt has a maximum context window, so a whole knowledge base simply does not fit. Even when it does fit, you pay for every token you send on every request, so stuffing large amounts of text into each prompt gets slow and expensive. On top of that you would have to know up front which facts each question needs.
 
-There is a more practical approach. Instead of baking the knowledge into the model, you fetch the relevant facts at question time and hand them to the model together with the question. The model then answers from that supplied context instead of its frozen memory. The hard part is the fetching. The user asks in plain natural language, and your source material is written in plain natural language too, so you need a way to find the right passages by their meaning rather than by matching exact words.
+There is a more practical approach. Instead of baking the knowledge into the model, you fetch the relevant facts at question time and hand them to the model together with the question. The model then answers from that supplied context instead of its frozen memory. The hard part is the fetching. The user asks in plain natural language, and your documents are written in plain natural language too, so you need a way to find the right passages by their meaning rather than by matching exact words.
 
 This technique is called Retrieval Augmented Generation, or RAG. It is the most common pattern for building AI applications over private or fast changing data. The name describes the flow. You retrieve relevant information, use it to augment the prompt, and let the model generate an answer that is grounded in that information.
 
@@ -24,9 +22,10 @@ The bridge that makes both phases work is the embedding. It is what lets you fin
 
 An embedding is a numerical representation of a piece of content. It is an array of floating point numbers, called a vector, that captures the meaning of the content. The important property is that texts with similar meaning produce vectors that sit close together in this numerical space, even when they share no words. The question "How do I reset my password" and the sentence "I forgot my login credentials" land near each other. A question about the weather lands far away. By measuring the distance between two vectors you measure how related two pieces of text are. This is what makes search by meaning possible instead of search by exact keyword.
 
-The length of that array is fixed by the embedding model and is called the number of dimensions. Each model always outputs the same size, for example 1536 numbers for OpenAI text-embedding-3-small or 768 for many open models, no matter how long the input text is. More dimensions can capture finer shades of meaning, but they also take more storage and make the similarity search a little slower. Because the size is fixed per model, vectors from two different models do not line up and cannot be compared, which is one more reason you stay with a single embedding model.
+<!-- TODO adjust to have images pushed to assets on releases and link to them -->
+![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/embeddings.jpg)
 
-One rule matters above all. You must use the same embedding model for indexing and for querying. The vectors are only comparable when they were produced the same way. The model that embeds your documents is the model that must embed the user question.
+The length of that array is called the number of dimensions. Each embedding model has a maximum it can produce, for example 1536 numbers, and by default it always outputs that full size no matter how long the input text is. Some models also let you configure a smaller number of dimensions. More dimensions can capture finer shades of meaning, but they also take more storage and make the similarity search a little slower, so a lower setting trades a bit of accuracy for less storage and faster search. Because vectors from two different models do not line up, you must use the same embedding model, with the same dimensions, for indexing and for querying.
 
 ### The Vector Store and Similarity Search
 
@@ -44,6 +43,10 @@ Semantic similarity is powerful, but sometimes you also need exact constraints. 
 
 We have skipped over how raw files become stored, searchable content. That is the indexing phase, and it follows a classic pattern called ETL, which stands for Extract, Transform, Load.
 
+<!-- TODO adjust to have images pushed to assets on releases and link to them -->
+![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/etl.png)
+
+
 Extract reads a source and produces documents. A document is simply a piece of text plus some metadata. Readers exist for the formats you meet in practice such as PDF, Office files, HTML, JSON, and plain text.
 
 Transform reshapes those documents before they are stored. The most important transform is chunking, which breaks a large document into smaller pieces. Chunking matters more than it first looks. If you embed a whole fifty page manual as one vector, a search either returns all fifty pages or nothing, and the single vector is too blurry to match anything well. Splitting into focused chunks lets retrieval pull back exactly the paragraph that answers the question, and you only spend tokens on relevant context. Other transforms can enrich documents before storage, for example by adding keywords or a short summary as metadata so you have more to filter and match on later.
@@ -52,6 +55,9 @@ Load writes the finished pieces into the vector store.
 You run this pipeline once, and again whenever your documents change, to fill the store.
 
 ### Simple RAG and Modular RAG
+
+<!-- TODO adjust to have images pushed to assets on releases and link to them -->
+![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/rag.jpg)
 
 The common case is straightforward. Embed the question, search the vector store, attach the results to the prompt, and call the model. This naive flow answers most needs well.
 
@@ -79,6 +85,9 @@ For a support assistant this is the difference between a chatbot that explains t
 
 Tool Calling, also called Function Calling, lets a model invoke pieces of your code, called tools, to fetch information or take action. The key thing to understand is that the model never runs anything itself. It cannot execute code, and it never touches your database or APIs directly. Instead the flow is a short conversation.
 
+<!-- TODO adjust to have images pushed to assets on releases and link to them -->
+![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/tool-calling.png)
+
 First, together with the user prompt, you tell the model which tools are available. Each tool has a name, a description, and the parameters it accepts. Second, if the model decides a tool would help, it does not answer in prose. It responds with a structured request to call a specific tool with specific arguments, for example a request to get the status of order number 1234. Third, your application executes that tool, running ordinary code, with full control over what it is allowed to do. Fourth, the result is sent back to the model. Fifth, the model continues with the tool result as new context and produces its final answer, or it requests another tool.
 
 So the model is the decision maker and your code is the doer. The model decides whether to call a tool and with which arguments. Your application decides what the tool actually does. This separation is what makes Tool Calling both powerful and safe to reason about. The model can only ask, it can never act on its own.
@@ -101,8 +110,6 @@ Often a tool needs information that should not come from the model. The current 
 
 Because tools can act, safety matters. The model decides which tools to call and with which arguments, and it can be steered by the user input. Treat a tool call as untrusted input to your own code. Validate the arguments, limit what each tool is allowed to do, and inject anything security sensitive yourself instead of accepting it as a model parameter. The model proposes and your application disposes.
 
-
-
 ## RAG and Tool Calling Side by Side
 
 Both patterns close a gap in what a bare model can do, but they solve different problems. RAG is in fact a specialized kind of information retrieval, so you can think of it as one particular tool the model can reach for. The table below sums up how the two compare.
@@ -118,7 +125,3 @@ Both patterns close a gap in what a bare model can do, but they solve different 
 | Relationship | A specialized form of information retrieval | The general mechanism, can include RAG as one tool |
 
 The two are not rivals, and real assistants often use both. RAG grounds the answer in your documentation, while tool calling lets the same assistant look something up live or take an action on the user's behalf.
-
-## What's Next
-
-You now have the mental model behind both patterns. Models only know their training data, so with RAG you retrieve relevant facts and augment the prompt to generate grounded answers. That rests on embeddings, which turn meaning into vectors, a vector store, which searches by similarity and filters by metadata, and an ETL pipeline, which reads, chunks, and loads your documents. Tool calling closes the other gap. Where RAG lets the model know more, tool calling lets it do more, by proposing calls into your application while your code stays in control of what actually runs. In the following sections you will see how Spring AI implements both of these patterns in practice.

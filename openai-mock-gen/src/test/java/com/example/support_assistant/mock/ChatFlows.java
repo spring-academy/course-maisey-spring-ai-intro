@@ -183,7 +183,7 @@ final class ChatFlows {
         var tokenTextSplitter = TokenTextSplitter.builder()
                 .withMinChunkLengthToEmbed(25)
                 .build();
-        var splitDocuments = tokenTextSplitter.apply(documents);
+        var splitDocuments = tokenTextSplitter.split(documents);
         vectorStore.add(splitDocuments);
 
         var ragSearchRequest = SearchRequest.builder().topK(4).similarityThreshold(0.4).build();

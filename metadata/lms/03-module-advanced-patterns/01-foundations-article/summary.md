@@ -1,1 +1,3 @@
-You now understand the theory behind RAG and tool calling, including embeddings, vector stores, the ETL pipeline, and how a model proposes tool calls while your application runs them.
+Models only know their training data, so with RAG you retrieve relevant facts and augment the prompt to generate grounded answers. That rests on embeddings, which turn meaning into vectors, a vector store, which searches by similarity and filters by metadata, and an ETL pipeline, which reads, chunks, and loads your documents. 
+
+Tool calling closes the other gap. Where RAG lets the model know more, tool calling lets it do more, by proposing calls into your application while your code stays in control of what actually runs. In the following sections you will see how Spring AI implements both of these patterns in practice.

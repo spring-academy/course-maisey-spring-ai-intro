@@ -43,7 +43,7 @@ class KnowledgeBaseIndexer {
         var tokenTextSplitter = TokenTextSplitter.builder()
                 .withMinChunkLengthToEmbed(25)
                 .build();
-        var splitDocuments = tokenTextSplitter.apply(documents);
+        var splitDocuments = tokenTextSplitter.split(documents);
         vectorStore.add(splitDocuments);
         log.info("Loaded {} document chunks into vector store", splitDocuments.size());
     }
