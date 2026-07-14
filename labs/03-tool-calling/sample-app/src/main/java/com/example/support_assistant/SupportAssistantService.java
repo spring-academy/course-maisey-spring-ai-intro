@@ -28,7 +28,7 @@ class SupportAssistantService {
         this.vectorStore = vectorStore;
     }
 
-    SupportResponse generateResponse(String query) {
+    SupportResponse generateResponse(String query, String conversationId) {
         var ragSearchRequest = SearchRequest.builder().topK(4).similarityThreshold(0.4).build();
 
         var promptTemplate = PromptTemplate.builder().resource(ragPromptResource).build();

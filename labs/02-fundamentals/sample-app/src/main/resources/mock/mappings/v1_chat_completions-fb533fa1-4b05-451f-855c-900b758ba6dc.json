@@ -1,0 +1,50 @@
+{
+  "id" : "fb533fa1-4b05-451f-855c-900b758ba6dc",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about Spring AI\",\"role\":\"user\"},{\"role\":\"assistant\",\"content\":\"{\\\"answer\\\":\\\"Spring AI is a Spring project that brings AI capabilities into Spring applications in a consistent, idiomatic way. It provides abstractions for working with chat models, embeddings, vector stores, prompt templates, and tool/function calling, so you can integrate providers like OpenAI and others without wiring everything manually.\\\\n\\\\nTypical uses include:\\\\n- building chatbots and assistants\\\\n- retrieval-augmented generation (RAG)\\\\n- semantic search\\\\n- calling external tools from an LLM workflow\\\\n\\\\nOfficial docs: https://docs.spring.io/spring-ai/reference/\\\",\\\"category\\\":\\\"TECHNICAL\\\"}\"},{\"content\":\"Answer the following question with a short, well-structured explanation: What did I just ask you about?\",\"role\":\"user\"}],\"response_format\":{\"json_schema\":{\"name\":\"json_schema\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"answer\":{\"type\":\"string\",\"description\":\"The helpful answer to the customer's question\"},\"category\":{\"type\":\"string\",\"enum\":[\"TECHNICAL\",\"BILLING\",\"SECURITY\",\"GENERAL\"],\"description\":\"The category of the support question: TECHNICAL, BILLING, SECURITY, or GENERAL\"}},\"required\":[\"answer\",\"category\"],\"additionalProperties\":false},\"strict\":true},\"type\":\"json_schema\"}}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 4)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-E1U67bpnEcVZmbZqcReJCibL7BYiW\",\n  \"object\": \"chat.completion\",\n  \"created\": 1784022731,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"answer\\\":\\\"You just asked about Spring AI — specifically, what it is and how it fits into the Spring ecosystem.\\\\n\\\\nOfficial docs: https://docs.spring.io/spring-ai/reference/\\\",\\\"category\\\":\\\"GENERAL\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 295,\n    \"completion_tokens\": 51,\n    \"total_tokens\": 346,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "73ms",
+      "set-cookie" : "__cf_bm=ND8853OJ8VqnbLqjir4YIzbalW.KeewZTooPZOP3UaU-1784022731.4163642-1.0.1.1-m6ZRKTE5A1gSAMBT2qk7hy_qX8I6Cjrii.7hDXmmrDSfAvmciPm5IJ5Vn3q6HXQPj7ttY7.NHtdjxK5Lxj_9gFAHZtn5VtMCtz9YBpcJ_nDuNVm6WcgW6yEVRF5VZ00j; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Tue, 14 Jul 2026 10:22:12 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_ea72d5674c1645c6a51d855fd6e42952",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a1afa2175d1d3057-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199756",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Tue, 14 Jul 2026 09:52:12 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "1208",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "fb533fa1-4b05-451f-855c-900b758ba6dc",
+  "persistent" : true,
+  "insertionIndex" : 123
+}

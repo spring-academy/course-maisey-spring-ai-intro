@@ -106,7 +106,7 @@ file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantS
 text: ".advisors(ragAdvisor)"
 before: 0
 after: 0
-description: 
+description: Register the tools on the ChatClient
 cascade: true
 ```
 
@@ -154,7 +154,3 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Does VMware 
 ```
 
 The advisor pulls the answer from the knowledge base. If the model decides a ticket is needed, the tool call files it.
-
-## Recap
-
-Your support assistant does more than answer questions now. It also acts. The model decides when to file or look up tickets, and Spring AI turns that decision into real method calls.

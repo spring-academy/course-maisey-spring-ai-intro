@@ -83,7 +83,3 @@ curl http://localhost:8080/actuator/health
 ```
 
 You should see `{"status":"UP"}`. Keep the app running in the second terminal.
-
-## Summary
-
-You've added Spring Data JDBC with an in-memory H2 database and a `support_ticket` table created at startup. In the next section you'll add the entity and repository to work with it.

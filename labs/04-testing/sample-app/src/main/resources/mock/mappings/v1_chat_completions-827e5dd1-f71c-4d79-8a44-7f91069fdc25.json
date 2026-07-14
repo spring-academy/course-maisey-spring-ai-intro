@@ -1,0 +1,50 @@
+{
+  "id" : "827e5dd1-f71c-4d79-8a44-7f91069fdc25",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 1)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-E1U5lXWKtBwiadDQKY35x3udYKlaO\",\n  \"object\": \"chat.completion\",\n  \"created\": 1784022709,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"Spring AI is a Spring ecosystem project that helps Java developers build AI-powered applications more easily. It gives you a Spring-style abstraction over different AI providers and models, so you can work with large language models, embeddings, image generation, and more without tying your code too tightly to one vendor.\\n\\n### What it does\\nSpring AI helps you:\\n- Send prompts to chat models\\n- Generate and use embeddings\\n- Build retrieval-augmented generation (RAG) apps\\n- Work with vector stores for semantic search\\n- Integrate AI into Spring Boot applications with familiar configuration and dependency injection patterns\\n\\n### Why people use it\\n- **Spring-native experience**: Uses the same conventions Spring developers already know\\n- **Provider abstraction**: Makes it easier to switch between model providers\\n- **Boot-friendly**: Works well with Spring Boot auto-configuration\\n- **Enterprise-friendly**: Fits into existing Java/Spring applications and architectures\\n\\n### Common features\\n- **Chat clients** for conversational AI\\n- **Prompt templates** for structured prompt construction\\n- **Tool/function calling** support in some integrations\\n- **Embeddings** for semantic similarity and search\\n- **Vector database integrations** for RAG\\n- **Document ingestion and retrieval** pipelines\\n\\n### Typical use cases\\n- AI chat assistants\\n- Internal knowledge-base Q&A\\n- Document search and summarization\\n- Customer support bots\\n- Code or text generation features inside business apps\\n\\n### Example idea\\nIn a Spring Boot app, you can inject an AI client and call a model with a prompt, similar to how you’d use any other Spring service.\\n\\nIf you want, I can also show:\\n1. a **simple Spring AI example**,  \\n2. how it compares to **LangChain**, or  \\n3. how to build a **RAG app with Spring AI**.\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 11,\n    \"completion_tokens\": 374,\n    \"total_tokens\": 385,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "2ms",
+      "set-cookie" : "__cf_bm=BAC1wfUkPjgAapTc9UpyT46KohwzoHxJ5KvmoVU64b0-1784022709.1509037-1.0.1.1-67xa3GoNzEs9w0oegpPI9qagrsYZnUo7oRcKuiNRtkIII_wcAJD4J7mou778IadgOkA3Q9AwJo2dK9NfPE.3on1H3DYMN.g1682hUW2U7R9beOBJrpqjG7RMKBL.mCNB; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Tue, 14 Jul 2026 10:21:52 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_64441d72d0b946879289f29762b30e3d",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a1afa18c2cb4dc05-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199992",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Tue, 14 Jul 2026 09:51:52 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "2780",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "827e5dd1-f71c-4d79-8a44-7f91069fdc25",
+  "persistent" : true,
+  "insertionIndex" : 132
+}

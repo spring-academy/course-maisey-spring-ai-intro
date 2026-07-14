@@ -72,7 +72,3 @@ text: |
 ```
 
 `ListCrudRepository` gives us `save`, `findAll`, `findById`, and more. The two derived query methods cover the lookups we want to expose as tools.
-
-## Summary
-
-You've created the `SupportTicket` record and its Spring Data JDBC repository. Now comes the interesting part. Next you will hand these capabilities to the model as tools.

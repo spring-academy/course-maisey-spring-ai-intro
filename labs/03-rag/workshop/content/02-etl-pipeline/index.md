@@ -118,7 +118,3 @@ Loaded 30 document chunks into vector store
 ```
 
 Each of those chunks has been run through the embedding model and stored as a vector, ready for similarity search.
-
-## Summary
-
-You've built the indexing side of RAG: read Markdown files, split them into chunks, and load them into the `VectorStore`. Now let's use them at query time.

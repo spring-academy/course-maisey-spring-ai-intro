@@ -1,8 +1,6 @@
-## From Theory to Spring AI
+In the foundations section you also learned what tool calling is and why it matters. A model can reason but it cannot act, so you give it tools. The model never runs anything itself. It only proposes a call, your application executes the matching code, and the result goes back so the model can continue. This section shows how Spring AI lets you expose ordinary Java methods as tools, and how it runs the request-execute-respond loop for you.
 
-In the foundations section you saw what tool calling is and why it matters. A model can reason but it cannot act, so you give it tools. The model never runs anything itself. It only proposes a call, your application executes the matching code, and the result goes back so the model can continue. This section shows how Spring AI lets you expose ordinary Java methods as tools, and how it runs the request-execute-respond loop for you.
-
-## Defining a Tool with `@Tool`
+## Defining a Tool
 
 The most natural way to define a tool in Spring AI is to write an ordinary method and mark it with `@Tool`. Here are two tools for our support assistant, one that retrieves information and one that takes an action.
 
@@ -30,7 +28,7 @@ Two annotations do the work.
 
 From these, Spring AI automatically generates the **JSON schema** of the tool's inputs that the model needs, so you don't write that by hand. You just describe your method, and the framework derives the contract the model sees.
 
-## Giving Tools to the `ChatClient`
+## Registering Tools to the ChatClient
 
 Tools attach to a `ChatClient` call the same fluent way everything else does. Hand the client an instance of your tools class with `.tools(...)`, and prompt as usual.
 
@@ -56,7 +54,7 @@ The `.tools()` method is flexible about what it accepts. `@Tool`-annotated objec
 
 Look again at that example. The user's request might require *two* tool calls (check the status, then conditionally open a ticket), and after each one the model needs the result before it can decide what to do next. This is the tool-calling loop from the foundations section. Yet your code is a single `.call()`. Who runs that back-and-forth?
 
-This is where the **advisor** mechanism from the RAG section returns. When you attach tools to a `ChatClient`, Spring AI automatically registers a **`ToolCallingAdvisor`** into the chain. That advisor manages the entire lifecycle. It sends the request, sees when the model asks for a tool, executes the matching method, feeds the result back, and repeats until the model produces a final answer instead of another tool request. All of that happens inside your one `.call()`. You write the tools and hand them over; the framework drives the loop.
+This is where the **advisor** mechanism returns. When you attach tools to a `ChatClient`, Spring AI automatically registers a **`ToolCallingAdvisor`** into the chain. That advisor manages the entire lifecycle. It sends the request, sees when the model asks for a tool, executes the matching method, feeds the result back, and repeats until the model produces a final answer instead of another tool request. 
 
 Because this is just an advisor, it composes with everything else on the client. Your support assistant can carry a RAG `QuestionAnswerAdvisor` *and* tools at the same time, grounding answers in documentation while also being able to act, all from the same prompt chain. And because it's auto-registered, you rarely think about it. You can disable the automatic registration globally with `spring.ai.chat.client.tool-calling.enabled=false`, or per call, on the rare occasion you want to run the loop yourself.
 
@@ -84,32 +82,66 @@ String answer = chatClient.prompt()
     .content();
 ```
 
-The key guarantee is that **`ToolContext` data is never sent to the model**. The model sees only `orderId` in the tool's schema; the `tenantId` is injected by your application at execution time. This keeps the model's view limited to what it legitimately needs to reason about, while your code retains control over the sensitive, security-relevant inputs.
+The key guarantee is that **`ToolContext` data is never sent to the model**. 
 
-## Tools as Functions
+## Building Tools Programmatically
 
-Annotated methods are the common case, but a tool is really just an implementation of the **`ToolCallback`** interface, which pairs a **`ToolDefinition`** (the name, description, and input schema the model sees) with the logic to execute. Spring AI also lets you build a tool from a plain `Function`, which is handy when the logic already lives in a service or a bean.
+Annotated methods are the common case, but a tool is really just an implementation of the **`ToolCallback`** interface. Each `ToolCallback` pairs a **`ToolDefinition`**, the name, description, and input schema the model sees, with the code to run when the model calls it. `@Tool` simply produces one of these for you. Sometimes you want to build one directly, for example when the logic already lives in a bean, when you can't annotate the method because it is third-party code, or when you assemble tools at runtime. Spring AI gives you two ways.
+
+### From an existing method with `MethodToolCallback`
+
+`MethodToolCallback` turns any method into a tool without the `@Tool` annotation. You describe the tool in a `ToolDefinition`, and point the callback at the method and the object to invoke it on. The input schema is derived from the method's parameters for you.
 
 ```java
-ToolCallback weatherTool = FunctionToolCallback
-    .builder("currentWeather", new WeatherService())
-    .description("Get the weather in a location")
-    .inputType(WeatherRequest.class)
+Method createTicket = ReflectionUtils.findMethod(SupportTicketService.class, "createTicket");
+
+ToolCallback createTicketTool = MethodToolCallback.builder()
+    .toolDefinition(ToolDefinition.builder(createTicket)
+        .description("Create a support ticket for a Spring or Tanzu Spring question")
+        .build())
+    .toolMethod(createTicket)
+    .toolObject(supportTicketService)
     .build();
 ```
 
-This produces the same kind of `ToolCallback` you'd get from an annotated method, and you pass it to `.tools(...)` just the same. Whether you reach for `@Tool` or `FunctionToolCallback` is a matter of where your code already lives. The model can't tell the difference.
+This is exactly what `@Tool` builds behind the scenes. The `ToolDefinition` carries what the model reads, and `toolMethod` plus `toolObject` tell Spring AI which method to call and on which instance.
+
+### From a plain function with `FunctionToolCallback`
+
+When the logic is a standalone function rather than a method on a bean, use `FunctionToolCallback`. A function takes a single input object and returns a result, so you first define that input type and describe its fields. The `@JsonPropertyDescription` annotations play the same role for a function input that `@ToolParam` plays for method parameters, they tell the model what each field is for.
+
+```java
+record CreateTicketRequest(
+        @JsonPropertyDescription("Brief summary of the issue") String summary,
+        @JsonPropertyDescription("The category of the issue") SupportCategory category,
+        @JsonPropertyDescription("The priority of the support ticket") SupportTicket.Priority priority) {
+}
+```
+
+The function itself maps that input to a result. Here it saves a new ticket and returns it.
+
+```java
+Function<CreateTicketRequest, SupportTicket> createTicket = request ->
+        ticketRepository.save(new SupportTicket(request.summary(), request.category(), request.priority()));
+
+ToolCallback createTicketTool = FunctionToolCallback
+    .builder("createTicket", createTicket)
+    .description("Create a support ticket for a Spring or Tanzu Spring question")
+    .inputType(CreateTicketRequest.class)
+    .build();
+```
+
+`inputType(CreateTicketRequest.class)` is what lets Spring AI derive the JSON schema for the input, just as it reads a method's parameters for `@Tool`. There are `builder` overloads for a `BiFunction` when you also need the `ToolContext`, and for `Supplier` and `Consumer` when the tool takes or returns nothing.
+
+Both approaches produce the same kind of `ToolCallback` you get from an annotated method, and you pass either to `.tools(...)` the same way. The model can't tell which style you used.
 
 ## When You Need More Control
 
 The defaults handle most applications, but a few knobs are worth knowing exist for when you need them.
 
 - **Returning a result directly** By default every tool result goes back to the model for a final, natural-language response. Sometimes you want the raw tool output returned straight to your caller instead, skipping that extra model round-trip. Setting `returnDirect = true` on a `@Tool` does exactly that.
-- **Handling failures** When a tool throws, Spring AI wraps it in a `ToolExecutionException`. By default the error *message* is sent back to the model so it can recover or explain the problem gracefully. You can instead make failures propagate as exceptions (`spring.ai.tools.throw-exception-on-error=true`) when you'd rather handle them in your own code.
-- **Controlling the loop yourself** The auto-registered advisor is one of several execution strategies. For full manual control you can drive the tool-calling loop directly against a `ChatModel`, executing calls and re-prompting until there are no more, but you'll reach for that rarely.
+- **Handling failures** When a tool throws, Spring AI wraps it in a `ToolExecutionException`. By default the error *message* is sent back to the model so it can recover or explain the problem gracefully. You can instead make failures propagate as exceptions (`spring.ai.tools.throw-exception-on-error=true`) when you'd rather handle them in your own code or implement a cutom `ToolExecutionExceptionProcessor`.
+- **Controlling the loop yourself** The auto-registered advisor is one of several execution strategies. Both `ChatClient` and `ChatModel` support user-controlled tool execution, where you are responsible for detecting tool calls in the `ChatResponse` and executing them.
+
 
 Keep in mind the safety guidance from the foundations section. The model decides which tools to call and with what arguments, and it can be steered by the user's input, so treat a tool call as untrusted input to your own code. Validate arguments, scope what each tool is permitted to do, and use `ToolContext` (not model parameters) for anything security-sensitive.
-
-## What's Next
-
-You've now seen how Spring AI turns the tool-calling pattern into ordinary Java. You write methods, describe them well with `@Tool` and `@ToolParam`, hand them to the `ChatClient`, and let the auto-registered `ToolCallingAdvisor` run the request-execute-respond loop for you. You use `ToolContext` to keep sensitive data out of the model's reach, and you can compose tools with RAG and everything else on the same client. In the next section you'll put this into practice, extending the support assistant with tools so it can move beyond explaining problems to actually resolving them.

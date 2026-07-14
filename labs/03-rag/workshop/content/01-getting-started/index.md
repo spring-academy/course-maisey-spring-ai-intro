@@ -97,8 +97,3 @@ curl http://localhost:8080/actuator/health
 ```
 
 You should see `{"status":"UP"}`. Keep the app running in the second terminal.
-
-
-## Summary
-
-You've added necessary RAG dependencies, configured the OpenAI embedding model declaratively, and provided an in-memory `VectorStore`. In the next section, you'll fill it with knowledge.

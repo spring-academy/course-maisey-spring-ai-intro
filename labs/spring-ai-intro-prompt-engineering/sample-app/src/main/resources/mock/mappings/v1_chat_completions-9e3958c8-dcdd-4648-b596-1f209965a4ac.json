@@ -1,0 +1,50 @@
+{
+  "id" : "9e3958c8-dcdd-4648-b596-1f209965a4ac",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream == true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 1)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "v1_chat_completions-9e3958c8-dcdd-4648-b596-1f209965a4ac.txt",
+    "headers" : {
+      "x-request-id" : "req_b2520ea91bd94328b61e83f0c50c73fb",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "Server" : "cloudflare",
+      "CF-Ray" : "a1afa1be5fbe3124-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199992",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Tue, 14 Jul 2026 09:51:57 GMT",
+      "x-ratelimit-reset-tokens" : "2ms",
+      "access-control-expose-headers" : [ "X-Request-ID", "CF-Ray", "CF-Ray" ],
+      "set-cookie" : "__cf_bm=mQRqD7YQr1EnoO_CMz1sjcuWVc.7_Yg0zSYsDJ.Guxo-1784022717.178416-1.0.1.1-2K7dcE_8m_ys.bzJsLMUabORGKuSd0RGzva4nHH14wPDenmBtcaSCEyGjM6xNtOgwsnepHQ1J8mSx.rqHyqYet3QiXhQOXBEy1Hz7LpVlacqNzTk8WITrkBKsqk2GSZn; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Tue, 14 Jul 2026 10:21:57 GMT",
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "271",
+      "alt-svc" : "h3=\":443\"; ma=86400",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "text/event-stream; charset=utf-8"
+    }
+  },
+  "uuid" : "9e3958c8-dcdd-4648-b596-1f209965a4ac",
+  "persistent" : true,
+  "insertionIndex" : 129
+}

@@ -119,7 +119,7 @@ text: |
   Use the following retrieved context to answer the user's question. Follow these rules:
 
   1. If the answer can be found in the context, base your answer strictly on that context.
-  2. If the context does not contain the information needed to answer, rely on your own general knowledge to answer, and explicitly note that the answer is not drawn from the provided context.
+  2. If the context does not contain the information needed to answer, rely on your own general knowledge to answer.
   3. If you are unsure or the question cannot be answered from either the context or your own knowledge, say so clearly rather than guessing.
   4. Do not fabricate facts, sources, or citations.
 
@@ -208,7 +208,3 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 ```
 
 The Tanzu question still comes back grounded in the indexed docs, the Spring AI question now gets a real answer instead of a refusal.
-
-## Recap
-
-Your support assistant now answers from your own documents, with the model's general knowledge as a graceful fallback.
