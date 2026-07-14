@@ -57,7 +57,7 @@ You run this pipeline once, and again whenever your documents change, to fill th
 ### Simple RAG and Modular RAG
 
 <!-- TODO adjust to have images pushed to assets on releases and link to them -->
-![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/rag.jpg)
+![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/rag.png)
 
 The common case is straightforward. Embed the question, search the vector store, attach the results to the prompt, and call the model. This naive flow answers most needs well.
 

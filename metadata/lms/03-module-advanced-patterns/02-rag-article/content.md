@@ -1,6 +1,6 @@
 In the foundations section you saw what RAG is and why it works. Models only know their training data, so you retrieve relevant facts, augment the prompt, and let the model generate a grounded answer. That rests on embeddings, a vector store, and an ETL pipeline that reads, chunks, and loads your documents. This section shows how Spring AI gives you each of those pieces, and how an advisor ties them together at query time.
 
-## The `EmbeddingModel`
+## The EmbeddingModel
 
 Just as `ChatModel` is the portable contract over chat providers, Spring AI defines **`EmbeddingModel`** as the portable contract over embedding providers (OpenAI, Ollama, and others). You hand it text and it returns vectors.
 
@@ -19,7 +19,7 @@ Remember the rule from the foundations section. You must use the same embedding 
 
 In practice you'll rarely call `EmbeddingModel` directly. It does its work behind the scenes, such as inside the `VectorStore` abstraction.
 
-## The `VectorStore` Abstraction
+## The VectorStore Abstraction
 
 Spring AI defines a single **`VectorStore`** abstraction over the many vector database implementations (PGVector, Redis, Qdrant, Milvus, Chroma, and many more), plus an in-memory `SimpleVectorStore` for testing. As with everything else, swapping implementations is mostly a dependency and configuration change, not a rewrite. You add the matching starter, and the auto-configuration provides a `VectorStore` bean.
 
@@ -102,7 +102,7 @@ You met the **advisor** concept in the fundamentals module. Recall that an advis
 
 RAG is just one more advisor in that chain. A RAG advisor retrieves matching documents from the vector store and injects them into the prompt as context, so the call proceeds to the model grounded in your own data. Spring AI ships two such advisors, a simple one and a modular one.
 
-## Bringing It Together with the `QuestionAnswerAdvisor`
+## Bringing It Together with the QuestionAnswerAdvisor
 
 The **`QuestionAnswerAdvisor`** is the advisor that turns a plain `ChatClient` into a RAG application. In its *before* phase it takes the user's question, runs a similarity search against the vector store, and injects the matching documents into the prompt as context. The call then proceeds to the model, which answers grounded in that context. 
 ```java
@@ -143,7 +143,7 @@ The QuestionAnswerAdvisor is using the same prompt template as default to augmen
 The important requirement for a is that a custom template must contain a `{query}` placeholder for the user question, and a `{question_answer_context}` placeholder for the retrieved context.
 
 
-## Modular RAG with the `RetrievalAugmentationAdvisor`
+## Modular RAG with the RetrievalAugmentationAdvisor
 
 The foundations section described how the retrieval flow can be broken into stages for when naive retrieval is not enough. Spring AI offers a second, more flexible advisor for exactly that, the **`RetrievalAugmentationAdvisor`**, built on a **modular RAG architecture**. It breaks the retrieval flow into the well-defined stages you read about, pre-retrieval, retrieval, post-retrieval, and generation, that you can mix and match like building blocks.
 
