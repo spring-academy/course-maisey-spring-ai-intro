@@ -1,3 +1,0 @@
-if [ -n "$OPENAI_API_KEY" ]; then
-  export SPRING_PROFILES_ACTIVE=openai
-fi

@@ -1,9 +1,0 @@
-pathways:
-  default: workshop
-
-  paths:
-    workshop:
-      title: "Spring AI - Prompt Engineering"
-
-      steps:
-      - 04-prompt-engineering
