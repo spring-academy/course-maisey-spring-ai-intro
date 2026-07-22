@@ -1,0 +1,13 @@
+{
+    "id": "spring-maisey-agentic-ai-module-agentic-patterns-spring-ai-article",
+    "slug": "agentic-patterns-spring-ai",
+    "title": "Agentic Patterns With Spring AI",
+    "status": "live",
+    "type": "article",
+    "duration": 15,
+    "order": 6,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

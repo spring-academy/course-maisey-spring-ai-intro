@@ -113,7 +113,7 @@ That's the advisor's **default prompt**, which instructs the model to refuse any
 Override the advisor's prompt with our own template. The two placeholders are filled by the advisor: `{query}` with the user's question, `{question_answer_context}` with the retrieved chunks:
 
 ```editor:append-lines-to-file
-file: ~/sample-app/src/main/resources/prompts/rag.st
+file: ~/sample-app/src/main/resources/prompts/rag-prompt.st
 description: Create the custom RAG prompt
 text: |
   Use the following retrieved context to answer the user's question. Follow these rules:
@@ -151,7 +151,7 @@ hidden: true
 text: |2
       private final VectorStore vectorStore;
 
-      @Value("classpath:/prompts/rag.st")
+      @Value("classpath:/prompts/rag-prompt.st")
       private Resource ragPromptResource;
 ```
 

@@ -1,10 +1,10 @@
 {
-    "id": "spring-maisey-agentic-ai-module-mcp-article",
-    "slug": "mcp-article",
+    "id": "spring-maisey-agentic-ai-module-mcp-fundamentals-article",
+    "slug": "mcp-fundamentals",
     "title": "Model Context Protocol (MCP)",
     "status": "live",
     "type": "article",
-    "duration": 20,
+    "duration": 12,
     "order": 2,
     "instructors": [],
     "settings": {

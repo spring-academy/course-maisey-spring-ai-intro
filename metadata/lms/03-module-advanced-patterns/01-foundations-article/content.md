@@ -23,7 +23,7 @@ The bridge that makes both phases work is the embedding. It is what lets you fin
 An embedding is a numerical representation of a piece of content. It is an array of floating point numbers, called a vector, that captures the meaning of the content. The important property is that texts with similar meaning produce vectors that sit close together in this numerical space, even when they share no words. The question "How do I reset my password" and the sentence "I forgot my login credentials" land near each other. A question about the weather lands far away. By measuring the distance between two vectors you measure how related two pieces of text are. This is what makes search by meaning possible instead of search by exact keyword.
 
 <!-- TODO adjust to have images pushed to assets on releases and link to them -->
-![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/embeddings.jpg)
+![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/embeddings.svg)
 
 The length of that array is called the number of dimensions. Each embedding model has a maximum it can produce, for example 1536 numbers, and by default it always outputs that full size no matter how long the input text is. Some models also let you configure a smaller number of dimensions. More dimensions can capture finer shades of meaning, but they also take more storage and make the similarity search a little slower, so a lower setting trades a bit of accuracy for less storage and faster search. Because vectors from two different models do not line up, you must use the same embedding model, with the same dimensions, for indexing and for querying.
 
@@ -44,7 +44,7 @@ Semantic similarity is powerful, but sometimes you also need exact constraints. 
 We have skipped over how raw files become stored, searchable content. That is the indexing phase, and it follows a classic pattern called ETL, which stands for Extract, Transform, Load.
 
 <!-- TODO adjust to have images pushed to assets on releases and link to them -->
-![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/etl.png)
+![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/etl.svg)
 
 
 Extract reads a source and produces documents. A document is simply a piece of text plus some metadata. Readers exist for the formats you meet in practice such as PDF, Office files, HTML, JSON, and plain text.
@@ -57,7 +57,7 @@ You run this pipeline once, and again whenever your documents change, to fill th
 ### Simple RAG and Modular RAG
 
 <!-- TODO adjust to have images pushed to assets on releases and link to them -->
-![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/rag.png)
+![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/rag.svg)
 
 The common case is straightforward. Embed the question, search the vector store, attach the results to the prompt, and call the model. This naive flow answers most needs well.
 
@@ -86,7 +86,7 @@ For a support assistant this is the difference between a chatbot that explains t
 Tool Calling, also called Function Calling, lets a model invoke pieces of your code, called tools, to fetch information or take action. The key thing to understand is that the model never runs anything itself. It cannot execute code, and it never touches your database or APIs directly. Instead the flow is a short conversation.
 
 <!-- TODO adjust to have images pushed to assets on releases and link to them -->
-![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/tool-calling.png)
+![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/03-module-advanced-patterns/01-foundations-article/assets/tool-calling.svg)
 
 First, together with the user prompt, you tell the model which tools are available. Each tool has a name, a description, and the parameters it accepts. Second, if the model decides a tool would help, it does not answer in prose. It responds with a structured request to call a specific tool with specific arguments, for example a request to get the status of order number 1234. Third, your application executes that tool, running ordinary code, with full control over what it is allowed to do. Fourth, the result is sent back to the model. Fifth, the model continues with the tool result as new context and produces its final answer, or it requests another tool.
 

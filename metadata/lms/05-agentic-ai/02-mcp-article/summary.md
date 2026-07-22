@@ -1,1 +1,0 @@
-You now understand the MCP architecture and how Spring AI lets you both expose tools through an MCP server and consume remote tools as an MCP client.

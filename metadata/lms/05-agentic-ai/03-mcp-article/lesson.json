@@ -1,0 +1,13 @@
+{
+    "id": "spring-maisey-agentic-ai-module-mcp-spring-ai-article",
+    "slug": "mcp-spring-ai",
+    "title": "MCP With Spring AI",
+    "status": "live",
+    "type": "article",
+    "duration": 18,
+    "order": 3,
+    "instructors": [],
+    "settings": {
+        "manualCompletion": true
+    }
+}

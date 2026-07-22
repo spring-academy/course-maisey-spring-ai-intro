@@ -1,0 +1,1 @@
+How the Model Context Protocol standardizes sharing tools across AI applications, its host, client, and server roles, the primitives a server offers, and the two transports.

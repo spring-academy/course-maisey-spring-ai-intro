@@ -194,7 +194,3 @@ session: 1
 ```
 
 You get back the current Spring Boot releases array from `api.spring.io`, wrapped in MCP's content envelope.
-
-## Summary
-
-Your Spring Releases MCP server is running. It exposes `fetchReleasesInfo` over the Streamable HTTP transport, and you have spoken the protocol to it directly. Keep it running. Next, the Support Assistant connects to it as an MCP client.

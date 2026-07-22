@@ -1,0 +1,1 @@
+Spring AI's MCP client and server support, from consuming remote tools and exposing your own with @McpTool to securing a server and where the standard is heading.

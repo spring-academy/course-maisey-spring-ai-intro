@@ -1,3 +1,7 @@
 - Provide (additional) and display images correctly
 - Add Multimodality to lab
 - Formatting of lists in articles
+- Add article about AI Gateway
+- Add article about MCP Security
+- Add article about MCP Registry
+- Add article about Agent runtime
