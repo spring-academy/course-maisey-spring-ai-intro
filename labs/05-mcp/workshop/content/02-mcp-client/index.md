@@ -89,12 +89,32 @@ line: 3
 text: import org.springframework.ai.tool.ToolCallbackProvider;
 ```
 
-There are two changes.
+Two things changed in the bean. The first one is a new constructor parameter.
 
-- **Inject `ToolCallbackProvider tools`**. Spring AI's MCP client auto-configuration provides this bean for you, and it wraps every connection from your configuration.
-- **`.defaultTools(tools)`**. Every call through this `ChatClient` now sees the MCP tools, with no extra wiring. `SupportAssistantService` does not change.
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+text: "ToolCallbackProvider tools) {"
+```
 
-The in-process ticket tools are still added per call with `.tools(supportTicketService)` in `generateResponse`. Default tools and per-call tools are combined, so the model sees both groups.
+The MCP client auto-configuration contributes this `ToolCallbackProvider` bean for you, and it already gathers the tools of every connection from your configuration. All you have to do is inject it.
+
+The second change hands those callbacks to the builder.
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+text: ".defaultTools(tools)"
+```
+
+Every call through this `ChatClient` can now reach the remote tools without any further wiring, which is why `SupportAssistantService` stays untouched.
+
+The in-process ticket tools are still added for a single call.
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+text: ".tools(supportTicketService)"
+```
+
+Default tools and per-call tools are combined, so the model sees both groups in the same request.
 
 ## Start the Support Assistant
 

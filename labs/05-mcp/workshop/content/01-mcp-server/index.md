@@ -87,6 +87,7 @@ Now create the service that exposes the release lookup as an MCP tool.
 ```editor:append-lines-to-file
 file: ~/spring-releases-mcp-server/src/main/java/com/example/spring_releases/SpringReleasesInfoService.java
 description: "Create the SpringReleasesInfoService"
+cascade: true
 text: |
   package com.example.spring_releases;
 
@@ -127,11 +128,42 @@ text: |
   }
 ```
 
-Three things are worth noting.
+```editor:select-matching-text
+file: ~/spring-releases-mcp-server/src/main/java/com/example/spring_releases/SpringReleasesInfoService.java
+hidden: true
+text: "@McpTool(description"
+```
 
-- **`@McpTool` and `@McpToolParam`** come from `org.springframework.ai.mcp.annotation`. These are the **MCP-specific** annotations. They are not the in-process `@Tool` and `@ToolParam` you used in `SupportTicketService`. The MCP server finds every bean with `@McpTool` methods and registers them with the protocol.
-- **`RestClient`** pulls live data from Spring's public release API. A real production tool would add error handling, caching, and retries. This version stays simple so the protocol is what stands out.
-- **The inner `ReleasesResponse` and `Embedded` records** are only Jackson plumbing for the API response.
+The `@McpTool` annotation is the **MCP-specific** version of the in-process `@Tool` you used in `SupportTicketService`. At startup the server scans every bean for methods that carry it and registers them with the protocol. The description is written for the model, because a client hands exactly this text to the LLM when it decides which tool fits a question.
+
+The parameter gets its own annotation.
+
+```editor:select-matching-text
+file: ~/spring-releases-mcp-server/src/main/java/com/example/spring_releases/SpringReleasesInfoService.java
+text: "@McpToolParam(description"
+```
+
+`@McpToolParam` is the MCP counterpart of `@ToolParam`. Spring AI builds the JSON schema of the tool from the method signature, and this text tells the model what a valid project slug looks like. You will see that schema later in this lab when you ask the server for its tool list.
+
+Everything below the annotations is plain Spring.
+
+```editor:select-matching-text
+file: ~/spring-releases-mcp-server/src/main/java/com/example/spring_releases/SpringReleasesInfoService.java
+text: "RestClient.create"
+```
+
+The `RestClient` pulls live data from Spring's public release API, and the method simply returns a `List<SpringRelease>`. Spring AI turns that list into JSON before it goes back over the protocol, so you never touch the wire format yourself. A production tool would add error handling, caching, and retries here. This version stays simple so the protocol is what stands out.
+
+The last two records are only plumbing.
+
+```editor:select-matching-text
+file: ~/spring-releases-mcp-server/src/main/java/com/example/spring_releases/SpringReleasesInfoService.java
+text: "private record ReleasesResponse"
+before: 0
+after: 3
+```
+
+`api.spring.io` wraps its results in an `_embedded` object, so these nested records exist only to unwrap the response for Jackson. They have nothing to do with MCP.
 
 ### Run It
 
