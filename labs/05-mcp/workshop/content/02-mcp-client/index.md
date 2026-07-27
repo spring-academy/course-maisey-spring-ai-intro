@@ -1,8 +1,8 @@
 ---
-title: MCP Client
+title: Consuming Tools With an MCP Client
 ---
 
-The Spring Releases MCP server is now running on port 8081. Next you connect the Support Assistant to it as an MCP **client**. The model can then call the remote `fetchReleasesInfo` tool next to its in-process ticket tools.
+The Spring Releases MCP server is now running on port 8090. Next you connect the Support Assistant to it as an MCP **client**. The model can then call the remote `fetchReleasesInfo` tool next to its in-process ticket tools.
 
 ## Add the MCP Client Dependency
 
@@ -39,7 +39,7 @@ For every named connection in your configuration, the starter creates one MCP cl
 file: ~/sample-app/src/main/resources/application.properties
 description: "Apply - Configure the MCP client connection"
 text: |
-  spring.ai.mcp.client.streamable-http.connections.spring-releases.url=http://localhost:8081
+  spring.ai.mcp.client.streamable-http.connections.spring-releases.url=http://localhost:8090
 
   # Verbose protocol logging while you learn. Turn these off in production.
   logging.level.io.modelcontextprotocol.client=DEBUG
@@ -103,7 +103,7 @@ command: cd ~/sample-app && ./mvnw spring-boot:run
 session: 2
 ```
 
-In the logs you will see the MCP client connect to `http://localhost:8081/mcp` on startup.
+In the logs you will see the MCP client connect to `http://localhost:8090/mcp` on startup.
 
 ## Test It via the Assistant
 

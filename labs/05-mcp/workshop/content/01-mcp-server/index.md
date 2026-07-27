@@ -1,5 +1,5 @@
 ---
-title: MCP Server
+title: Exposing Tools With an MCP Server
 ---
 
 Your support assistant already uses tool calling. But the `SupportTicketService` tools run **in the same process** as the assistant. The **Model Context Protocol (MCP)** is a standard way for one process to expose tools, resources, and prompts. An AI application in another process can then use them.
@@ -25,9 +25,20 @@ You don't have to run this. The generated project is already prepared for you in
     -o spring-releases-mcp-server.zip
 ```
 
-Because you also selected `web`, the Initializr id `spring-ai-mcp-server` resolves to the WebMVC starter `spring-ai-starter-mcp-server-webmvc`. That starter provides the HTTP Streamable transport. Unlike the support assistant, this server does not need a model provider starter such as OpenAI, Anthropic, Amazon Bedrock, or Ollama. It only *exposes* tools over the protocol and never calls an LLM itself.
+Because you also selected `web`, the Initializr id `spring-ai-mcp-server` resolves to the WebMVC starter `spring-ai-starter-mcp-server-webmvc`. 
+
+Now look at what the starter added to the project. First the provider-specific dependency.
+
+```editor:select-matching-text
+file: ~/spring-releases-mcp-server/pom.xml
+text: "spring-ai-starter-mcp-server-webmvc"
+```
+
+That starter provides the HTTP Streamable transport. Unlike the support assistant, this server does not need a model provider starter such as OpenAI, Anthropic, Amazon Bedrock, or Ollama. It only *exposes* tools over the protocol and never calls an LLM itself.
 
 ### Configure the Server
+
+The generated project ships with an almost empty `application.properties` file. Spring AI can already run an MCP server with those defaults, but a few properties are worth setting yourself. They control the identity the server shows to clients, the transport it speaks, and more.
 
 ```editor:select-matching-text
 file: ~/spring-releases-mcp-server/src/main/resources/application.properties
@@ -52,7 +63,8 @@ text: |
   logging.level.io.modelcontextprotocol.server=DEBUG
 ```
 
-The server will be reachable at `http://localhost:8081/mcp`. The `STREAMABLE` protocol matches what the support assistant client will call. The server name `spring-releases` is what clients see when they inspect the connection.
+The server will be reachable at `http://localhost:8090/mcp`. The `STREAMABLE` protocol matches what the support assistant client will call. The server name `spring-releases` is what clients see when they inspect the connection.
+We also turn on debug logging so you can watch every JSON-RPC message the server sends and receives. That logging is helpful while you learn the protocol, but you should switch it off in production.
 
 ### The Domain Record
 
@@ -128,15 +140,16 @@ command: cd ~/spring-releases-mcp-server && ./mvnw spring-boot:run
 session: 3
 ```
 
-You should see the embedded MCP server start on port 8081 and log one registered tool at startup.
+You should see the embedded MCP server start on port 8090 and log one registered tool at startup.
 
 ## Test the MCP Server Directly
 
 The Streamable HTTP transport speaks JSON-RPC over HTTP. The first request must be `initialize`. It returns the session id in the `Mcp-Session-Id` response header. Reuse that header on the calls that follow.
 
 ```terminal:execute
+description: "Open an MCP session and keep its session id"
 command: |-
-  SESSION_ID=$(curl -sS -D - -o /dev/null -X POST http://localhost:8081/mcp \
+  SESSION_ID=$(curl -sS -D - -o /dev/null -X POST http://localhost:8090/mcp \
     -H "Content-Type: application/json" \
     -H "Accept: application/json, text/event-stream" \
     -d '{
@@ -157,8 +170,9 @@ session: 1
 List the tools the server advertises.
 
 ```terminal:execute
+description: "List the tools the server offers"
 command: |-
-  curl -sS -X POST http://localhost:8081/mcp \
+  curl -sS -X POST http://localhost:8090/mcp \
     -H "Content-Type: application/json" \
     -H "Accept: application/json, text/event-stream" \
     -H "Mcp-Session-Id: $SESSION_ID" \
@@ -176,8 +190,9 @@ You should see one entry. It is `fetchReleasesInfo`, with its description and th
 Call the tool directly.
 
 ```terminal:execute
+description: "Call the fetchReleasesInfo tool"
 command: |-
-  curl -sS -X POST http://localhost:8081/mcp \
+  curl -sS -X POST http://localhost:8090/mcp \
     -H "Content-Type: application/json" \
     -H "Accept: application/json, text/event-stream" \
     -H "Mcp-Session-Id: $SESSION_ID" \
