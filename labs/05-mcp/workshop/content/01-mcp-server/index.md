@@ -8,10 +8,12 @@ In this lab you build a small, separate **Spring Releases MCP server**. It fetch
 
 ## Build the MCP Server
 
-The MCP server is a **second, separate** Spring Boot application. Create it with Spring Initializr.
+The MCP server is a **second, separate** Spring Boot application. You can generate the project with the [Spring Initializr](https://start.spring.io) using the following command.
+{{< note >}}
+You don't have to run this. The generated project is already prepared for you in `~/spring-releases-mcp-server`, and the rest of this lab edits the files in that folder.
+{{< /note >}}
 
-```terminal:execute
-command: |-
+```bash
   curl https://start.spring.io/starter.zip \
     -d dependencies=web,spring-ai-mcp-server \
     -d type=maven-project \
@@ -20,9 +22,7 @@ command: |-
     -d name=spring-releases \
     -d packageName=com.example.spring_releases \
     -d javaVersion=21 \
-    -o spring-releases-mcp-server.zip && \
-  unzip spring-releases-mcp-server.zip -d ~/spring-releases-mcp-server
-session: 3
+    -o spring-releases-mcp-server.zip
 ```
 
 Because you also selected `web`, the Initializr id `spring-ai-mcp-server` resolves to the WebMVC starter `spring-ai-starter-mcp-server-webmvc`. That starter provides the HTTP Streamable transport. Unlike the support assistant, this server does not need a model provider starter such as OpenAI, Anthropic, Amazon Bedrock, or Ollama. It only *exposes* tools over the protocol and never calls an LLM itself.
