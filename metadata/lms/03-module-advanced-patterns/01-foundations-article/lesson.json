@@ -4,9 +4,8 @@
     "title": "Foundations of RAG and Tool Calling",
     "status": "live",
     "type": "article",
-    "duration": 20,
+    "duration": 900,
     "order": 1,
-    "instructors": [],
     "settings": {
         "manualCompletion": true
     }

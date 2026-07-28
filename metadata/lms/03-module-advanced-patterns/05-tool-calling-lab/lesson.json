@@ -4,12 +4,9 @@
     "title": "Lab - Tool Calling",
     "status": "live",
     "type": "lab",
-    "entitlements": [
-        "auth"
-    ],
+    "entitlements": ["auth"],
     "order": 5,
-    "duration": 30,
-    "instructors": [],
+    "duration": 1800,
     "settings": {
         "educates": "spring-maisey-tool-calling",
         "manualCompletion": true

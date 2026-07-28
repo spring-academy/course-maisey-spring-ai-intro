@@ -4,12 +4,9 @@
     "title": "Lab - Model Context Protocol (MCP)",
     "status": "live",
     "type": "lab",
-    "entitlements": [
-        "auth"
-    ],
-    "duration": 30,
+    "entitlements": ["auth"],
+    "duration": 1800,
     "order": 4,
-    "instructors": [],
     "settings": {
         "educates": "spring-maisey-mcp",
         "manualCompletion": true

@@ -4,12 +4,9 @@
     "title": "Lab - Retrieval-Augmented Generation (RAG) ",
     "status": "live",
     "type": "lab",
-    "entitlements": [
-        "auth"
-    ],
-    "duration": 30,
+    "entitlements": ["auth"],
+    "duration": 1800,
     "order": 3,
-    "instructors": [],
     "settings": {
         "educates": "spring-maisey-rag",
         "manualCompletion": true

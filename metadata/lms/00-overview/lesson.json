@@ -4,10 +4,16 @@
     "title": "Introduction",
     "status": "live",
     "type": "article",
-    "duration": 5,
+    "duration": 180,
     "order": 1,
     "instructors": [ ],
     "settings": {
-      "manualCompletion": true
+      "manualCompletion": true,
+      "links": [
+        {
+          "text": "Spring AI",
+          "url": "https://spring.io/"
+        }
+      ]
     }
   }

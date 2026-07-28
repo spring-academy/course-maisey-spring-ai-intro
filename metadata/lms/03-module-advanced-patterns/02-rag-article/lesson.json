@@ -4,9 +4,8 @@
     "title": "Retrieval-Augmented Generation (RAG)",
     "status": "live",
     "type": "article",
-    "duration": 30,
+    "duration": 1200,
     "order": 2,
-    "instructors": [],
     "settings": {
         "manualCompletion": true
     }
