@@ -20,6 +20,9 @@ add-files-to-archive:
 	  mv $$f.resolved $$f; \
 	done
 
+	labs/04-observability/sample-app/mvnw -f labs/04-observability/sample-app dependency:go-offline
+	tar -czvf build/m2-repository.tar.gz -C ${HOME}/.m2 repository
+
 build-date:
 	rm -rf build
 	# This ensures there is always a build directory with an asset to upload
