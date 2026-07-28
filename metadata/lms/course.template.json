@@ -5,7 +5,8 @@
   "status": "unlisted",
   "level": "beginner",
   "entitlements": ["auth"],
-  "instructors": [],
+  "order": 650,
+  "instructors": ["spring-timo-salm"],
   "topics": ["ai"],
   "settings": {
     "thumbnail": "https://raw.githubusercontent.com/vmware-tanzu-learning/spring-academy-assets/main/courses/course-spring-professional/thumbnails/course-springFrameworkEssentials-thumbnail-large.svg",

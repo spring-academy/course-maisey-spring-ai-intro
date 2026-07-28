@@ -4,11 +4,8 @@
     "title": "Lab - Observability",
     "status": "live",
     "type": "lab",
-    "entitlements": [
-        "auth"
-    ],
-    "duration": 30,
-    "instructors": [],
+    "entitlements": ["auth"],
+    "duration": 1800,
     "order": 4,
     "settings": {
         "educates": "spring-maisey-observability",

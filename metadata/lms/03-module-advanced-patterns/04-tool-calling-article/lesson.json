@@ -4,9 +4,8 @@
     "title": "Tool Calling",
     "status": "live",
     "type": "article",
-    "duration": 25,
+    "duration": 1800,
     "order": 4,
-    "instructors": [],
     "settings": {
         "manualCompletion": true
     }
