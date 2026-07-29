@@ -2,9 +2,15 @@
 title: OpenTelemetry Export Into Grafana
 ---
 
-The actuator endpoints are good for spot checks. For a real dashboard you push everything over OTLP into a stack that stores and visualizes it. In this section you run that stack locally, wire the application to it, and read your traces, logs, and metrics in Grafana.
+The actuator endpoints are good for spot checks. For a real dashboard you push everything over OTLP into a stack that stores and visualizes it. 
 
-The `grafana/otel-lgtm` image bundles Grafana, Mimir (metrics), Loki (logs), Tempo (traces), and an OTel collector into a single container. You run it with Docker Compose, and you let Spring Boot start and stop it together with the application.
+In this section you run that stack locally, wire the application to it, and read your traces and metrics in Grafana.
+
+The `grafana/otel-lgtm` image bundles Grafana, Prometheus (metrics), Loki (logs), Tempo (traces), and an OTel collector into a single container. You run it with Docker Compose, and you let Spring Boot start and stop it together with the application.
+
+{{< note >}}
+Only traces and metrics are forwarded in this lab. Sending your logs over OTLP as well needs an extra OpenTelemetry logging appender and some Logback configuration in the application, which is out of scope here.
+{{< /note >}}
 
 ## Add the otel-lgtm Stack to Docker Compose
 
@@ -27,6 +33,8 @@ text: |
       environment:
         GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /otel-lgtm/grafana/conf/provisioning/dashboards/custom/custom-dashboard.json
 ```
+
+The two last lines bring in a ready-made dashboard. The file `custom-grafana-dashboard.json` is already part of the project, and the volume mount puts it where Grafana looks for provisioned dashboards. The `GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH` variable makes it the home dashboard.
 
 ## Let Spring Boot Manage the Compose Stack
 
@@ -99,18 +107,24 @@ text: |2
   management.metrics.tags.application=${spring.application.name}
 ```
 
-`sampling.probability=1.0` captures every request. That is fine for development, but lower it to `0.1` or `0.01` before anything close to production traffic.
-
-`management.otlp.metrics.export.step=5s` pushes metrics every 5 seconds instead of the 1 minute default, so your token and latency numbers show up in Grafana almost right away. Keep the interval short for the workshop, and raise it again for production to cut down on data volume.
-
-`management.metrics.tags.application=${spring.application.name}` adds an `application` tag with the value `support-assistant` to every metric. Common tags like this let you filter and group in Grafana by application, which matters once more than one service pushes into the same stack.
+Every request now ends up in a trace, metrics are pushed every 5 seconds instead of every minute so your numbers show up in Grafana almost right away, and each metric carries an `application` tag you can filter and group by. Full sampling and such a short interval are right for a workshop. In production you lower both to keep the data volume down.
 
 ## Start the App and Explore in Grafana
 
-Spring Boot now starts the otel-lgtm container first, so the first run takes a bit longer while the image is pulled.
-```dashboard:open-dashboard
-name: Terminal
+The application is still running from the previous section. Spring Boot DevTools restarts it when your classes change, but it does not pick up the new dependencies and the new `compose.yaml`. So stop it first.
+
+```terminal:interrupt
+session: 2
 ```
+
+Then start it again.
+
+```terminal:execute
+command: cd ~/sample-app && ./mvnw spring-boot:run
+session: 2
+```
+
+Spring Boot now starts the otel-lgtm container before the application, so this run takes a bit longer.
 
 {{< note >}}
 Wait for "Started SupportAssistantApplication" before proceeding.
@@ -130,17 +144,27 @@ command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Ope
 session: 1
 ```
 
-Open the **Grafana** dashboard tab. Sign in with the default credentials `admin` / `admin`. Mimir, Loki, and Tempo are pre-configured as datasources.
-
+Open the **Grafana** dashboard tab.
 ```dashboard:open-dashboard
 name: Grafana
 ```
 
-- **Explore → Tempo.** Search by service name `support-assistant`, then click a trace to see the chat span tree, from the HTTP request through the ChatClient call, the vector store query, the tool invocation, the second ChatClient call, and the response.
-- **Explore → Loki.** Query `{service_name="support-assistant"}` to show the structured Spring AI logs, with prompts and completions if you enabled the observation content flags.
-- **Explore → Mimir.** The same `gen_ai_*` metrics, ready to graph.
+You land on the provisioned **Spring AI Observability** dashboard. It visualizes the core metrics Spring AI records for you, so token usage, model call latency and errors, and the time spent in the advisors and in your tools. The last row lists the matching traces from Tempo. 
 
-Token usage is the metric most teams want first, because it is the proxy for cost. To visualize it per request, paste this into **Explore → Mimir**.
+The tool call table shows the arguments and the result, which are only there because you turned the observation content flags on in the previous section. 
+
+Give it a few seconds after your requests, because metrics arrive in 5 second batches.
+
+Now follow one request end to end. In the **Chat API traces** table, click on one of the requests.
+
+Grafana opens the trace view with the full span tree. You see the HTTP request at the top, and below it the `ChatClient` span with the advisors nested inside, the vector store query the RAG advisor triggers, the first model call, the tool call that the model asked for, and the second model call that produces the final answer. The width of each bar tells you where the time went, which is usually the model calls.
+
+Click a single span to see its attributes on the right. The model spans carry `gen_ai.request.model`, the token counts, and the finish reason, and the tool span carries the tool name with the arguments and the result. This is the same data as in the tables, now in the context of one request.
+
+Compare a trace of the RAG query with a trace of the tool-calling query. The tool-calling one has the extra tool span and the second model call, which is the round trip you saw in the logs earlier.
+
+Besides the dashboard, you can query the data yourself under **Explore**. Token usage is usually the first thing teams want, so pick the Prometheus datasource and paste in the query behind the token rate panel.
+Explore opens in the **Builder** view, where you click a query together from dropdowns. Switch to the **Code** view with the toggle on the right of the query row before you paste the query in.
 
 ```promql
 sum by (gen_ai_token_type, gen_ai_request_model) (
@@ -173,6 +197,8 @@ text: |
   # Not recommended for production - high data volume and risk of exposing sensitive content
   spring.ai.chat.client.observations.log-prompt=true
   spring.ai.chat.client.observations.log-completion=true
+  spring.ai.chat.observations.log-prompt=true
+  spring.ai.chat.observations.log-completion=true
   spring.ai.chat.observations.include-error-logging=true
   spring.ai.tools.observations.include-content=true
   spring.ai.vectorstore.observations.log-query-response=true
@@ -194,7 +220,7 @@ Finally, take the same settings back out of `application.properties` and turn th
 file: ~/sample-app/src/main/resources/application.properties
 text: "# Not recommended for production - high data volume and risk of exposing sensitive content"
 description: Replace the inline observability config with disabled defaults
-after: 9
+after: 14
 cascade: true
 ```
 
