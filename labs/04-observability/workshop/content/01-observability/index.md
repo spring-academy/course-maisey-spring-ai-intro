@@ -46,7 +46,7 @@ You need three of them in this lab.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/resources/application.properties
-description: Apply - Expose the metrics and prometheus actuator endpoints
+description: Expose the metrics and prometheus actuator endpoints
 text: |2
 
   management.endpoints.web.exposure.include=health,metrics,prometheus
