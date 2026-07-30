@@ -4,15 +4,15 @@ title: OpenTelemetry Export Into Grafana
 
 The actuator endpoints are good for spot checks. For a real dashboard you push everything over OTLP into a stack that stores and visualizes it. 
 
-In this section you run that stack locally, wire the application to it, and read your traces and metrics in Grafana.
+In this case the stack runs locally next to your application. The application pushes its traces and metrics into it, and you read them in Grafana.
+
+## Run the Grafana Stack with Docker Compose
 
 The `grafana/otel-lgtm` image bundles Grafana, Prometheus (metrics), Loki (logs), Tempo (traces), and an OTel collector into a single container. You run it with Docker Compose, and you let Spring Boot start and stop it together with the application.
 
 {{< note >}}
 Only traces and metrics are forwarded in this lab. Sending your logs over OTLP as well needs an extra OpenTelemetry logging appender and some Logback configuration in the application, which is out of scope here.
 {{< /note >}}
-
-## Add the otel-lgtm Stack to Docker Compose
 
 Create a `compose.yaml` in the project root with the otel-lgtm service.
 
@@ -36,9 +36,7 @@ text: |
 
 The two last lines bring in a ready-made dashboard. The file `custom-grafana-dashboard.json` is already part of the project, and the volume mount puts it where Grafana looks for provisioned dashboards. The `GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH` variable makes it the home dashboard.
 
-## Let Spring Boot Manage the Compose Stack
-
-The `spring-boot-docker-compose` module detects the `compose.yaml` at startup, runs `docker compose up`, and stops the containers again when the application shuts down. So you do not start the stack by hand. It also recognizes the `grafana/otel-lgtm` image and fills in the OTLP endpoints for you, which you rely on further down.
+You do not start the stack by hand. The `spring-boot-docker-compose` module detects the `compose.yaml` at startup, runs `docker compose up`, and stops the containers again when the application shuts down. It also recognizes the `grafana/otel-lgtm` image and **fills in the OTLP endpoints for you**, which you rely on further down.
 
 Add it after the `spring-boot-devtools` dependency.
 
@@ -69,11 +67,11 @@ text: |2
   		</dependency>
 ```
 
-## Add the OpenTelemetry Starter
+## Add and Configure the OpenTelemetry Starter
 
-Spring Boot **4.0** is the first release with an official `spring-boot-starter-opentelemetry` starter, and Spring Boot **4.1** builds on that initial support. 
+Spring Boot **4.0** is the first release with an official `spring-boot-starter-opentelemetry` starter, and Spring Boot **4.1** builds on that initial support with, for example, exemplar support that allows users to link trace signals with metrics.
 
-This starter pulls in `io.micrometer:micrometer-registry-otlp`, the OTLP metrics registry. It plays the same role over OTLP that `micrometer-registry-prometheus` played for scraping, so you swap one for the other.
+It pulls in the OTLP metrics registry, which replaces `micrometer-registry-prometheus`, so you swap one for the other.
 ```editor:select-matching-text
 file: ~/sample-app/pom.xml
 text: "<artifactId>micrometer-registry-prometheus</artifactId>"
@@ -93,9 +91,7 @@ text: |2
   		</dependency>
 ```
 
-## Set the Trace Sampling Rate
-
-You do not set any OTLP URLs. Because `spring-boot-docker-compose` recognizes the `grafana/otel-lgtm` image, Spring Boot reads the container ports and provides the traces, metrics, and logs endpoints as connection details for you. The only thing left is how much to sample.
+As already mentioned, you don't have to set an OTLP URL, because `spring-boot-docker-compose` hands the endpoints of the container to the starter. All that is left is a bit of configuration for the export itself.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/resources/application.properties
@@ -107,7 +103,7 @@ text: |2
   management.metrics.tags.application=${spring.application.name}
 ```
 
-Every request now ends up in a trace, metrics are pushed every 5 seconds instead of every minute so your numbers show up in Grafana almost right away, and each metric carries an `application` tag you can filter and group by. Full sampling and such a short interval are right for a workshop. In production you lower both to keep the data volume down.
+Every request now ends up in a trace, metrics are pushed every 5 seconds instead of every minute so your numbers show up in Grafana almost right away, and each metric carries an `application` tag you can filter and group by. In production you lower the sampling rate and export less often to keep the data volume down.
 
 ## Start the App and Explore in Grafana
 
@@ -176,7 +172,7 @@ In plain words this asks how many tokens per second you use across the last minu
 
 ## Make Observability Opt-In With a Profile
 
-The otel-lgtm container is heavy, and the verbose prompt and completion logging is a data volume and privacy risk. You do not want either on every run. Move all of it behind a profile so the default run stays lightweight, and you switch the full stack on only when you want it.
+You do not want the heavy otel-lgtm container and the content logging on every run. Move all of it behind a profile so the default run stays lightweight, and you switch the full stack on only when you want it.
 
 First, gate the otel-lgtm service behind an `otel` Docker Compose profile, so Compose does not start it unless that profile is active.
 

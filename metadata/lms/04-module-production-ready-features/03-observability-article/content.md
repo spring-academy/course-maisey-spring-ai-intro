@@ -10,6 +10,8 @@ Spring AI's observability is built on **Micrometer** and **Spring Boot Actuator*
 
 Concretely, you add the Actuator starter and whatever registry/exporter you use (for example, a Prometheus registry for metrics and an OpenTelemetry or Zipkin exporter for traces), and Spring AI's instrumentation lights up automatically. The auto-configuration wires its observations into the same Micrometer `ObservationRegistry` the rest of Boot uses.
 
+The building block behind all of this is Micrometer's `Observation` API. An observation is a single instrumentation point around a piece of work. Your application records it once, and the handlers registered on the `ObservationRegistry` turn that one recording into several outputs. A meter handler writes timers and counters for the metrics backend, a tracing handler creates a span, and a logging handler writes it to the application log. Spring AI records these observations for you inside the `ChatClient`, the model implementations, the advisors, and the vector stores, which is why the signals show up without a single line of instrumentation code in your own classes.
+
 ## Two Kinds of Signals, Metrics and Traces
 
 Observability here comes in two complementary forms, and it helps to keep them straight.
@@ -45,7 +47,7 @@ This turns an abstract worry ("are we spending too much?") into a number you can
 
 ## Logging Prompts and Completions, Powerful but Opt-In
 
-Metrics and span tags tell you *that* a call happened and *how* it behaved, but deliberately leave out the most sensitive thing, the actual content of prompts and responses. When you're debugging "why did the model answer *that*?", though, seeing the real text is invaluable. Spring AI lets you turn it on, but it is **disabled by default, and for good reason**. Prompts and completions routinely contain user data, private documents, and other sensitive information you do not want flowing into your logs by accident.
+Metrics and span tags tell you *that* a call happened and *how* it behaved, but deliberately leave out the most sensitive thing, the actual content of prompts and responses. When you're debugging "why did the model answer *that*?", though, seeing the real text is invaluable. Spring AI lets you turn it on, but it is **disabled by default, and for good reason**. Prompts and completions routinely contain user data, private documents, and other sensitive information you do not want flowing into your logs by accident. There is a second reason as well. The prompt and the answer are different on every single request, so they are exactly the high-cardinality data described earlier, and they have no business on a metric.
 
 So content logging is strictly opt-in, configured per surface. The following properties are examples.
 
@@ -65,6 +67,10 @@ spring.ai.tools.observations.include-content=true
 # Include the documents returned by a vector-store query
 spring.ai.vectorstore.observations.log-query-response=true
 ```
+
+Look closely at the two different prefixes for chat. `spring.ai.chat.client.observations` sits at the `ChatClient` level, so it captures the request the way your code handed it over, before any advisor changed it. `spring.ai.chat.observations` sits at the `ChatModel` level, which is the request that finally goes to the provider, with the retrieved documents, the conversation history, and the output format instructions already in it. Comparing those two log lines is the fastest way to see what your advisor chain actually did. The same split exists for tools and for the vector store, each with its own prefix.
+
+When you switch one of these flags on, Spring AI registers the matching logging handlers and writes a warning at startup, as a reminder that the content can be sensitive.
 
 Treat these as debugging switches, not production defaults. The guiding principle is privacy by default. You must consciously decide to record content, and you should weigh that against where your logs are stored and who can read them. When tracing is active, these logs carry trace-correlation ids, so you can line a logged prompt up with the exact span it came from.
 

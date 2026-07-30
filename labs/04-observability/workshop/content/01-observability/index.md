@@ -36,10 +36,7 @@ text: "<artifactId>spring-boot-starter-actuator</artifactId>"
 description: Show the Actuator dependency
 ```
 
-Actuator brings a whole set of endpoints. `health` reports whether the application is up, `info` shows build and version data, `env` shows the resolved configuration, `loggers` reads and changes log levels while the application runs, and `metrics` exposes everything Micrometer records. Only `health` is reachable over HTTP by default, because the other endpoints can reveal a lot about your application.
-
-You need three of them in this lab.
-
+Only `health` is reachable over HTTP by default, so you have to list the endpoints you want. This lab needs:
 * `health` confirms that the application has started.
 * `metrics` lists all metric names and returns the values of a single metric.
 * `prometheus` returns the same metrics in the text format that a Prometheus server scrapes.
@@ -84,18 +81,16 @@ text: |2
 
 ## Spring AI Observations and Their Content
 
-The metrics you are about to look at come from Micrometer's `Observation` API. An observation is a single instrumentation point around a piece of work. You record it once, and registered handlers turn it into several outputs. A meter handler writes timers and counters for the metrics backend, a tracing handler creates a span, and a logging handler writes it to the application log. Spring AI records the observations for you, which is why metrics show up without any instrumentation code in your application.
+Spring AI records a Micrometer observation for every step of an AI call, so the metrics are there without any instrumentation code in your application.
 
-Spring AI records an observation for every step of an AI call.
+The prompt and completion data of the `ChatClient` and of the chat model is typically big and can contain sensitive information. For those reasons it is not exported by default. Spring AI can log it instead, which helps with debugging and troubleshooting. When tracing is available, those log lines carry the trace information, so you can correlate a logged prompt with the matching trace.
 
-* The `ChatClient` call, which covers the complete request including all advisors.
-* The `ChatModel` call, which is the single request to the provider and carries the token counts.
-* Embedding model calls and vector store queries.
-* Every tool call the model triggers.
+The input arguments and the result of a tool call are not exported by default either, for the same reason. Spring AI can add them to the observation as span attributes.
 
-Each observation carries key values, which become tags on the metric and attributes on the span. Only values with few possible variants belong there, such as the model name, the provider, and the operation name. The prompt and the answer are different on every request. Putting them on a metric would create a new time series each time and overwhelm the metrics backend.
+{{< note >}}
+Turning any of this on brings the risk of exposing sensitive or private information. Please be careful.
+{{< /note >}}
 
-That is one reason why Spring AI leaves the prompt and response content out of its observations by default. The other reason is that this content often holds personal data, which you do not want to spread into logs and traces by accident. You can opt in, and Spring AI then registers logging handlers that write the content to the application log. If a tracer is on the classpath, those log lines also carry the trace id, so you can move from a log entry to the matching trace.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/resources/application.properties
@@ -115,11 +110,9 @@ text: |2
   spring.ai.vectorstore.observations.log-query-response=true
 ```
 
-Watch the two different prefixes. `spring.ai.chat.client.observations` sits at the `ChatClient` level, so it captures the request as your code handed it over, before the advisors changed it. `spring.ai.chat.observations` sits at the `ChatModel` level, which is the request that finally goes to the provider. The same split exists for tools and for the vector store, each with its own prefix.
+Watch the two different prefixes, because you compare their output in a moment. `spring.ai.chat.client.observations` sits at the `ChatClient` level, so it captures the request before the advisors changed it. `spring.ai.chat.observations` sits at the `ChatModel` level, which is the request that finally goes to the provider.
 
-Spring AI logs a warning at start-up whenever you enable one of these flags, as a reminder that the content can be sensitive.
-
-In a workshop or development setup, this is very useful. You see every prompt the model sees, every retrieved document, and every tool argument. In production, it is a compliance risk, so keep it off by default.
+Spring AI logs a warning at start-up whenever you enable one of these flags. Keep them off in production, where the content is a data volume and privacy risk.
 
 ## Generate Traffic and Inspect the Logs and Metrics
 
@@ -164,7 +157,7 @@ The first response carries no text at all. It has `finishReason` `TOOL_CALLS` an
 
 ### Query the Metrics Endpoint
 
-The `metrics` endpoint is the quickest way to see what Micrometer collected, with nothing but `curl`. Called without a name it returns the list of all metric names, and called with a name it returns the current values together with the tags that split them up. It only knows the values of the running instance and keeps no history, so it is made for a quick look during development. For dashboards and alerts you need the Prometheus endpoint further down.
+The `metrics` endpoint is the quickest way to see what Micrometer collected, with nothing but `curl`. Called without a name it returns the list of all metric names, and called with a name it returns the current values together with the tags that split them up.
 
 List all metric names registered in the app.
 
@@ -191,13 +184,9 @@ session: 1
 
 The metric names follow the OpenTelemetry GenAI semantic conventions. You will see useful tags such as `gen_ai.system` (`openai`, `anthropic`, ...), `gen_ai.request.model`, `gen_ai.operation.name` (`chat`, `embedding`, ...), and on token usage `gen_ai.token.type` (`input` / `output`).
 
-The metric *names* and *shapes* are provider-agnostic. What changes is the `gen_ai.system` tag value and which labels carry meaningful data.
-
 ### Scrape the Prometheus Endpoint
 
-The metrics endpoint gave you the values of this one running instance at this one moment. Nothing keeps them, so you cannot see how the token usage grew over the last hour, and you cannot put a chart or an alert on it. For that you need a system that collects the values over time, and the common choice is Prometheus.
-
-Prometheus collects them by calling your application's `prometheus` actuator endpoint at a fixed interval.
+The metrics endpoint keeps no history, so for charts and alerts you need a system that collects the values over time. Prometheus does that by calling your application's `prometheus` actuator endpoint at a fixed interval.
 
 ```terminal:execute
 command: curl -s http://localhost:8080/actuator/prometheus | grep gen_ai
