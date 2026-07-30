@@ -62,13 +62,15 @@ Two rules in the specification are worth understanding, because they prevent the
 
 ## Where the Standard Is Going
 
-MCP is young and still changing, so it helps to know the direction before you build on it. The upcoming specification revision, dated 2026-07-28, is the largest change so far.
+MCP is young and still changing, so it helps to know the direction before you build on it. A new specification revision, dated 2026-07-28, has been released and it is the largest change so far.
 
-The biggest shift is from a stateful protocol to a stateless one. Today a connection begins with the mandatory `initialize` handshake and keeps session state afterwards. In the new design that handshake disappears, and each request carries the information about the caller with it. Capability discovery moves from the handshake to an explicit call that a client makes when it wants to know what is available. The practical benefit is operational, because without sticky sessions a remote server can sit behind an ordinary load balancer and scale like any other web service. Streamable HTTP becomes the primary transport, and the older HTTP with SSE transport is on its way out.
+Released does not yet mean available. Most of the ecosystem still speaks the older revision `2025-06-18`, and that includes Spring AI. The code you write in this course targets that older revision, so everything you learn here keeps working. Read this part as a preview of what your applications will look like once the libraries catch up.
 
-Two additions are worth watching. **Tasks** give long running work a standard shape, so a server can return a task identifier immediately and let the client poll for the result instead of holding a connection open. **MCP Apps** let a server offer a small interactive HTML interface that the host renders in a sandbox inframe, which opens the door to things like configuration wizards inside a chat.
+The biggest shift is from a stateful protocol to a stateless one. In the older revision a connection begins with the mandatory `initialize` handshake and keeps session state afterwards. In the new design that handshake disappears, and each request carries the information about the caller with it. Capability discovery moves from the handshake to an explicit call that a client makes when it wants to know what is available. The practical benefit is operational, because without sticky sessions a remote server can sit behind an ordinary load balancer and scale like any other web service. Streamable HTTP becomes the primary transport, and the older HTTP with SSE transport is on its way out.
 
-Authorization gets stricter as well. Alignment with OAuth 2.1 and OpenID Connect becomes mandatory, and a new extension lets administrators centrally decide which servers their organization may use. 
+Two additions are worth watching. **Tasks** give long running work a standard shape, so a server can return a task identifier immediately and let the client poll for the result instead of holding a connection open. **MCP Apps** let a server offer a small interactive HTML interface that the host renders in a sandboxed inframe, which opens the door to things like configuration wizards inside a chat.
+
+Authorization gets stricter as well. Alignment with OAuth 2.1 and OpenID Connect is now mandatory, and a new extension lets administrators centrally decide which servers their organization may use. 
 
 **Several features are being retired**, including sampling, roots, logging, and dynamic client registration. Sampling in particular is going away because letting a server call back into the client's model created security problems, and the guidance now is that a server should call a model directly if it needs one.
 

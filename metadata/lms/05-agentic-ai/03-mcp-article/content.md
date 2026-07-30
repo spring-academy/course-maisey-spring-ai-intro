@@ -4,6 +4,8 @@ Spring AI supports both sides of the protocol, so your application can be a clie
 
 It is worth knowing where that SDK comes from. The Spring AI team is one of its main contributors and develops it together with Anthropic, so the official Java implementation of the protocol and the Spring integration on top of it are built by the same people. For you this means Java support arrives early rather than late, and the Spring layer fits the SDK closely instead of working around it.
 
+One thing to keep in mind while you read this section is which revision of the specification you are working with. Spring AI speaks the `2025-06-18` revision, so everything below describes that behaviour. The new `2026-07-28` revision has been released, but neither the MCP Java SDK nor Spring AI supports it yet, and the same is true for most other implementations across languages.
+
 ### Consuming Another Server as a Client
 
 To call tools that live in someone else's server you add the client starter.
