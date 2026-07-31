@@ -11,4 +11,4 @@ chmod +x spring-releases-mcp-server/mvnw
 code-server --install-extension redhat.java
 (cd sample-app && ./mvnw dependency:go-offline)
 (cd spring-releases-mcp-server && ./mvnw dependency:go-offline)
-docker pull dexidp/dex:v2.45.1
+docker pull quay.io/keycloak/keycloak:26.4 &

@@ -1,5 +1,6 @@
 package com.example.support_assistant;
 
+import org.springaicommunity.mcp.security.client.sync.config.McpClientOAuth2Configurer;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
@@ -15,6 +16,10 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.core.Ordered;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SupportAssistantConfiguration {
@@ -38,5 +43,14 @@ public class SupportAssistantConfiguration {
     @Bean
     VectorStore simpleVectorStore(EmbeddingModel embeddingModel) {
         return SimpleVectorStore.builder(embeddingModel).build();
+    }
+
+    @Bean
+    SecurityFilterChain mcpSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .with(McpClientOAuth2Configurer.mcpClientOAuth2(), Customizer.withDefaults())
+                .csrf(CsrfConfigurer::disable)
+                .build();
     }
 }

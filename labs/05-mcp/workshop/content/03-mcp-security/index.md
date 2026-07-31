@@ -6,64 +6,93 @@ Your MCP server is open. Anyone who can reach port 8090 can list its tools and c
 
 The MCP specification answers this with OAuth 2.0. The server becomes an **OAuth 2.0 resource server**, so every request must carry a valid access token, and the client obtains that token from an **authorization server**.
 
-In this lab you add all three pieces. You run [Dex](https://dexidp.io) as the authorization server, you turn the Spring Releases MCP server into a resource server, and you give the support assistant the ability to fetch a token and attach it to every MCP call.
+In this lab you add all three pieces. You run [Keycloak](https://www.keycloak.org) as the authorization server, you turn the Spring Releases MCP server into a resource server, and you give the support assistant the ability to fetch a token and attach it to every MCP call.
 
 The Spring AI ecosystem provides this through the experimental [MCP Security](https://github.com/spring-ai-community/mcp-security) project. It's build on Spring Security, so the building blocks are the ones you already know.
 
-## Run Dex as the Authorization Server
+## Run Keycloak as the Authorization Server
 
-Dex is a small identity service that speaks OpenID Connect. It ships as a single container image, so you can run it with Docker Compose, the same way you ran the observability stack in an earlier lab. This time the Compose file belongs to the MCP server project rather than the support assistant, because the MCP server interacts with the authorization server while it starts up and will not come up without it.
+Keycloak is an identity service that speaks OpenID Connect. It ships as a single container image and its development mode needs no database, so you can run it with Docker Compose, the same way you ran the observability stack in an earlier lab. This time the Compose file belongs to the MCP server project rather than the support assistant, because the MCP server interacts with the authorization server while it starts up and will not come up without it.
 
-First create the Dex configuration file.
+Keycloak keeps its configuration in a **realm**. You can hand a realm to the container as a JSON file, so the workshop starts with the same setup every time. Create that file first.
 
 ```editor:append-lines-to-file
-file: ~/spring-releases-mcp-server/dex-config.yaml
-description: "Create the Dex configuration"
+file: ~/spring-releases-mcp-server/keycloak-realm.json
+description: "Create the Keycloak realm"
 text: |
-  issuer: http://localhost:5556/dex
-
-  storage:
-    type: memory
-
-  web:
-    http: 0.0.0.0:5556
-
-  oauth2:
-    skipApprovalScreen: true
-
-  staticClients:
-  - id: support-assistant
-    name: 'Support Assistant'
-    secret: support-assistant-secret
-    redirectURIs:
-    - 'http://localhost:8080/authorize/oauth2/code/dex'
-
-  connectors:
-  - type: mockCallback
-    id: mock
-    name: Example
+  {
+    "realm": "spring",
+    "enabled": true,
+    "sslRequired": "none",
+    "users": [
+      {
+        "username": "alice",
+        "enabled": true,
+        "email": "alice@jon.es",
+        "emailVerified": true,
+        "firstName": "Alice",
+        "lastName": "Jones",
+        "realmRoles": ["default-roles-spring"],
+        "credentials": [
+          {
+            "type": "password",
+            "value": "password",
+            "temporary": false
+          }
+        ]
+      }
+    ],
+    "components": {
+      "org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy": [
+        {
+          "name": "Trusted Hosts",
+          "providerId": "trusted-hosts",
+          "subType": "anonymous",
+          "subComponents": {},
+          "config": {
+            "trusted-hosts": ["localhost"],
+            "host-sending-registration-request-must-match": ["false"],
+            "client-uris-must-match": ["true"]
+          }
+        }
+      ]
+    }
+  }
 ```
 
-The `issuer` is the identity of the authorization server. Every token Dex signs carries it in the `iss` claim, and both applications use it to find Dex. The `staticClients` block registers the support assistant as an OAuth 2.0 client with an id, a secret, and the one URL Dex may send the user back to after a login. 
+The realm is called `spring`, and its name becomes part of the issuer URL further down. It holds one user, `alice`, with the password `password` and the email address `alice@jon.es`. You sign in as that user later in this section. The `realmRoles` entry gives the user the normal set of default roles, which a user created through the admin console would get anyway.
 
-The `mockCallback` connector is a test connector. It signs everybody in as a fixed user called `kilgore@kilgore.trout` without showing a login form, which lets you drive the whole flow from the terminal. Together with `skipApprovalScreen` it also means no consent screen appears. In a real setup you replace it with an LDAP, GitHub, or OIDC connector.
+`sslRequired` is set to `none` because everything here runs on `localhost` over plain HTTP. Never do this outside a workshop.
 
-Now create the Compose file that runs Dex.
+The `Trusted Hosts` block is the one setting you need for the last part of this lab. Keycloak lets an application register itself as a client, but by default it only accepts such a request from a host it knows. Here you tell it that `localhost` is fine.
+
+Now create the Compose file that runs Keycloak.
 
 ```editor:append-lines-to-file
 file: ~/spring-releases-mcp-server/compose.yaml
-description: "Create compose.yaml with the Dex service"
+description: "Create compose.yaml with the Keycloak service"
 text: |
   services:
     authorization-server:
-      image: dexidp/dex:v2.45.1
-      container_name: spring-releases-mcp-server-dex
-      command: ["dex", "serve", "/etc/dex/config.yaml"]
+      image: quay.io/keycloak/keycloak:26.4
+      container_name: spring-releases-mcp-server-keycloak
+      command: ["start-dev", "--import-realm"]
+      environment:
+        KC_BOOTSTRAP_ADMIN_USERNAME: admin
+        KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+        KC_HEALTH_ENABLED: "true"
       volumes:
-        - ./dex-config.yaml:/etc/dex/config.yaml:ro
+        - ./keycloak-realm.json:/opt/keycloak/data/import/realm.json:ro
       ports:
-        - "5556:5556"
+        - "5556:8080"
+      healthcheck:
+        test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"status\": \"UP\"' <&3"]
+        interval: 5s
+        timeout: 5s
+        retries: 30
 ```
+
+`start-dev --import-realm` starts Keycloak in development mode and reads the realm file you just wrote. The health check matters more than it looks. Keycloak needs a few seconds before it answers, and Spring Boot waits for the container to report that it is healthy before it continues to start your application. Without the health check the MCP server would try to read the Keycloak configuration too early and fail.
 
 Add the `spring-boot-docker-compose` dependency.
 
@@ -94,10 +123,15 @@ text: |2
   		</dependency>
 ```
 
-Restart the MCP server, so it will start the Dex container via Docker Compose.
+Stop the MCP client and restart the MCP server, so it will start the Keycloak container via Docker Compose.
 
 ```terminal:interrupt
+session: 2
+cascade: true
+```
+```terminal:interrupt
 session: 3
+hidden: true
 ```
 
 ```terminal:execute
@@ -108,11 +142,13 @@ session: 3
 Every OpenID Connect provider publishes a discovery document. Read it to see the endpoints Spring Security will use.
 
 ```terminal:execute
-command: curl -sS http://localhost:5556/dex/.well-known/openid-configuration
+command: curl -sS http://localhost:5556/realms/spring/.well-known/openid-configuration
 session: 1
 ```
 
-You get back the authorization endpoint, the token endpoint, and the `jwks_uri`. The last one is the URL where Dex publishes its public keys. The MCP server downloads those keys and uses them to verify the signature of every token it receives, so the two never have to share a secret.
+You get back the authorization endpoint, the token endpoint, and the `jwks_uri`. The last one is the URL where Keycloak publishes its public keys. The MCP server downloads those keys and uses them to verify the signature of every token it receives, so the two never have to share a secret.
+
+Note the `registration_endpoint` as well. That is the URL an application calls to create an OAuth 2.0 client for itself, and the support assistant uses it at the end of this lab.
 
 ## Turn the MCP Server Into a Resource Server
 
@@ -145,20 +181,20 @@ text: |2
 
 The MCP Security modules are not part of the Spring AI release train yet, so they carry their own version number instead of coming from the Spring AI BOM.
 
-### Point the Server at Dex
+### Point the Server at Keycloak
 
 ```editor:append-lines-to-file
 file: ~/spring-releases-mcp-server/src/main/resources/application.properties
 description: "Configure the resource server"
 text: |2
 
-  spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:5556/dex
+  spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:5556/realms/spring
   spring.security.oauth2.resourceserver.jwt.principal-claim-name=email
 ```
 
 The `issuer-uri` is the only value the server needs. At startup Spring Security reads the discovery document you just looked at, finds the `jwks_uri`, and builds a decoder that validates the signature, the issuer, and the expiry of every incoming token.
 
-By default the name of the authenticated user comes from the `sub` claim, which Dex fills with an internal identifier. With `principal-claim-name` you tell Spring Security to use the `email` claim instead, so the user shows up with a readable name.
+By default the name of the authenticated user comes from the `sub` claim, which Keycloak fills with an internal identifier. With `principal-claim-name` you tell Spring Security to use the `email` claim instead, so the user shows up with a readable name.
 
 ### Watch the Server Reject Anonymous Calls
 
@@ -196,18 +232,56 @@ command: curl -sS http://localhost:8090/.well-known/oauth-protected-resource/mcp
 session: 1
 ```
 
-The document names the resource, `http://localhost:8090/mcp`, and the authorization server that protects it, `http://localhost:5556/dex`. A client that has never seen this server before can now find Dex on its own.
+The document names the resource, `http://localhost:8090/mcp`, and the authorization server that protects it, `http://localhost:5556/realms/spring`. A client that has never seen this server before can now find Keycloak on its own.
 
 ### Call the Tool With a Token
 
-Play the role of the client once by hand. First run the authorization code flow against Dex. Because the mock connector signs you in without a form, `curl` can follow the redirects all the way to the end.
+Play the role of the client once by hand. You need an OAuth 2.0 client before you can ask for a token, so create one at the `registration_endpoint` you saw in the discovery document. Nobody has to open the admin console for this.
 
 ```terminal:execute
-description: "Get an authorization code from Dex"
+description: "Register an OAuth 2.0 client"
 command: |-
-  CODE=$(curl -sS -L -o /dev/null -w '%{url_effective}' \
-    "http://localhost:5556/dex/auth?client_id=support-assistant&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fauthorize%2Foauth2%2Fcode%2Fdex&response_type=code&scope=openid+profile+email&state=demo" \
-    | sed -n 's/.*code=\([^&]*\).*/\1/p')
+  CLIENT=$(curl -sS -X POST http://localhost:5556/realms/spring/clients-registrations/openid-connect \
+    -H "Content-Type: application/json" \
+    -d '{
+          "client_name": "curl-demo",
+          "grant_types": ["authorization_code"],
+          "redirect_uris": ["http://localhost:8080/authorize/oauth2/code/spring-releases"]
+        }')
+
+  CLIENT_ID=$(echo "$CLIENT" | sed -n 's/.*"client_id":"\([^"]*\)".*/\1/p')
+  CLIENT_SECRET=$(echo "$CLIENT" | sed -n 's/.*"client_secret":"\([^"]*\)".*/\1/p')
+
+  echo "Client id: $CLIENT_ID"
+session: 1
+```
+
+Keycloak invents the id and the secret and hands them back. This is **dynamic client registration**, and the support assistant does the very same call for itself at the end of this lab.
+
+Now start the authorization code flow with that client. The first request ends on the Keycloak sign in page, so you keep the cookies and read the address the form posts to.
+
+```terminal:execute
+description: "Open the login page"
+command: |-
+  LOGIN_PAGE=$(curl -sS -c /tmp/kc-cookies -b /tmp/kc-cookies -L \
+    "http://localhost:5556/realms/spring/protocol/openid-connect/auth?client_id=$CLIENT_ID&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fauthorize%2Foauth2%2Fcode%2Fspring-releases&response_type=code&scope=openid+profile+email&state=demo")
+
+  LOGIN_URL=$(echo "$LOGIN_PAGE" | grep -o 'action="[^"]*"' | head -1 | sed 's/action="//; s/"$//; s/&amp;/\&/g')
+
+  echo "Login URL: $LOGIN_URL"
+session: 1
+```
+
+Sign in as `alice`. Keycloak answers with a redirect back to the application, and the one time code sits in that address.
+
+```terminal:execute
+description: "Sign in and read the authorization code"
+command: |-
+  CODE=$(curl -sS -c /tmp/kc-cookies -b /tmp/kc-cookies -o /dev/null -w '%{redirect_url}' \
+    -d "username=alice" \
+    -d "password=password" \
+    "$LOGIN_URL" \
+    | sed -n 's/.*[?&]code=\([^&]*\).*/\1/p')
 
   echo "Code: $CODE"
 session: 1
@@ -218,26 +292,26 @@ Exchange that one time code for an access token.
 ```terminal:execute
 description: "Exchange the code for an access token"
 command: |-
-  TOKEN=$(curl -sS -X POST http://localhost:5556/dex/token \
-    -u "support-assistant:support-assistant-secret" \
+  TOKEN=$(curl -sS -X POST http://localhost:5556/realms/spring/protocol/openid-connect/token \
+    -u "$CLIENT_ID:$CLIENT_SECRET" \
     -d grant_type=authorization_code \
     -d "code=$CODE" \
-    -d "redirect_uri=http://localhost:8080/authorize/oauth2/code/dex" \
+    -d "redirect_uri=http://localhost:8080/authorize/oauth2/code/spring-releases" \
     | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')
 
   echo "Token: $TOKEN"
 session: 1
 ```
 
-The token is a signed JWT with three parts separated by dots. Ask Dex what is inside it.
+The token is a signed JWT with three parts separated by dots. Ask Keycloak what is inside it.
 
 ```terminal:execute
 command: |-
-  curl -sS -H "Authorization: Bearer $TOKEN" http://localhost:5556/dex/userinfo
+  curl -sS -H "Authorization: Bearer $TOKEN" http://localhost:5556/realms/spring/protocol/openid-connect/userinfo
 session: 1
 ```
 
-You see the issuer, the expiry, and the `email` claim of the signed in user. The MCP server reads the same claims after it has verified the signature. Now repeat the `initialize` call with that token.
+You see the name and the `email` claim of the signed in user. The MCP server reads the same claims after it has verified the signature. Now repeat the `initialize` call with that token.
 
 ```terminal:execute
 description: "Call the MCP server with a token"
@@ -303,7 +377,7 @@ file: ~/spring-releases-mcp-server/src/main/java/com/example/spring_releases/Spr
 text: "@PreAuthorize"
 ```
 
-`@PreAuthorize` works on a tool method like on any other Spring bean method. This rule only asks for an authenticated caller, which the filter chain already guarantees. The interesting version checks what the token allows, for example `@PreAuthorize("hasAuthority('SCOPE_releases.read')")`, but Dex does not put scopes into its access tokens.
+`@PreAuthorize` works on a tool method like on any other Spring bean method. This rule only asks for an authenticated caller, which the filter chain already guarantees. The interesting version checks what the token allows, for example `@PreAuthorize("hasAuthority('SCOPE_releases.read')")`. Keycloak writes the granted scopes into the access token, and Spring Security turns each one into an authority with a `SCOPE_` prefix, so a rule like that works once you add the scope to the realm.
 
 The second change reads the caller.
 
@@ -323,11 +397,11 @@ session: 2
 ```
 
 ```terminal:execute
-command: cd ~/sample-app && ./mvnw spring-boot:run
+command: ./mvnw spring-boot:run
 session: 2
 ```
 
-The application fails to start with an `Authorization error in sendMessage with code 401`. Spring AI creates the MCP client from your properties at startup and immediately connects to the server. At that moment no user is signed in, so there is no token to send. This is the friction that the MCP Security documentation warns about, and you fix it with a property further down.
+The application fails to start with an `Authorization error when sending message`. Spring AI creates the MCP client from your properties at startup and immediately connects to the server. At that moment no user is signed in, so there is no token to send. This is the friction that the MCP Security documentation warns about, and you fix it with a property further down.
 
 ### Add the Dependencies
 
@@ -369,7 +443,6 @@ text: |2
   spring.ai.mcp.client.authorization.dynamic-client-registration.enabled=true
   # For development purposes, explicitly allows HTTP for loopback addresses (MCP Security enforces HTTPS for all URLs involved in the Dynamic Client Registration flow)
   spring.ai.mcp.client.authorization.dynamic-client-registration.allow-loopback-addresses=true
-  # spring.security.oauth2.client.registration.dex.scope=openid,profile,email
 ```
 
 `spring.ai.mcp.client.initialized=false` is the fix for the startup failure. The MCP client no longer connects while the application starts. It connects on the first request instead, and by then a user is signed in and there is a token to send.
@@ -417,6 +490,7 @@ hidden: true
 line: 18
 text: |2
   import org.springframework.security.web.SecurityFilterChain;
+  import org.springframework.security.config.Customizer;
   import org.springframework.security.config.annotation.web.builders.HttpSecurity;
   import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
   import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -436,13 +510,48 @@ file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantC
 text: "McpClientOAuth2Configurer.mcpClientOAuth2()"
 ```
 
-That single line does all the OAuth 2.0 wiring. Underneath it switches on the normal `oauth2Client` support of Spring Security for MCP, which runs the authorization code flow and keeps the token in the user session. When a request needs a token and there is none yet, Spring Security sends the user to Dex, remembers the original request, and repeats it after the login.
+That single line does all the OAuth 2.0 wiring. Underneath it switches on the normal `oauth2Client` support of Spring Security for MCP, which runs the authorization code flow and keeps the token in the user session. When a request needs a token and there is none yet, Spring Security sends the user to Keycloak, remembers the original request, and repeats it after the login.
 
 On top of that the configurer adds the MCP specific part. It puts a `resource` parameter into the authorization request and into the token request, and that parameter names the MCP server the token is for. 
 
 ### Test the Whole Chain
 
-The assistant now runs a browser flow on your behalf, so `curl` needs to keep cookies and follow redirects. `-c` and `-b` share a cookie file and `-L` follows every redirect.
+Start the support assistant.
+```terminal:execute
+command: ./mvnw spring-boot:run
+session: 2
+```
+
+The assistant now runs a browser flow on your behalf, so `curl` needs to keep cookies and follow redirects. `-c` and `-b` share a cookie file and `-L` follows every redirect. Because nobody is signed in yet, this first request ends on the Keycloak sign in page instead of on an answer.
+
+```terminal:execute
+description: "Ask a question and land on the login page"
+command: |-
+  curl -sS -c /tmp/cookies -b /tmp/cookies -L -G "http://localhost:8080/api/v1/chat" \
+    --data-urlencode "query=What is the latest stable release of Spring AI? Please also open a high-priority ticket to request access to Spring Application Advisor to accelerate upgrading our application to that version." \
+    -o /tmp/login.html
+
+  LOGIN_URL=$(grep -o 'action="[^"]*"' /tmp/login.html | head -1 | sed 's/action="//; s/"$//; s/&amp;/\&/g')
+
+  echo "Login URL: $LOGIN_URL"
+session: 1
+```
+
+Spring Security remembered your question while it sent you to Keycloak. Sign in as `alice` with the same cookie file.
+
+```terminal:execute
+description: "Sign in and get the answer"
+command: |-
+  curl -sS -c /tmp/cookies -b /tmp/cookies -L \
+    -d "username=alice" \
+    -d "password=password" \
+    "$LOGIN_URL"
+session: 1
+```
+
+You get the answer as before. What happened in between is the interesting part. The chat request needed the remote tool, the MCP client had no client and no token, so it registered itself with Keycloak, and Spring Security sent `curl` to the sign in page. After you signed in, Keycloak sent `curl` back with a code, the assistant exchanged the code for a token, and then the original chat request ran again with that token attached.
+
+You are signed in now, so a second question needs one command only.
 
 ```terminal:execute
 command: |-
@@ -451,20 +560,18 @@ command: |-
 session: 1
 ```
 
-You get the answer as before. What happened in between is the interesting part. The chat request needed the remote tool, the MCP client had no token, Spring Security sent `curl` to Dex, Dex signed in the mock user and sent it back with a code, the assistant exchanged the code for a token, and then the original chat request ran again with that token attached.
-
 Now look at the terminal where the MCP server runs. You find a line like this one.
 
 ```
-Fetch spring release info for project spring-boot called by kilgore@kilgore.trout
+Fetch spring release info for project spring-boot called by alice@jon.es
 ```
 
-The identity of the end user travelled from Dex, through the support assistant, into the MCP server, and all the way into the tool method.
+The identity of the end user travelled from Keycloak, through the support assistant, into the MCP server, and all the way into the tool method.
 
 ## Before You Move On
 
-You do not want to run Dex on every start from now on. The applications you begin the next lab with therefore keep everything from this section behind a Spring profile called `mcp-security`, in the same way the observability stack sits behind `local-observability`.
+You do not want to run Keycloak on every start from now on. The applications you begin the next lab with therefore keep everything from this section behind a Spring profile called `mcp-security`, in the same way the observability stack sits behind `local-observability`.
 
-Without that profile the MCP server stays open, the support assistant sends no token, and no Dex container has to run.
+Without that profile the MCP server stays open, the support assistant sends no token, and no Keycloak container has to run.
 
 
