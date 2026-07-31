@@ -123,33 +123,6 @@ text: |2
   		</dependency>
 ```
 
-Stop the MCP client and restart the MCP server, so it will start the Keycloak container via Docker Compose.
-
-```terminal:interrupt
-session: 2
-cascade: true
-```
-```terminal:interrupt
-session: 3
-hidden: true
-```
-
-```terminal:execute
-command: ./mvnw spring-boot:run
-session: 3
-```
-
-Every OpenID Connect provider publishes a discovery document. Read it to see the endpoints Spring Security will use.
-
-```terminal:execute
-command: curl -sS http://localhost:5556/realms/spring/.well-known/openid-configuration
-session: 1
-```
-
-You get back the authorization endpoint, the token endpoint, and the `jwks_uri`. The last one is the URL where Keycloak publishes its public keys. The MCP server downloads those keys and uses them to verify the signature of every token it receives, so the two never have to share a secret.
-
-Note the `registration_endpoint` as well. That is the URL an application calls to create an OAuth 2.0 client for itself, and the support assistant uses it at the end of this lab.
-
 ## Turn the MCP Server Into a Resource Server
 
 The server side needs a single dependency. `mcp-server-security-spring-boot` is the Spring Boot module of the MCP Security project. It pulls in Spring Security and the OAuth 2.0 resource server support, and it adds the auto configuration that wires them together for MCP.
@@ -197,6 +170,31 @@ The `issuer-uri` is the only value the server needs. At startup Spring Security 
 By default the name of the authenticated user comes from the `sub` claim, which Keycloak fills with an internal identifier. With `principal-claim-name` you tell Spring Security to use the `email` claim instead, so the user shows up with a readable name.
 
 ### Watch the Server Reject Anonymous Calls
+
+Stop the MCP client and restart the MCP server, so it will start the Keycloak container via Docker Compose.
+
+```terminal:interrupt
+session: 2
+cascade: true
+```
+```terminal:interrupt
+session: 3
+hidden: true
+```
+
+```terminal:execute
+command: ./mvnw spring-boot:run
+session: 3
+```
+
+Every OpenID Connect provider publishes a discovery document. Read it to see the endpoints Spring Security will use.
+
+```terminal:execute
+command: curl -sS http://localhost:5556/realms/spring/.well-known/openid-configuration
+session: 1
+```
+
+You get back the authorization endpoint, the token endpoint, and the `jwks_uri`. The last one is the URL where Keycloak publishes its public keys. The MCP server downloads those keys and uses them to verify the signature of every token it receives, so the two never have to share a secret
 
 Repeat the `initialize` call from the first section, without a token.
 
@@ -390,11 +388,7 @@ Inside the tool method you reach the authenticated user through the normal `Secu
 
 ## Give the MCP Client a Token
 
-The support assistant now talks to a server that rejects it. Restart it and watch what happens.
-
-```terminal:interrupt
-session: 2
-```
+The support assistant now talks to a server that rejects it. Start it and watch what happens.
 
 ```terminal:execute
 command: ./mvnw spring-boot:run

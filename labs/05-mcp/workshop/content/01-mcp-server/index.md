@@ -56,7 +56,7 @@ text: |
 The server will be reachable at `http://localhost:8090/mcp`. The `STREAMABLE` protocol matches what the support assistant client will call. The server name `spring-releases` is what clients see when they inspect the connection.
 We also turn on debug logging so you can watch every JSON-RPC message the server sends and receives. That logging is helpful while you learn the protocol, but you should switch it off in production.
 
-### The Domain Record
+### The MCP Tool Service
 
 Create a record that maps directly to what `api.spring.io` returns for a single release.
 
@@ -69,8 +69,6 @@ text: |
   record SpringRelease(String version, String status, boolean current) {
   }
 ```
-
-### The MCP Tool Service
 
 Now create the service that exposes the release lookup as an MCP tool.
 
