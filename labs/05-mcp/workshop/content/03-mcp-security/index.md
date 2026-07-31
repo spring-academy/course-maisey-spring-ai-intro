@@ -8,13 +8,11 @@ The MCP specification answers this with OAuth 2.0. The server becomes an **OAuth
 
 In this lab you add all three pieces. You run [Keycloak](https://www.keycloak.org) as the authorization server, you turn the Spring Releases MCP server into a resource server, and you give the support assistant the ability to fetch a token and attach it to every MCP call.
 
-The Spring AI ecosystem provides this through the experimental [MCP Security](https://github.com/spring-ai-community/mcp-security) project. It's build on Spring Security, so the building blocks are the ones you already know.
-
 ## Run Keycloak as the Authorization Server
 
 Keycloak is an identity service that speaks OpenID Connect. It ships as a single container image and its development mode needs no database, so you can run it with Docker Compose, the same way you ran the observability stack in an earlier lab. This time the Compose file belongs to the MCP server project rather than the support assistant, because the MCP server interacts with the authorization server while it starts up and will not come up without it.
 
-Keycloak keeps its configuration in a **realm**. You can hand a realm to the container as a JSON file, so the workshop starts with the same setup every time. Create that file first.
+Keycloak keeps its configuration in a realm. You can hand a realm to the container as a JSON file, so the workshop starts with the same setup every time. Create that file first.
 
 ```editor:append-lines-to-file
 file: ~/spring-releases-mcp-server/keycloak-realm.json
@@ -60,11 +58,7 @@ text: |
   }
 ```
 
-The realm is called `spring`, and its name becomes part of the issuer URL further down. It holds one user, `alice`, with the password `password` and the email address `alice@jon.es`. You sign in as that user later in this section. The `realmRoles` entry gives the user the normal set of default roles, which a user created through the admin console would get anyway.
-
-`sslRequired` is set to `none` because everything here runs on `localhost` over plain HTTP. Never do this outside a workshop.
-
-The `Trusted Hosts` block is the one setting you need for the last part of this lab. Keycloak lets an application register itself as a client, but by default it only accepts such a request from a host it knows. Here you tell it that `localhost` is fine.
+The realm is called `spring`, and its name becomes part of the issuer URL further down. It holds one user, `alice`, with the password `password` and the email address `alice@jon.es`. You sign in as that user later in this section. 
 
 Now create the Compose file that runs Keycloak.
 
@@ -92,7 +86,7 @@ text: |
         retries: 30
 ```
 
-`start-dev --import-realm` starts Keycloak in development mode and reads the realm file you just wrote. The health check matters more than it looks. Keycloak needs a few seconds before it answers, and Spring Boot waits for the container to report that it is healthy before it continues to start your application. Without the health check the MCP server would try to read the Keycloak configuration too early and fail.
+The health check matters more than it looks. Keycloak needs a few seconds before it answers, and Spring Boot waits for the container to report that it is healthy before it continues to start your application. Without the health check the MCP server would try to read the Keycloak configuration too early and fail.
 
 Add the `spring-boot-docker-compose` dependency.
 
@@ -154,8 +148,6 @@ text: |2
 
 The MCP Security modules are not part of the Spring AI release train yet, so they carry their own version number instead of coming from the Spring AI BOM.
 
-### Point the Server at Keycloak
-
 ```editor:append-lines-to-file
 file: ~/spring-releases-mcp-server/src/main/resources/application.properties
 description: "Configure the resource server"
@@ -187,15 +179,6 @@ command: ./mvnw spring-boot:run
 session: 3
 ```
 
-Every OpenID Connect provider publishes a discovery document. Read it to see the endpoints Spring Security will use.
-
-```terminal:execute
-command: curl -sS http://localhost:5556/realms/spring/.well-known/openid-configuration
-session: 1
-```
-
-You get back the authorization endpoint, the token endpoint, and the `jwks_uri`. The last one is the URL where Keycloak publishes its public keys. The MCP server downloads those keys and uses them to verify the signature of every token it receives, so the two never have to share a secret
-
 Repeat the `initialize` call from the first section, without a token.
 
 ```terminal:execute
@@ -223,115 +206,7 @@ You get `401 Unauthorized` with this response header.
 WWW-Authenticate: Bearer resource_metadata=http://localhost:8090/.well-known/oauth-protected-resource/mcp
 ```
 
-That header is the heart of MCP authorization. The failed request tells the client where to look next. Follow the URL yourself.
-
-```terminal:execute
-command: curl -sS http://localhost:8090/.well-known/oauth-protected-resource/mcp
-session: 1
-```
-
-The document names the resource, `http://localhost:8090/mcp`, and the authorization server that protects it, `http://localhost:5556/realms/spring`. A client that has never seen this server before can now find Keycloak on its own.
-
-### Call the Tool With a Token
-
-Play the role of the client once by hand. You need an OAuth 2.0 client before you can ask for a token, so create one at the `registration_endpoint` you saw in the discovery document. Nobody has to open the admin console for this.
-
-```terminal:execute
-description: "Register an OAuth 2.0 client"
-command: |-
-  CLIENT=$(curl -sS -X POST http://localhost:5556/realms/spring/clients-registrations/openid-connect \
-    -H "Content-Type: application/json" \
-    -d '{
-          "client_name": "curl-demo",
-          "grant_types": ["authorization_code"],
-          "redirect_uris": ["http://localhost:8080/authorize/oauth2/code/spring-releases"]
-        }')
-
-  CLIENT_ID=$(echo "$CLIENT" | sed -n 's/.*"client_id":"\([^"]*\)".*/\1/p')
-  CLIENT_SECRET=$(echo "$CLIENT" | sed -n 's/.*"client_secret":"\([^"]*\)".*/\1/p')
-
-  echo "Client id: $CLIENT_ID"
-session: 1
-```
-
-Keycloak invents the id and the secret and hands them back. This is **dynamic client registration**, and the support assistant does the very same call for itself at the end of this lab.
-
-Now start the authorization code flow with that client. The first request ends on the Keycloak sign in page, so you keep the cookies and read the address the form posts to.
-
-```terminal:execute
-description: "Open the login page"
-command: |-
-  LOGIN_PAGE=$(curl -sS -c /tmp/kc-cookies -b /tmp/kc-cookies -L \
-    "http://localhost:5556/realms/spring/protocol/openid-connect/auth?client_id=$CLIENT_ID&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fauthorize%2Foauth2%2Fcode%2Fspring-releases&response_type=code&scope=openid+profile+email&state=demo")
-
-  LOGIN_URL=$(echo "$LOGIN_PAGE" | grep -o 'action="[^"]*"' | head -1 | sed 's/action="//; s/"$//; s/&amp;/\&/g')
-
-  echo "Login URL: $LOGIN_URL"
-session: 1
-```
-
-Sign in as `alice`. Keycloak answers with a redirect back to the application, and the one time code sits in that address.
-
-```terminal:execute
-description: "Sign in and read the authorization code"
-command: |-
-  CODE=$(curl -sS -c /tmp/kc-cookies -b /tmp/kc-cookies -o /dev/null -w '%{redirect_url}' \
-    -d "username=alice" \
-    -d "password=password" \
-    "$LOGIN_URL" \
-    | sed -n 's/.*[?&]code=\([^&]*\).*/\1/p')
-
-  echo "Code: $CODE"
-session: 1
-```
-
-Exchange that one time code for an access token.
-
-```terminal:execute
-description: "Exchange the code for an access token"
-command: |-
-  TOKEN=$(curl -sS -X POST http://localhost:5556/realms/spring/protocol/openid-connect/token \
-    -u "$CLIENT_ID:$CLIENT_SECRET" \
-    -d grant_type=authorization_code \
-    -d "code=$CODE" \
-    -d "redirect_uri=http://localhost:8080/authorize/oauth2/code/spring-releases" \
-    | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')
-
-  echo "Token: $TOKEN"
-session: 1
-```
-
-The token is a signed JWT with three parts separated by dots. Ask Keycloak what is inside it.
-
-```terminal:execute
-command: |-
-  curl -sS -H "Authorization: Bearer $TOKEN" http://localhost:5556/realms/spring/protocol/openid-connect/userinfo
-session: 1
-```
-
-You see the name and the `email` claim of the signed in user. The MCP server reads the same claims after it has verified the signature. Now repeat the `initialize` call with that token.
-
-```terminal:execute
-description: "Call the MCP server with a token"
-command: |-
-  curl -sS -i -X POST http://localhost:8090/mcp \
-    -H "Content-Type: application/json" \
-    -H "Accept: application/json, text/event-stream" \
-    -H "Authorization: Bearer $TOKEN" \
-    -d '{
-          "jsonrpc": "2.0",
-          "id": 1,
-          "method": "initialize",
-          "params": {
-            "protocolVersion": "2025-06-18",
-            "capabilities": {},
-            "clientInfo": { "name": "curl", "version": "1" }
-          }
-        }'
-session: 1
-```
-
-This time you get `200 OK` and a session id.
+That header is the heart of MCP authorization. The failed request tells the client where to look next. 
 
 ## Protect a Single Tool
 
@@ -397,7 +272,7 @@ session: 2
 
 The application fails to start with an `Authorization error when sending message`. Spring AI creates the MCP client from your properties at startup and immediately connects to the server. At that moment no user is signed in, so there is no token to send. This is the friction that the MCP Security documentation warns about, and you fix it with a property further down.
 
-### Add the Dependencies
+### Let the Client Register Itself
 
 ```editor:select-matching-text
 file: ~/sample-app/pom.xml
@@ -425,7 +300,7 @@ text: |2
 
 The `mcp-client-security-spring-boot` module brings auto configuration with it. When it finds exactly one OAuth 2.0 client registration, it wires the MCP transport so that every outgoing request carries the token of the current user.
 
-### Let the Client Register Itself
+Now add the configuration it needs.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/resources/application.properties

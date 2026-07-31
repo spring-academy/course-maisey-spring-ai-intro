@@ -48,7 +48,6 @@ text: |
   spring.ai.mcp.server.name=${spring.application.name}
   spring.ai.mcp.server.protocol=STREAMABLE
   spring.ai.mcp.server.version=1.0.0
-  server.port=8090
 
   logging.level.io.modelcontextprotocol.server=DEBUG
 ```

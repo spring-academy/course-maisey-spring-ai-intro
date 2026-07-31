@@ -16,3 +16,5 @@ services:
       interval: 5s
       timeout: 5s
       retries: 30
+    profiles:
+      - mcp-security

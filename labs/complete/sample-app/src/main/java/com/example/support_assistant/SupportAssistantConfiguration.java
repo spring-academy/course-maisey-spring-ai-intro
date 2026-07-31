@@ -58,7 +58,6 @@ public class SupportAssistantConfiguration {
         return SimpleVectorStore.builder(embeddingModel).build();
     }
 
-    // OAuth 2.0 for the MCP client, only with the "mcp-security" profile
     @Bean
     @Profile("mcp-security")
     SecurityFilterChain mcpSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -69,7 +68,6 @@ public class SupportAssistantConfiguration {
                 .build();
     }
 
-    // Without that profile everything stays open, instead of the defaults of Spring Boot
     @Bean
     @Profile("!mcp-security")
     SecurityFilterChain permitAllFilterChain(HttpSecurity http) throws Exception {
