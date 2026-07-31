@@ -9,5 +9,4 @@ chmod +x sample-app/mvnw
 chmod +x spring-releases-mcp-server/mvnw
 
 code-server --install-extension redhat.java
-(cd sample-app && ./mvnw dependency:go-offline)
-(cd spring-releases-mcp-server && ./mvnw dependency:go-offline)
+curl ${WEBSERVER}/m2-repository.tar.gz | tar -xzvf - -C ${HOME}/.m2

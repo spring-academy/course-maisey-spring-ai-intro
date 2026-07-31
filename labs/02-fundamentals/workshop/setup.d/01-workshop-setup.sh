@@ -8,4 +8,4 @@ jq ". + { \"editor.fontSize\": 14, \"files.exclude\": { \".**\": true}}" /home/e
 chmod +x sample-app/mvnw
 
 code-server --install-extension redhat.java
-(cd sample-app && ./mvnw dependency:go-offline)
+curl ${WEBSERVER}/m2-repository.tar.gz | tar -xzvf - -C ${HOME}/.m2

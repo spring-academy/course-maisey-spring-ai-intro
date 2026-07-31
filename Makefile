@@ -20,7 +20,8 @@ add-files-to-archive:
 	  mv $$f.resolved $$f; \
 	done
 
-	labs/04-observability/sample-app/mvnw -f labs/04-observability/sample-app dependency:go-offline
+	labs/complete/sample-app/mvnw -f labs/complete/sample-app dependency:go-offline
+	labs/complete/spring-releases-mcp-server/mvnw -f labs/complete/spring-releases-mcp-server dependency:go-offline
 	tar -czvf build/m2-repository.tar.gz -C ${HOME}/.m2 repository
 
 build-date:
