@@ -284,8 +284,8 @@ final class ChatFlows {
                 .defaultTools(springReleasesToolCallback())
                 .build();
         for (var mcpQuestion : List.of(
-                "What is the latest stable release of Spring Boot?",
-                "What is the latest release of Spring Boot? Please also open a high-priority ticket to request access to Spring Application Advisor to accelerate upgrading our application to that version."
+                "What is the latest stable release of Spring AI?",
+                "What is the latest stable release of Spring AI? Please also open a high-priority ticket to request access to Spring Application Advisor to accelerate upgrading our application to that version."
         )) {
             mcpChatClient.prompt()
                     .user(u -> u
@@ -317,7 +317,7 @@ final class ChatFlows {
 
             @Override
             public String call(String toolInput) {
-                return "[{\"version\":\"3.5.0\",\"status\":\"GENERAL_AVAILABILITY\",\"current\":true}]";
+                return "[{\"version\":\"2.0.1-SNAPSHOT\",\"status\":\"SNAPSHOT\",\"current\":false},{\"version\":\"2.0.0\",\"status\":\"GENERAL_AVAILABILITY\",\"current\":true},{\"version\":\"1.1.8\",\"status\":\"GENERAL_AVAILABILITY\",\"current\":false},{\"version\":\"1.1.9-SNAPSHOT\",\"status\":\"SNAPSHOT\",\"current\":false},{\"version\":\"1.0.9\",\"status\":\"GENERAL_AVAILABILITY\",\"current\":false}]";
             }
         };
     }

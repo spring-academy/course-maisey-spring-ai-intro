@@ -1,0 +1,50 @@
+{
+  "id" : "1a3bbd3e-cd84-425f-ad3d-eed210565020",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Use the following retrieved context to answer the user's question. Follow these rules:\\n\\n1. If the answer can be found in the context, base your answer strictly on that context.\\n2. If the context does not contain the information needed to answer, rely on your own general knowledge to answer.\\n3. If you are unsure or the question cannot be answered from either the context or your own knowledge, say so clearly rather than guessing.\\n4. Do not fabricate facts, sources, or citations.\\n\\n---\\nContext:\\nMore than 50 projects are supported, plus the OpenJDK and Apache Tomcat runtimes. The supported projects, grouped by category:Runtimes OpenJDK Apache Tomcat VMware tc ServerCore framework Spring Framework Spring Boot Reactor AspectJSpring Cloud Spring Cloud Commons Spring Cloud Config Spring Cloud Netflix Spring Cloud Bus Spring Cloud CircuitBreaker Spring Cloud CloudFoundry Spring Cloud Open Service Broker Spring Cloud Consul Spring Cloud Sleuth Spring Cloud Zookeeper Spring Cloud Kubernetes Spring Cloud OpenFeign Spring Cloud Gateway Spring Cloud Function Spring Cloud Contract Spring Cloud Task Spring Cloud Vault Spring Cloud Data FlowSpring Data Spring Data Commons Spring Data KeyValue Spring Data LDAP Spring Data JDBC Spring Data JPA Spring Data Relational Spring Data MongoDB Spring Data Redis Spring Data REST Spring Data for Apache CassandraMessaging and streams Spring AMQP Spring for Apache Kafka Spring for Apache Pulsar Spring Cloud Stream Spring Cloud Stream Binder for Apache Kafka Spring Cloud Stream Binder for RabbitMQ Spring Cloud Stream Binder for Kafka Streams Spring Cloud Stream ApplicationsSecurity and authorization Spring Security Spring Authorization Server Spring Session Spring CredHub Spring Vault Spring Kerberos Spring LDAPObservability and integration Micrometer Micrometer Tracing Spring IntegrationWeb and API Spring for GraphQL Spring Web Flow Spring Web Services Spring HATEOAS Spring REST DocsOther projects Spring AI Spring Batch Spring Retry Spring Statemachine Spring Shell Spring Tools\\nApplication Advisor automatically generates pull requests when new Spring dependency versions become available. Each pull request includes updates to both build configuration and Java source files, so it integrates into CI/CD pipelines without manual work.\\nhttps://enterprise.spring.io/lts-releasesExtended enterprise support for Spring open-source projects, OpenJDK, and Apache Tomcat. It lets organizations align their upgrade timeline with business and technology goals instead of the standard open-source support windows.\\nOpenRewrite integration: uses OpenRewrite recipes internally but hides the complexity. Developers review pull requests instead of finding and configuring recipes themselves. Synchronized multi-project upgrades: identifies Spring projects that must upgrade together. For example, an app using Spring Web 5.3.x with Spring Security 5.8 is upgraded so both move to 6.0.x together for a successful build. Incremental updates: enables continuous, small-scale dependency upgrades and API-breaking changes through regular pull requests, keeping systems current with minimal disruption. CI pipeline compatibility: generated pull requests fit into existing continuous integration workflows.\\n---\\n\\nQuestion:\\nAnswer the following question with a short, well-structured explanation: What is the latest stable release of Spring AI?\\n\",\"role\":\"user\"},{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"id\":\"call_gfVauIlq6eZC883ZreyZ1d3N\",\"function\":{\"arguments\":\"{\\\"projectSlug\\\":\\\"spring-ai\\\"}\",\"name\":\"fetchReleasesInfo\"},\"type\":\"function\"}]},{\"role\":\"tool\",\"tool_call_id\":\"call_gfVauIlq6eZC883ZreyZ1d3N\"}],\"response_format\":{\"json_schema\":{\"name\":\"json_schema\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"answer\":{\"type\":\"string\",\"description\":\"The helpful answer to the customer's question\"},\"category\":{\"type\":\"string\",\"enum\":[\"TECHNICAL\",\"BILLING\",\"SECURITY\",\"GENERAL\"],\"description\":\"The category of the support question: TECHNICAL, BILLING, SECURITY, or GENERAL\"}},\"required\":[\"answer\",\"category\"],\"additionalProperties\":false},\"strict\":true},\"type\":\"json_schema\"},\"tools\":[{\"function\":{\"name\":\"fetchReleasesInfo\",\"description\":\"Get all releases for a Spring project, including version and support status.\",\"parameters\":{\"type\":\"object\",\"properties\":{\"projectSlug\":{\"type\":\"string\"}},\"strict\":true}},\"type\":\"function\"},{\"function\":{\"name\":\"createTicket\",\"description\":\"Create a new support ticket. Use this when the user explicitly requests to create, open, or file a support ticket.\",\"parameters\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"summary\":{\"type\":\"string\",\"description\":\"Brief summary of the issue (max 100 chars)\"},\"category\":{\"type\":\"string\",\"enum\":[\"TECHNICAL\",\"BILLING\",\"SECURITY\",\"GENERAL\"],\"description\":\"The category of the issue\"},\"priority\":{\"type\":\"string\",\"enum\":[\"LOW\",\"MEDIUM\",\"HIGH\",\"CRITICAL\"],\"description\":\"The priority of the support ticket\"}},\"required\":[\"summary\",\"category\",\"priority\"],\"additionalProperties\":false,\"strict\":true}},\"type\":\"function\"},{\"function\":{\"name\":\"retrieveTickets\",\"description\":\"List all support tickets\",\"parameters\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{},\"required\":[],\"additionalProperties\":false,\"strict\":true}},\"type\":\"function\"},{\"function\":{\"name\":\"retrieveOpenTickets\",\"description\":\"List all support tickets that are not yet resolved\",\"parameters\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{},\"required\":[],\"additionalProperties\":false,\"strict\":true}},\"type\":\"function\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 4)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-E7h5r6k9huaomNIhPcrfRYYFmkov5\",\n  \"object\": \"chat.completion\",\n  \"created\": 1785502655,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"answer\\\":\\\"The latest stable release of Spring AI is **2.0.0**.\\\\n\\\\n- **Status:** General Availability (GA)\\\\n- **Note:** `2.0.1-SNAPSHOT` is a snapshot build, so it is not considered stable.\\\\n\\\\nOfficial releases info: https://spring.io/projects/spring-ai\\\",\\\"category\\\":\\\"GENERAL\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 1111,\n    \"completion_tokens\": 82,\n    \"total_tokens\": 1193,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "291ms",
+      "set-cookie" : "__cf_bm=TJoviDv1lZr.ugdJ8qlM9gOs4VMO4V7oFQ8VA0BE7SE-1785502654.8763704-1.0.1.1-jr0rc6b94_9LnICT0foFNaWiWXgdD6UQmNn7yQ63eFervSuULsPRPoCCmIlrwzWIc1GwV7AjYhTn4xM6eg7oXjJX.OWu6s3oXAO.KuBmMNPFdivmtbW5OaAk08O3L7TB; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 31 Jul 2026 13:27:36 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_413983710404443d8c004bcf683083e8",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a23cc508ff229240-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199027",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Fri, 31 Jul 2026 12:57:36 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "977",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "1a3bbd3e-cd84-425f-ad3d-eed210565020",
+  "persistent" : true,
+  "insertionIndex" : 71
+}

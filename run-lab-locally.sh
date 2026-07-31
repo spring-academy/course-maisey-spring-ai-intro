@@ -138,6 +138,7 @@ while IFS= read -r -d '' f; do
     -e '/code-server --install-extension/d' \
     -e '/mvnw dependency:go-offline/d' \
     -e '/docker pull grafana\/otel-lgtm:latest/d' \
+    -e '/docker pull dexidp\/dex:/d' \
     "$f"
   rm -f "$f.bak"
 done < <(find "$STAGE_DIR" -path '*/workshop/setup.d/*.sh' -print0)

@@ -1,0 +1,11 @@
+services:
+  authorization-server:
+    image: dexidp/dex:v2.45.1
+    container_name: spring-releases-mcp-server-dex
+    command: ["dex", "serve", "/etc/dex/config.yaml"]
+    volumes:
+      - ./dex-config.yaml:/etc/dex/config.yaml:ro
+    ports:
+      - "5556:5556"
+    profiles:
+      - mcp-security

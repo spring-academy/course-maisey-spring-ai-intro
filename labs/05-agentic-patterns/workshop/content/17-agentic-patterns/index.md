@@ -2,7 +2,7 @@
 title: Agentic Patterns
 ---
 
-Your Support Assistant has a growing set of tools. It has three in-process ticket tools. It also has every tool advertised by every connected MCP server, like the Spring Releases MCP server you connected in the previous lab.
+Your support assistant has a growing set of tools. It has three in-process ticket tools. It also has every tool advertised by every connected MCP server, like the Spring Releases MCP server you connected in the previous lab.
 
 This creates a problem. **Every chat call sends the full tool schema to the model**, even when none of those tools can help with the question. Every tool description costs tokens on every request. The model also has more chances to pick the wrong tool, and the prompt keeps growing as you add MCP servers.
 
@@ -10,7 +10,7 @@ The fix is the **Tool Search Tool**. This is an agentic pattern. The model gets 
 
 ## Start the Spring Releases MCP Server
 
-The Spring Releases MCP server from the MCP lab is already part of this workshop environment. Start it so its `fetchReleasesInfo` tool is available to the Support Assistant.
+The Spring Releases MCP server from the MCP lab is already part of this workshop environment. Start it so its `fetchReleasesInfo` tool is available to the support assistant.
 
 ```terminal:execute
 command: cd ~/spring-releases-mcp-server && ./mvnw spring-boot:run
@@ -21,7 +21,7 @@ You should see the embedded MCP server start on port 8090 and log one registered
 
 ## Add the Tool Search Advisor Dependency
 
-Add the Tool Search advisor to the Support Assistant's `pom.xml`.
+Add the Tool Search advisor to the support assistant's `pom.xml`.
 
 ```editor:select-matching-text
 file: ~/sample-app/pom.xml
@@ -169,7 +169,7 @@ SupportResponse chat(@RequestParam String query,
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
 text: "SupportResponse chat(@RequestParam String query) {"
-description: "Apply - Accept the conversation id as a header"
+description: "Accept the conversation id as a header"
 before: 0
 after: 1
 cascade: true
@@ -232,7 +232,7 @@ SupportResponse generateResponse(String query, String conversationId) {
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "SupportResponse generateResponse(String query) {"
-description: "Apply - Pass the conversation id to the advisors"
+description: "Pass the conversation id to the advisors"
 before: 0
 after: 16
 cascade: true

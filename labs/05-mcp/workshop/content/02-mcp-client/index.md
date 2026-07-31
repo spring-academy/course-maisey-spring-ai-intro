@@ -2,11 +2,11 @@
 title: Consuming Tools With an MCP Client
 ---
 
-The Spring Releases MCP server is now running on port 8090. Next you connect the Support Assistant to it as an MCP **client**. The model can then call the remote `fetchReleasesInfo` tool next to its in-process ticket tools.
+The Spring Releases MCP server is now running on port 8090. Next you connect the support assistant to it as an MCP **client**. The model can then call the remote `fetchReleasesInfo` tool next to its in-process ticket tools.
 
-## Add the MCP Client Dependency
+## Connect to the MCP Server
 
-In the Support Assistant project, add the MCP client starter to the `pom.xml`.
+In the support assistant project, add the MCP client starter to the `pom.xml`.
 
 ```editor:select-matching-text
 file: ~/sample-app/pom.xml
@@ -33,12 +33,13 @@ text: |2
 
 For every named connection in your configuration, the starter creates one MCP client. It then exposes a single `ToolCallbackProvider` bean that gathers every remote tool.
 
-## Configure the MCP Client
+Now declare the connection itself.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/resources/application.properties
-description: "Apply - Configure the MCP client connection"
+description: "Configure the MCP client connection"
 text: |
+
   spring.ai.mcp.client.streamable-http.connections.spring-releases.url=http://localhost:8090
 
   # Verbose protocol logging while you learn. Turn these off in production.
@@ -46,7 +47,7 @@ text: |
   logging.level.io.modelcontextprotocol.spec=DEBUG
 ```
 
-The `spring-releases` segment is the connection name. It becomes a prefix on the imported tools, for example `spring-releases_fetchReleasesInfo`. This way the model can tell remote tools apart from each other and from the in-process ones.
+The `spring-releases` segment is the custom connection name.
 
 ## Register the Remote Tools With the ChatClient
 
@@ -116,28 +117,28 @@ text: ".tools(supportTicketService)"
 
 Default tools and per-call tools are combined, so the model sees both groups in the same request.
 
-## Start the Support Assistant
+## Try It Out
+
+Start the support assistant.
 
 ```terminal:execute
 command: cd ~/sample-app && ./mvnw spring-boot:run
 session: 2
 ```
 
-In the logs you will see the MCP client connect to `http://localhost:8090/mcp` on startup.
-
-## Test It via the Assistant
+In the logs you will see the MCP client connect to `http://localhost:8090/mcp` on startup. Now ask it a question that only the remote tool can answer.
 
 ```terminal:execute
-command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is the latest stable release of Spring Boot?"
+command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is the latest stable release of Spring AI?"
 session: 1
 ```
 
-In the assistant's logs you will see the model make a `spring-releases_fetchReleasesInfo` tool call with `{"projectSlug": "spring-boot"}`. The result is then fed back into the model for the final answer.
+In the assistant's logs you will see the model make a `fetchReleasesInfos` tool call with `{"projectSlug": "spring-ai"}`. The result is then fed back into the model for the final answer.
 
 Now try a query that uses both the remote MCP tool and an in-process tool in a single conversation turn.
 
 ```terminal:execute
-command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is the latest release of Spring Boot? Please also open a high-priority ticket to request access to Spring Application Advisor to accelerate upgrading our application to that version."
+command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is the latest stable release of Spring AI? Please also open a high-priority ticket to request access to Spring Application Advisor to accelerate upgrading our application to that version."
 session: 1
 ```
 

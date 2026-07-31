@@ -1,1 +1,1 @@
-In this hands-on lab you'll build an MCP server that provides live information about Spring project releases, and connect the support assistant to it as an MCP client so the model can answer release questions from live data.
+In this hands-on lab you'll build an MCP server that provides live information about Spring project releases, connect the support assistant to it as an MCP client, and then secure the connection with OAuth 2.0 so that only authorized callers can reach the tools.

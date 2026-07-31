@@ -8,3 +8,4 @@ pathways:
       steps:
       - 01-mcp-server
       - 02-mcp-client
+      - 03-mcp-security

@@ -4,9 +4,9 @@ metadata:
   name: spring-maisey-mcp
 spec:
   title: Spring Academy - Spring AI - MCP Integration
-  description: "Expose your Spring AI tools as a Model Context Protocol server"
+  description: "Expose your Spring AI tools as a Model Context Protocol server and secure it with OAuth 2.0"
   difficulty: beginner
-  duration: 20m
+  duration: 35m
   vendor: Broadcom
   workshop:
     image: jdk21-environment:*
@@ -37,6 +37,10 @@ spec:
         layout: split/2
       editor:
         enabled: true
+      docker:
+        enabled: true
+        socket:
+          enabled: true
   environment:
     objects:
     - apiVersion: v1

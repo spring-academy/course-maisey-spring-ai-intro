@@ -1,1 +1,1 @@
-You learned how to share tools across applications with the Model Context Protocol, building an MCP server that provides live Spring release information and consuming it from the support assistant as an MCP client.
+You learned how to share tools across applications with the Model Context Protocol, building an MCP server that provides live Spring release information, consuming it from the support assistant as an MCP client, and protecting it as an OAuth 2.0 resource server so that the identity of the end user reaches the tool.

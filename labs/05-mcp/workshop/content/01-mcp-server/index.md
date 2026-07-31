@@ -4,7 +4,7 @@ title: Exposing Tools With an MCP Server
 
 Your support assistant already uses tool calling. But the `SupportTicketService` tools run **in the same process** as the assistant. The **Model Context Protocol (MCP)** is a standard way for one process to expose tools, resources, and prompts. An AI application in another process can then use them.
 
-In this lab you build a small, separate **Spring Releases MCP server**. It fetches live release data from `api.spring.io`. Then you connect the Support Assistant to it as an MCP **client**. After that, a question like *"What's the latest release of Spring Boot?"* is answered from live data instead of the model's old training knowledge.
+In this lab you build a small, separate **Spring Releases MCP server**. It fetches live release data from `api.spring.io`. Then you connect the support assistant to it as an MCP **client**. After that, a question like *"What's the latest release of Spring Boot?"* is answered from live data instead of the model's old training knowledge.
 
 ## Build the MCP Server
 
@@ -15,7 +15,7 @@ You don't have to run this. The generated project is already prepared for you in
 
 ```bash
   curl https://start.spring.io/starter.zip \
-    -d dependencies=web,spring-ai-mcp-server \
+    -d dependencies=web,spring-ai-mcp-server,devtools \
     -d type=maven-project \
     -d groupId=com.example \
     -d artifactId=spring-releases-mcp-server \
@@ -40,20 +40,10 @@ That starter provides the HTTP Streamable transport. Unlike the support assistan
 
 The generated project ships with an almost empty `application.properties` file. Spring AI can already run an MCP server with those defaults, but a few properties are worth setting yourself. They control the identity the server shows to clients, the transport it speaks, and more.
 
-```editor:select-matching-text
+```editor:append-lines-to-file
 file: ~/spring-releases-mcp-server/src/main/resources/application.properties
-text: "spring.application.name=spring-releases"
 description: "Configure the MCP server"
-before: 0
-after: 0
-cascade: true
-```
-
-```editor:replace-text-selection
-file: ~/spring-releases-mcp-server/src/main/resources/application.properties
-hidden: true
 text: |
-  spring.application.name=spring-releases
 
   spring.ai.mcp.server.name=${spring.application.name}
   spring.ai.mcp.server.protocol=STREAMABLE
@@ -234,7 +224,7 @@ command: |-
           "method": "tools/call",
           "params": {
             "name": "fetchReleasesInfo",
-            "arguments": { "projectSlug": "spring-boot" }
+            "arguments": { "projectSlug": "spring-ai" }
           }
         }'
 session: 1

@@ -2,7 +2,7 @@
 title: Built-in Logs and Metrics
 ---
 
-By now the Support Assistant covers chat, structured output, RAG, tool calling, and tests. In this lab you add **observability**. You get structured logs of every prompt and completion, and Micrometer metrics that include token usage. Spring AI hooks into Spring's `Observation` API, so you get metrics and traces for chat calls, embeddings, vector store queries, and tool calls without extra work.
+By now the support assistant covers chat, structured output, RAG, tool calling, and tests. In this lab you add **observability**. You get structured logs of every prompt and completion, and Micrometer metrics that include token usage. Spring AI hooks into Spring's `Observation` API, so you get metrics and traces for chat calls, embeddings, vector store queries, and tool calls without extra work.
 
 The application in the `sample-app` directory contains the state after the previous labs. 
 
