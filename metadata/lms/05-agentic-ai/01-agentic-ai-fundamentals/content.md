@@ -23,8 +23,6 @@ The trade-offs between the two are worth keeping in mind.
 
 Many developers want to start with a fully autonomous agent. But, while fully autonomous agents might seem appealing, workflows often provide better predictability and consistency for well-defined tasks. This aligns perfectly with enterprise requirements where reliability and maintainability are crucial.
 
-Spring AI does not give you a heavy "agent framework" for any of this. Everything agentic is built from the building blocks you already know, such as the `ChatClient`, structured output, tools, and advisors. An agentic system is therefore just ordinary Spring code that you can debug.
-
 ## The Autonomous Agent You've Already Built
 
 You may not have noticed it, but you have already run an autonomous agent. The tool-calling loop from the tool calling section is the minimal agent. The model is given tools, calls them, sees the results, and decides what to do next, until it judges the task complete. Give that loop RAG and a handful of tools, and it becomes a capable assistant that plans its own path through a request.
