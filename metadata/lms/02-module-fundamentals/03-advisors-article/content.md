@@ -9,6 +9,9 @@ If you've used on of those, advisors will feel familiar.
 
 An advisor is an **interceptor that wraps a `ChatClient` call**, with a chance to act both *before* the request reaches the model and *after* the response comes back. Several advisors form a **chain**, and a request passes through all of them on the way in, hits the model, and passes back through them on the way out. This is the classic "around" pattern. Each advisor can inspect and modify the request, decide whether to proceed, and then inspect and modify the response.
 
+<!-- TODO adjust to have images pushed to assets on releases and link to them -->
+![A prompt that is converted into a ChatClientRequest, passes through the before advising step of the advisor chain, reaches the chat model, and travels back as a ChatClientResponse through the after advising step before it becomes a ChatResponse](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/02-module-fundamentals/03-advisors-article/assets/advisors-flow.svg)
+
 Concretely, the framework wraps your `Prompt` in a **`ChatClientRequest`** (the request plus a shared context map) and hands it to the first advisor. Each advisor does its *before* work, then calls the chain to invoke the next advisor, and the last one calls the model. The model's answer travels back as a **`ChatClientResponse`**, and each advisor gets to do its *after* work as it unwinds. A logging advisor captures the shape nicely, logging on the way in, delegating to the rest of the chain, and logging on the way out.
 
 ```java
@@ -103,7 +106,12 @@ This id is required. If you leave it out the advisor throws at runtime, because 
 
 Every advisor so far calls `chain.nextCall(request)` exactly once, so the request travels down the chain a single time. Some patterns need to reach the model more than once for one user call. Validating structured output, for example, means checking the answer against a schema and asking again when it does not fit.
 
-A **recursive advisor** handles this by looping the downstream part of the chain. Instead of calling `nextCall` once, it takes a copy of the chain that holds only the advisors after itself, with `chain.copy(this)`, and invokes that sub-chain as many times as it needs. Working on a copy keeps the ordering correct and makes sure the advisors before it do not run again on every loop.
+A **recursive advisor** handles this by looping the downstream part of the chain.
+
+<!-- TODO adjust to have images pushed to assets on releases and link to them -->
+![A recursive advisor whose before step sends the request down the rest of the chain to the chat model, and whose after step decides whether to return the response or send it through the downstream chain once more](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/02-module-fundamentals/03-advisors-article/assets/advisors-recursive.svg)
+
+Instead of calling `nextCall` once, it takes a copy of the chain that holds only the advisors after itself, with `chain.copy(this)`, and invokes that sub-chain as many times as it needs. Working on a copy keeps the ordering correct and makes sure the advisors before it do not run again on every loop.
 
 ```java
 CallAdvisorChain downstream = chain.copy(this); // only the advisors after this one

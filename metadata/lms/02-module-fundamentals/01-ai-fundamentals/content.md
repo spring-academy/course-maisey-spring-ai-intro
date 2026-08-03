@@ -1,7 +1,7 @@
 Artificial intelligence is a broad field that covers any technique enabling machines to perform tasks that normally require human intelligence. It ranges from rule based systems and classic machine learning to computer vision and robotics.
 
 <!-- TODO adjust to have images pushed to assets on releases and link to them -->
-![AI](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/02-module-fundamentals/01-ai-fundamentals/assets/ai.png)
+![Nested circles showing Machine Learning inside Artificial Intelligence, Deep Learning inside Machine Learning, and Generative AI inside Deep Learning](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/02-module-fundamentals/01-ai-fundamentals/assets/ai.svg)
 
 Within that broad field sit several nested layers. **Machine Learning (ML)** is the subset of AI where algorithms learn from data to make predictions instead of being explicitly programmed. **Deep Learning** is a further subset of ML that uses neural networks, loosely inspired by how neurons in the brain work, to learn complex patterns. And **Generative AI** is the part of deep learning that does not just analyze or classify existing data but creates new content such as text, images, audio, and code.
 
@@ -20,7 +20,7 @@ The third force was accessibility. The public release of capable chat based assi
 ## How LLMs Work
 
 <!-- TODO adjust to have images pushed to assets on releases and link to them -->
-![How LLMs work](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/02-module-fundamentals/01-ai-fundamentals/assets/how-llms-work.png)
+![The prompt Spring AI simplifies split into the tokens Spring, AI, simpl and ifies, where one word becomes two subword tokens, and an LLM that ranks the candidates for the next token and appends the most likely one to the completion](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/02-module-fundamentals/01-ai-fundamentals/assets/how-llms-work.svg)
 
 Despite their sophistication, LLMs do something conceptually simple. Given a piece of text, they predict the most likely next piece of text, and then they repeat that step over and over. Scaled up across billions of examples, this prediction produces responses that are coherent, contextually relevant, and often surprisingly creative.
 

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1620" font-family="'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="g" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0.5,0.5 L8,4 L0.5,7.5" fill="none" stroke="#7a8896" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="1400" height="1620" fill="#ffffff"/>
+
+  <!-- ===== ADVISORS container ===== -->
+  <rect x="60" y="490" width="1280" height="760" rx="34" fill="#f6f8fa" stroke="#e2e8ee" stroke-width="2"/>
+  <text x="700" y="562" text-anchor="middle" font-size="42" font-weight="800" fill="#1c3d5a">ADVISORS</text>
+
+  <!-- ===== connectors (behind) ===== -->
+  <g stroke="#7a8896" stroke-width="4" fill="none">
+    <!-- request path, downwards -->
+    <path d="M340,140 V208" marker-end="url(#g)"/>
+    <path d="M340,352 V610" marker-end="url(#g)"/>
+    <path d="M340,762 V960 H528" marker-end="url(#g)"/>
+    <path d="M570,1048 V1420 H614" marker-end="url(#g)"/>
+    <!-- response path, upwards -->
+    <path d="M786,1420 H830 V1048" marker-end="url(#g)"/>
+    <path d="M858,960 H1060 V766" marker-end="url(#g)"/>
+    <path d="M1060,612 V352" marker-end="url(#g)"/>
+    <path d="M1060,208 V148" marker-end="url(#g)"/>
+  </g>
+
+  <!-- ===== Prompt in ===== -->
+  <rect x="220" y="54" width="240" height="86" rx="16" fill="#ffffff" stroke="#237e7a" stroke-width="4"/>
+  <text x="340" y="108" text-anchor="middle" font-size="32" fill="#1c3d5a">Prompt</text>
+
+  <!-- ===== ChatResponse out ===== -->
+  <rect x="910" y="54" width="300" height="86" rx="16" fill="#ffffff" stroke="#6b3fa0" stroke-width="4"/>
+  <text x="1060" y="108" text-anchor="middle" font-size="32" fill="#1c3d5a">ChatResponse</text>
+
+  <!-- ===== conversion steps (dashed) ===== -->
+  <rect x="150" y="210" width="380" height="140" rx="14" fill="#ffffff" stroke="#2b6a8f" stroke-width="3" stroke-dasharray="11 8"/>
+  <g text-anchor="middle" font-size="30" fill="#1c3d5a">
+    <text x="340" y="272">Prompt to</text>
+    <text x="340" y="316">ChatClientRequest</text>
+  </g>
+
+  <rect x="850" y="210" width="420" height="140" rx="14" fill="#ffffff" stroke="#2b6a8f" stroke-width="3" stroke-dasharray="11 8"/>
+  <g text-anchor="middle" font-size="30" fill="#1c3d5a">
+    <text x="1060" y="272">ChatClientResponse</text>
+    <text x="1060" y="316">to ChatResponse</text>
+  </g>
+
+  <!-- ===== advising steps (dashed) ===== -->
+  <rect x="200" y="620" width="280" height="140" rx="14" fill="#ffffff" stroke="#2b6a8f" stroke-width="3" stroke-dasharray="11 8"/>
+  <text x="340" y="702" text-anchor="middle" font-size="30" fill="#1c3d5a">Before advising</text>
+
+  <rect x="920" y="620" width="280" height="140" rx="14" fill="#ffffff" stroke="#2b6a8f" stroke-width="3" stroke-dasharray="11 8"/>
+  <text x="1060" y="702" text-anchor="middle" font-size="30" fill="#1c3d5a">After advising</text>
+
+  <!-- ===== Advisor (internal) ===== -->
+  <rect x="550" y="880" width="300" height="160" rx="20" fill="#ffffff" stroke="#237e7a" stroke-width="4"/>
+  <g text-anchor="middle" fill="#1c3d5a">
+    <text x="700" y="948" font-size="34" font-weight="700">Advisor</text>
+    <text x="700" y="992" font-size="30">(internal)</text>
+  </g>
+
+  <!-- ===== Chat Model neural net ===== -->
+  <g stroke="#1c3d5a" stroke-width="2" fill="none">
+    <line x1="640" y1="1390" x2="700" y2="1363"/><line x1="640" y1="1390" x2="700" y2="1420"/><line x1="640" y1="1390" x2="700" y2="1477"/>
+    <line x1="640" y1="1450" x2="700" y2="1363"/><line x1="640" y1="1450" x2="700" y2="1420"/><line x1="640" y1="1450" x2="700" y2="1477"/>
+    <line x1="700" y1="1363" x2="762" y2="1420"/><line x1="700" y1="1420" x2="762" y2="1420"/><line x1="700" y1="1477" x2="762" y2="1420"/>
+  </g>
+  <g fill="#ffffff" stroke="#1c3d5a" stroke-width="2.5">
+    <circle cx="640" cy="1390" r="12"/><circle cx="640" cy="1450" r="12"/>
+    <circle cx="700" cy="1363" r="12"/><circle cx="700" cy="1420" r="12"/><circle cx="700" cy="1477" r="12"/>
+    <circle cx="762" cy="1420" r="12"/>
+  </g>
+  <text x="701" y="1556" text-anchor="middle" font-size="34" fill="#1c3d5a">Chat Model</text>
+
+  <!-- ===== edge labels ===== -->
+  <g font-size="26" fill="#1c3d5a">
+    <text x="320"  y="426"  text-anchor="end">ChatClientRequest</text>
+    <text x="1080" y="426"  text-anchor="start">ChatClientResponse</text>
+    <text x="360"  y="862"  text-anchor="start">ChatClientRequest</text>
+    <text x="1040" y="862"  text-anchor="end">ChatClientResponse</text>
+    <text x="550"  y="1212" text-anchor="end">Prompt</text>
+    <text x="850"  y="1212" text-anchor="start">ChatResponse</text>
+  </g>
+</svg>
