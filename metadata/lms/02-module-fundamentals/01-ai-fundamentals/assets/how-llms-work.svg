@@ -1,96 +1,87 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 720" font-family="'Helvetica Neue', Arial, sans-serif">
   <defs>
-    <marker id="g" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
-      <path d="M0.5,0.5 L8,4 L0.5,7.5" fill="none" stroke="#7a8896" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-    </marker>
-    <marker id="up" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
-      <path d="M0.5,0.5 L8,4 L0.5,7.5" fill="none" stroke="#1c3d5a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7.5" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0.5,0.5 L8,4 L0.5,7.5" fill="none" stroke="#7a8896" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
     </marker>
   </defs>
+
   <rect x="0" y="0" width="1700" height="720" fill="#ffffff"/>
 
-  <!-- ===== connectors (behind) ===== -->
-  <g stroke="#7a8896" stroke-width="4" fill="none">
-    <line x1="545" y1="445" x2="625" y2="445" marker-end="url(#g)"/>   <!-- prompt -> llm -->
-    <line x1="810" y1="445" x2="890" y2="445" marker-end="url(#g)"/>   <!-- llm -> completion -->
+  <!-- ===== Connections (drawn first, behind boxes) ===== -->
+  <g stroke="#7a8896" stroke-width="3" fill="none" stroke-linecap="round" marker-end="url(#arrow)">
+    <path d="M530,445 L600,445"/>
+    <path d="M840,445 L890,445"/>
   </g>
-  <g stroke="#7a8896" stroke-width="4" fill="none" stroke-dasharray="11 9">
-    <line x1="782" y1="424" x2="782" y2="330" marker-end="url(#g)"/>   <!-- llm -> candidates -->
+  <g stroke="#7a8896" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="10 8" marker-end="url(#arrow)">
+    <path d="M720,382 L720,330"/>
   </g>
 
-  <!-- ===== Tokens leader lines ===== -->
-  <g stroke="#9aa4ad" stroke-width="2.5" fill="none" stroke-linecap="round">
+  <!-- ===== Tokens callout ===== -->
+  <g stroke="#7a8896" stroke-width="2" fill="none" stroke-linecap="round">
     <path d="M125,396 L272,348"/>
     <path d="M240,396 L277,348"/>
     <path d="M340,396 L283,348"/>
     <path d="M455,396 L288,348"/>
   </g>
-  <text x="280" y="322" text-anchor="middle" font-size="34" fill="#1c3d5a">Tokens</text>
+  <text x="280" y="322" text-anchor="middle" font-size="27" font-weight="600" fill="#7a8896">Tokens</text>
 
   <!-- ===== Prompt tokens ===== -->
-  <g stroke="#2b6a8f" stroke-width="4">
-    <rect x="50"  y="400" width="150" height="92" rx="8" fill="#ffffff"/>
-    <rect x="200" y="400" width="80"  height="92" rx="8" fill="#ffffff"/>
-    <rect x="280" y="400" width="120" height="92" rx="8" fill="#e3eef5"/>
-    <rect x="400" y="400" width="110" height="92" rx="8" fill="#e3eef5"/>
+  <g stroke="#2b6a8f" stroke-width="3">
+    <rect x="50"  y="400" width="150" height="92" rx="10" fill="#ffffff"/>
+    <rect x="200" y="400" width="80"  height="92" rx="10" fill="#ffffff"/>
+    <rect x="280" y="400" width="120" height="92" rx="10" fill="#e3eef5"/>
+    <rect x="400" y="400" width="110" height="92" rx="10" fill="#e3eef5"/>
   </g>
-  <g text-anchor="middle" font-size="34" fill="#1c3d5a">
-    <text x="125" y="457">Spring</text>
-    <text x="240" y="457">AI</text>
-    <text x="340" y="457">simpl</text>
-    <text x="455" y="457">ifies</text>
+  <g text-anchor="middle" font-size="30" font-weight="700" fill="#1c3d5a">
+    <text x="125" y="456">Spring</text>
+    <text x="240" y="456">AI</text>
+    <text x="340" y="456">simpl</text>
+    <text x="455" y="456">ifies</text>
   </g>
 
-  <!-- ===== subword annotation ===== -->
+  <!-- subword annotation -->
   <path d="M282,502 v6 q0,12 12,12 h87 q11,0 14,11 q3,-11 14,-11 h87 q12,0 12,-12 v-6"
-        fill="none" stroke="#9aa4ad" stroke-width="2.5" stroke-linecap="round"/>
-  <text x="395" y="568" text-anchor="middle" font-size="27" font-style="italic" fill="#9aa4ad">one word, two subword tokens</text>
+        fill="none" stroke="#7a8896" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="395" y="566" text-anchor="middle" font-size="24" fill="#7a8896">one word, two subword tokens</text>
 
-  <!-- ===== Prompt brace ===== -->
+  <!-- Prompt brace -->
   <path d="M52,596 v6 q0,12 12,12 h202 q11,0 14,11 q3,-11 14,-11 h202 q12,0 12,-12 v-6"
-        fill="none" stroke="#9aa4ad" stroke-width="3" stroke-linecap="round"/>
-  <text x="280" y="668" text-anchor="middle" font-size="34" fill="#1c3d5a">Prompt</text>
+        fill="none" stroke="#7a8896" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="280" y="668" text-anchor="middle" font-size="27" font-weight="600" fill="#7a8896">Prompt</text>
 
-  <!-- ===== Candidate tokens bracket ===== -->
-  <g fill="none" stroke="#1c3d5a" stroke-width="5" stroke-linecap="round">
-    <path d="M680,44 C630,44 620,72 620,112 V242 C620,282 630,310 680,310"/>
-    <path d="M1020,44 C1070,44 1080,72 1080,112 V242 C1080,282 1070,310 1020,310"/>
+  <!-- ===== Next token candidates ===== -->
+  <rect x="560" y="60" width="520" height="260" rx="18" fill="#e3eef5" stroke="#2b6a8f" stroke-width="3"/>
+  <text x="820" y="112" text-anchor="middle" font-size="27" font-weight="700" fill="#1c3d5a">Next token candidates</text>
+  <g font-size="30" fill="#1c3d5a">
+    <text x="620" y="180">development</text>
+    <text x="620" y="235">integration</text>
+    <text x="620" y="290">building</text>
   </g>
-  <g font-size="38" fill="#1c3d5a">
-    <text x="680" y="112">development</text>
-    <text x="680" y="190">integration</text>
-    <text x="680" y="268">building</text>
-  </g>
-  <line x1="990" y1="278" x2="990" y2="76" stroke="#1c3d5a" stroke-width="5" marker-end="url(#up)"/>
-  <text x="1032" y="177" text-anchor="middle" font-size="30" font-style="italic" fill="#9aa4ad" transform="rotate(-90 1032 177)">more likely</text>
+  <path d="M990,298 L990,155" fill="none" stroke="#7a8896" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <text x="1035" y="226" text-anchor="middle" font-size="24" fill="#7a8896" transform="rotate(-90 1035 226)">more likely</text>
 
-  <!-- ===== LLM neural net ===== -->
-  <g stroke="#1c3d5a" stroke-width="2" fill="none">
-    <line x1="660" y1="415" x2="720" y2="388"/><line x1="660" y1="415" x2="720" y2="445"/><line x1="660" y1="415" x2="720" y2="502"/>
-    <line x1="660" y1="475" x2="720" y2="388"/><line x1="660" y1="475" x2="720" y2="445"/><line x1="660" y1="475" x2="720" y2="502"/>
-    <line x1="720" y1="388" x2="782" y2="445"/><line x1="720" y1="445" x2="782" y2="445"/><line x1="720" y1="502" x2="782" y2="445"/>
-  </g>
-  <g fill="#ffffff" stroke="#1c3d5a" stroke-width="2.5">
-    <circle cx="660" cy="415" r="12"/><circle cx="660" cy="475" r="12"/>
-    <circle cx="720" cy="388" r="12"/><circle cx="720" cy="445" r="12"/><circle cx="720" cy="502" r="12"/>
-    <circle cx="782" cy="445" r="12"/>
-  </g>
-  <text x="721" y="582" text-anchor="middle" font-size="34" fill="#1c3d5a">LLM</text>
+  <!-- ===== LLM ===== -->
+  <rect x="615" y="390" width="210" height="110" rx="16" fill="#e3eef5" stroke="#2b6a8f" stroke-width="3"/>
+  <text x="720" y="458" text-anchor="middle" font-size="34" font-weight="700" fill="#1c3d5a">LLM</text>
 
   <!-- ===== Completion ===== -->
-  <g stroke-width="4">
-    <rect x="920"  y="400" width="150" height="92" rx="8" fill="#ffffff" stroke="#2b6a8f"/>
-    <rect x="1070" y="400" width="80"  height="92" rx="8" fill="#ffffff" stroke="#2b6a8f"/>
-    <rect x="1150" y="400" width="120" height="92" rx="8" fill="#e3eef5" stroke="#2b6a8f"/>
-    <rect x="1270" y="400" width="110" height="92" rx="8" fill="#e3eef5" stroke="#2b6a8f"/>
-    <rect x="1380" y="400" width="260" height="92" rx="8" fill="#ffffff" stroke="#6b3fa0"/>
+  <g stroke-width="3">
+    <rect x="905"  y="400" width="140" height="92" rx="10" fill="#ffffff" stroke="#2b6a8f"/>
+    <rect x="1045" y="400" width="75"  height="92" rx="10" fill="#ffffff" stroke="#2b6a8f"/>
+    <rect x="1120" y="400" width="115" height="92" rx="10" fill="#e3eef5" stroke="#2b6a8f"/>
+    <rect x="1235" y="400" width="105" height="92" rx="10" fill="#e3eef5" stroke="#2b6a8f"/>
+    <rect x="1340" y="400" width="245" height="92" rx="10" fill="#ffffff" stroke="#6aa84f"/>
   </g>
-  <g text-anchor="middle" font-size="34" fill="#1c3d5a">
-    <text x="995"  y="457">Spring</text>
-    <text x="1110" y="457">AI</text>
-    <text x="1210" y="457">simpl</text>
-    <text x="1325" y="457">ifies</text>
-    <text x="1510" y="457">development</text>
+  <g text-anchor="middle" font-size="30" font-weight="700" fill="#1c3d5a">
+    <text x="975"  y="456">Spring</text>
+    <text x="1082" y="456">AI</text>
+    <text x="1177" y="456">simpl</text>
+    <text x="1287" y="456">ifies</text>
+    <text x="1462" y="456">development</text>
   </g>
-  <text x="1510" y="582" text-anchor="middle" font-size="34" fill="#6b3fa0">Completion</text>
+
+  <!-- Completion brace -->
+  <path d="M907,596 v6 q0,12 12,12 h312 q11,0 14,11 q3,-11 14,-11 h312 q12,0 12,-12 v-6"
+        fill="none" stroke="#7a8896" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="1245" y="668" text-anchor="middle" font-size="27" font-weight="600" fill="#7a8896">Completion</text>
 </svg>
