@@ -1,6 +1,6 @@
 ## The Workflow Patterns
 
-The fundamentals section explained the difference between workflows, where your code decides the steps, and agents, where the model decides. On the workflow side, a small set of recurring shapes covers most multi-step tasks.
+The fundamentals section explained the difference between workflows, where your code decides the steps, and agents, where the model decides. On the workflow side, a small set of recurring shapes covers most multi-step tasks. Each one below is a genuine **pattern**, a named, reusable topology you could draw as a box diagram, that solves one specific recurring problem and slots into a system without changing anything else around it.
 
 **Chain** breaks a complex task into sequential steps and feeds the output of each model call into the next one. It is slower but more accurate. Use it when a task is too big for a single prompt but splits cleanly into steps, for example extract, then classify, then summarize.
 
@@ -26,22 +26,40 @@ All of these are composition patterns. Pick the simplest one that fits, and move
 
 ## Patterns for a Single Agent
 
-The workflow patterns describe how you combine several model calls. A second group of patterns describes how you shape one agent. They became popular because an autonomous agent runs into the same few problems in almost every project. The context window fills up, the model gets confused by too many choices, and nobody wants a system that takes risky actions without asking. Each pattern below is an answer to one of those problems.
+The workflow patterns describe how you combine several model calls. This part covers how you shape one agent, and all of it lives in the harness, which is everything around the model that turns a single call into a working agent. 
 
-**Persona** gives the agent a role, a tone, and a set of rules in the system prompt. The problem it solves is that a model without a role produces generic answers and behaves a little differently on every request. A prompt like "You are a support agent for an online shop. You are friendly, you never promise a refund, and you always ask for the order number first" makes the answers consistent and keeps the agent inside the boundaries of its job. A persona is the cheapest way to control behaviour, so try it before you reach for anything more complex.
+Each pattern below is a component you put inside that harness, and each one became popular because an autonomous agent runs into the same few problems in almost every project. The context window fills up, the model gets confused by too many choices, or an action needs a person in the loop. Agent Skills and Tool Search decide what gets loaded into context, Plan and Execute and Subagents decide how the work gets split, and Human-in-the-Loop decides where a person steps into the flow.
 
-**Agent Skills** are reusable instruction packages that the agent loads only when it needs them. The problem they solve is that an agent often has to know a lot. How your company formats invoices, how a refund is approved, how a report should look. If you put all of that into the system prompt, you waste context on every request and the model has trouble finding the part that matters. With skills, each package is a small file with a name and a short description. Only the names and descriptions are loaded at the start, and the full instructions are loaded when the task matches. This idea is called progressive disclosure. The agent knows what it could learn, and learns the details on demand.
+It helps to split the harness into an inner and an outer part. The inner harness is whatever the model or the agent framework already ships with, an SDK, a default loop, default tool handling. The outer harness is what you add on top for your own task, your own skills, your own MCP servers, your own approval steps. Everything in this section lives in that outer layer, because it is the part you get to design.
 
-**Tool Search** applies the same idea to tools instead of instructions. The problem it solves is that an agent is only as capable as the tools it can reach, but sending hundreds of tool definitions with every request costs a lot of tokens and makes the model pick the wrong tool more often. Instead of loading everything upfront, the agent gets one search tool and looks up the others when it needs them. 
+**Agent Skills** are reusable instruction packages that the agent loads only when it needs them. 
+```
+my-skill/
+├── SKILL.md          # Required: metadata + instructions
+├── scripts/          # Optional: executable code
+├── references/       # Optional: documentation
+├── assets/           # Optional: templates, resources
+└── ...               # Any additional files or directories
+```
 
-**Human-in-the-Loop** puts a person into the agent's decision path. There are two common forms. The agent can ask a question when the input is ambiguous, instead of guessing, and the agent can ask for approval before an action that is expensive or hard to undo, like sending an email or deleting a record. The problem it solves is that autonomy and risk grow together. A confident wrong guess is worse than a short question, and an approval step lets you give an agent real permissions without giving up control.
+The problem they solve is that an agent often has to know a lot, how your company formats invoices, how a refund is approved, how a report should look. If you put all of that into the system prompt, you waste context on every request and the model has trouble finding the part that matters. With skills, each package is a small file with a name and a short description. Only the names and descriptions are loaded at the start, and the full instructions are loaded when the task matches. This idea is called progressive disclosure. The agent knows what it *could* learn, and learns the details on demand.
 
-**Least Privilege and Guardrails** limit what the agent can do at all. A human approval step protects against the actions you thought about. Guardrails protect against the ones you did not. Give the agent read only tools where reading is enough, restrict a tool to the current user's own data, validate the arguments a tool receives, and check the output before it reaches the user. The problem this solves is that the model is not a trusted component. Its instructions can come from a document it just read or a website it just visited, so the safe design assumes the agent will at some point be talked into doing the wrong thing.
+A common misunderstanding is treating Agent Skills and MCP as competitors, but they actually solve different problems. MCP gives an agent access to external tools and data sources, while Agent Skills give it the know-how, the instructions, and often executable scripts for how to do a task well, so in practice the two work together rather than replacing each other.
+
+**Tool Search** applies the same idea to tools instead of instructions. The problem it solves is that an agent is only as capable as the tools it can reach, but sending hundreds of tool definitions with every request costs a lot of tokens and makes the model pick the wrong tool more often. Instead of loading everything upfront, the agent gets one search tool and looks up the others when it needs them, loading only the two or three definitions that are actually relevant to the current step. Other frameworks tackle this differently, for instance Embabel's `UnfoldingTool` skips the search step entirely and simply lets the agent unlock a whole group of tools by invoking a single facade tool.
 
 **Plan and Execute** asks the model to write down a list of steps before it starts working, and then to work through the list and mark the steps as done. The problem it solves is that agents lose track during long tasks. They forget a subtask, repeat one they already finished, or stop too early. A visible plan also helps you, because you can see what the agent intends to do before it does it.
 
-**Context Management** keeps the conversation inside the context window during long runs. Chat memory alone is not enough, because a long agent run collects tool results, errors, and intermediate output. Common techniques are summarizing older messages into a short recap, dropping large tool results once they have been used, and storing the details outside the context in a file or a vector store that the agent can read again when needed. The problem it solves is that quality drops and cost rises as the context grows, long before the hard limit is reached.
+```
+Progress: 2/4 tasks completed (50%)
+[✓] Classify the ticket as a billing issue
+[✓] Look up the customer's order history
+[→] Draft a reply with the refund options
+[ ] Check the reply against the support policy
+```
 
-**Subagents** move a part of the work into a separate agent with its own context, its own tools, and its own prompt. The main agent gives it a task and receives only the result. The problem this solves is twofold. A large research step would otherwise fill the main context with material that is only needed once, and one agent with tools for many different jobs is harder to control than several small agents that each do one job well. This is the orchestrator-workers pattern from above, applied to agents instead of single model calls. When those agents live in different systems, a protocol like Agent-to-Agent (A2A) lets them find and call each other, in the same way MCP lets one agent reach external tools.
+**Human-in-the-Loop** puts a person into the agent's decision path. There are two common forms. The agent can ask a question when the input is ambiguous, instead of guessing, and the agent can ask for approval before an action that is expensive or hard to undo, like sending an email or deleting a record. The problem it solves is that autonomy and risk grow together. A confident wrong guess is worse than a short question, and an approval step lets you give an agent real permissions without giving up control.
 
-Just like the workflow patterns, none of these are required from the start. Add a pattern when you feel the problem it solves. The next section looks at what Spring AI provides for some of them, starting with Tool Search.
+**Subagents** move a part of the work into a separate agent with its own context, its own tools, and its own prompt. The main agent gives it a task and receives only the result. This solves two problems at once. A large research step would otherwise fill the main context with material that is only needed once, and one agent with tools for many different jobs is harder to control than several small agents that each do one job well. Structurally, this is the Orchestrator-Workers pattern from above, applied to agents instead of single model calls, so the same diagram shape applies, just with each "worker" being a full agent rather than one model call. When those agents live in different systems, a protocol like **Agent-to-Agent (A2A)** lets them find and call each other, in the same way MCP lets one agent reach external tools.
+
+Just like the workflow patterns, none of the patterns above are required from the start. Add one when you feel the specific problem it solves. The next section looks at what Spring AI provides for some of these, starting with Tool Search.
