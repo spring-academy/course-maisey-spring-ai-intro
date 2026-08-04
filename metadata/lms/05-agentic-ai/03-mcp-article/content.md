@@ -271,7 +271,8 @@ If you do not already run an identity provider you can let your own application 
 
 ### What to Expect
 
-One point should be stated clearly. **MCP Security is a community project initiated by one of our Spring Security experts, and it is not officially supported by Spring AI yet. Please treat it as a work in progress.**
+One point should be stated clearly. While **MCP Security is developed and maintained by the Spring AI team, it is still in an experimental phase and not part of Spring AI itself yet.**
+
 The main reason is the protocol rather than the Spring code. MCP only finalized its authorization specification recently, and it is still changing, so the libraries built on top of it cannot be stable before the specification underneath them is.
 
 The limitations listed for the server and the client side follow from that, and the authorization server has the same WebMVC restriction.
