@@ -271,9 +271,9 @@ If you do not already run an identity provider you can let your own application 
 
 ### What to Expect
 
-One point should be stated clearly. **MCP Security is a community project and is not officially endorsed by Spring AI yet, so you should treat it as work in progress.** The main reason is the protocol rather than the Spring code. MCP only finalized its authorization specification recently, and it is still changing, so the libraries built on top of it cannot be stable before the specification underneath them is.
+One point should be stated clearly. **MCP Security is a community project initiated by one of our Spring Security experts, and it is not officially supported by Spring AI yet. Please treat it as a work in progress.**
+The main reason is the protocol rather than the Spring code. MCP only finalized its authorization specification recently, and it is still changing, so the libraries built on top of it cannot be stable before the specification underneath them is.
 
 The limitations listed for the server and the client side follow from that, and the authorization server has the same WebMVC restriction.
 
 None of this means you should avoid MCP. It means you should expect changes, keep your security configuration in one place so it is easy to adjust, and be careful about which tools you expose to which callers. It is also worth remembering the general advice from the tool calling section. The model decides which tool to call and with what arguments, and it can be influenced by user input, so treat every tool call as untrusted input, validate the arguments, and give each tool the narrowest permissions it needs.
-
