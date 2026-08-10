@@ -34,7 +34,7 @@ spec:
     applications:
       terminal:
         enabled: true
-        layout: split
+        layout: split/2
       editor:
         enabled: true
   environment:
