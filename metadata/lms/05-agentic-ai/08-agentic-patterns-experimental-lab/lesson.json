@@ -1,0 +1,12 @@
+{
+    "id": "spring-maisey-agentic-ai-module-agentic-patterns-experimental-lab",
+    "slug": "agentic-patterns-experimental-lab",
+    "title": "Lab - Agentic Patterns (Experimental) - COMING SOON",
+    "status": "live",
+    "type": "article",
+    "duration": 1800,
+    "order": 8,
+    "settings": {
+        "manualCompletion": true
+    }
+}
