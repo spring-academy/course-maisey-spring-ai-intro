@@ -3,7 +3,7 @@ The patterns from the previous section are just shapes you build with the `ChatC
 Spring AI is not at the same stage with all of them. Some patterns are already provided out of the box by the framework, and this article walks through those in detail. 
 
 The remaining patterns exist as experimental implementations, and they are planned to become generally available with Spring AI 2.1. 
-This article only gives you an overview of them, and not the implementation details - as those will probably change.
+This article shows you what each of them provides and how you would use it in code, but treat those code samples as a first impression rather than as a stable API, because they will probably still change.
 
 ## Tool Search: Giving an Agent Hundreds of Tools
 
@@ -58,19 +58,167 @@ The semantic `VectorToolIndex` works the same way as the retrieval step in the R
 
 The `LuceneToolIndex` builds on [Apache Lucene](https://lucene.apache.org/), the open source search library that also powers Elasticsearch and Solr. It indexes the words of your tool names and descriptions and matches the query against those words, so there is no model call and no embedding involved, which makes it fast and cheap. The trade-off is that it only finds a tool when the query uses similar wording.
 
-## Pattern Implementations That Are Not GA Yet
+## Implementations for the Workflow Patterns (Experimental)
 
 If you want to see the workflow patterns as running code rather than as diagrams, the Spring AI team wrote them up in [Building Effective Agents with Spring AI](https://spring.io/blog/2025/01/21/spring-ai-agentic-patterns), and each one has a complete sample implementation in the [agentic-patterns examples](https://github.com/spring-projects/spring-ai-examples/tree/main/agentic-patterns) repository.
 
-Several of the other patterns already have a ready-made implementation as well, a tool or an advisor you drop in instead of writing the pattern by hand. Those are maintained in the **`spring-ai-community`** project, most of them in the [spring-ai-agent-utils](https://github.com/spring-ai-community/spring-ai-agent-utils) repository.
+### LLM-as-a-Judge and Self-Refine
 
-Here is what already exists:
+The evaluator-optimizer pattern is packaged as a reusable advisor. Built on Spring AI's experimental *recursive advisors*, a [`SelfRefineEvaluationAdvisor`](https://spring.io/blog/2025/11/10/spring-ai-llm-as-judge-blog-post) generates a response, has a separate judge model rate it on a structured scale, and retries with that feedback until it passes. Using a different model as the judge avoids the bias a model has towards its own output. Because it is an advisor, you add it with `defaultAdvisors` and the whole evaluate and improve loop happens inside a single `call()`.
 
-- **LLM-as-a-Judge / Self-Refine** — the evaluator-optimizer pattern packaged as a reusable advisor. Built on Spring AI's experimental *recursive advisors*, a `SelfRefineEvaluationAdvisor` generates a response, has a (separate, bias-avoiding) judge model rate it on a structured scale, and retries with the feedback until it passes. It turns "evaluate then improve" into a single drop-in advisor.
-- **Skills** — a `SkillsTool` that lets an agent load reusable *knowledge modules* written as Markdown files with YAML front-matter. Skills are discovered by name and description at startup and their full instructions loaded only when semantically relevant, the same load-on-demand philosophy as Tool Search, applied to instructions rather than tools.
-- **Plan and Execute** — a `TodoWriteTool` that lets the agent write its own task list and keep it current while it works. Every item has an id, a description, and a status of `todo`, `in_progress`, or `completed`, and only one item may be in progress at a time, which walks the model through the steps one after the other instead of letting it skip ahead. It needs chat memory, otherwise the list does not survive from one model call to the next, and you can register an event handler to stream each update to a user interface, which makes the plan from the previous section something you can actually watch happen.
-- **Ask-User-Question** — an `AskUserQuestionTool` that puts a human in the loop. Instead of guessing at ambiguous instructions, the agent can pause to ask the user a structured question (with options or free text) and continue once answered, essential for high-stakes actions where you want confirmation, not assumption.
-- **Subagents** — a `Task` tool that lets the main agent hand a piece of work to a separate agent with its own context window, its own system prompt, its own tools, and even its own model. The subagents are described in Markdown files with YAML front-matter, the same shape as Skills, and the main agent picks one by its description. Only the result comes back, so a long research or review step never clutters the main conversation, and a simple job can go to a cheap model while the hard analysis stays with a strong one.
-- **Agent-to-Agent (A2A)** — `spring-ai-a2a` provides server-side support for exposing a Spring AI agent over the open **A2A protocol**, so agents in *different* systems can discover and delegate to one another. Where MCP connects an agent to *tools*, A2A connects an agent to *other agents*, the next layer of composition once a single agent isn't enough.
+## Agentic Patterns in the spring-ai-community project (Experimental)
 
-The Spring team introduced each one in an [ongoing blog series](https://spring.io/blog/2026/04/15/spring-ai-session-management#agentic-patterns-series) that has grown beyond the list above with long term memory and event sourced session management.
+Several of the other patterns already have a ready-made implementation as well. Those are maintained in the **`spring-ai-community`** project, and most of them in the [spring-ai-agent-utils](https://github.com/spring-ai-community/spring-ai-agent-utils) repository.
+
+They are plain tools, so you register them on the `ChatClient` the same way you registered your own ticket tools. A BOM and a single dependency bring all of them in, with the Agent-to-Agent (A2A) support as the only exception, because that one ships as artifacts of its own.
+
+```xml
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.springaicommunity</groupId>
+            <artifactId>spring-ai-agent-utils-bom</artifactId>
+            <version>0.10.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+```
+
+```xml
+<dependency>
+    <groupId>org.springaicommunity</groupId>
+    <artifactId>spring-ai-agent-utils</artifactId>
+</dependency>
+```
+
+The Spring team introduced each pattern in an [ongoing blog series](https://spring.io/blog/2026/04/15/spring-ai-session-management#agentic-patterns-series), which is the place to look for the full picture. Here is what already exists and how you would use it.
+
+### Skills
+
+The [`SkillsTool`](https://spring.io/blog/2026/01/13/spring-ai-generic-agent-skills) points at one or more directories of skills. Each skill is a folder with a `SKILL.md` file, and the name and description from its YAML front-matter are all that is loaded at startup. The full instructions follow only when the task matches, which is the same load-on-demand idea as Tool Search, applied to instructions instead of tools.
+
+```java
+@Value("classpath:skills")
+private Resource skillsResource;
+
+ChatClient chatClient = builder
+    .defaultToolCallbacks(SkillsTool.builder().addSkillsResource(skillsResource).build()
+    .defaultTools(FileSystemTools.builder().build(), ShellTools.builder().build())
+    .build();
+```
+
+A skill can also ship reference files and scripts, so it is usually combined with the `FileSystemTools` and `ShellTools` from the same library, which let the agent read those files and run those scripts. You can also configure skills in a directory on a disk instead of a classpath resource with e.g. `.addSkillsDirectory(".claude/skills")`.
+
+### Plan and Execute
+
+The [`TodoWriteTool`](https://spring.io/blog/2026/01/20/spring-ai-agentic-patterns-3-todowrite) lets the agent write its own task list and keep it current while it works. Every item on that list has three fields. `content` says what needs to be done, `activeForm` is the same step worded as something in progress, so it reads well while the agent is working on it, and `status` is one of `pending`, `in_progress`, or `completed`. Only one item may be in progress at a time, which walks the model through the steps one after the other instead of letting it skip ahead. The tool describes itself as being for tasks with three or more steps, so the model decides on its own when a written plan is worth the effort.
+
+```java
+ChatClient chatClient = builder
+    .defaultTools(TodoWriteTool.builder()
+        .todoEventHandler(todos -> ...)
+        .build())
+    .defaultAdvisors(MessageChatMemoryAdvisor.builder(
+            MessageWindowChatMemory.builder().build())
+        .build())
+    .build();
+```
+
+Two things matter here. Chat memory is required, because without it the list does not survive from one model call to the next. The event handler is optional and gives you every update the current list of todos and their status to, for example, show the live plan in a user interface.
+
+### Ask-User-Question
+
+The [`AskUserQuestionTool`](https://spring.io/blog/2026/01/16/spring-ai-ask-user-question-tool) puts a human in the loop. Instead of guessing at an ambiguous instruction, the agent asks a structured question with two to four options, and you decide how that question reaches the user.
+
+```java
+ChatClient chatClient = builder
+    .defaultTools(AskUserQuestionTool.builder()
+        .questionHandler(this::askUser)
+        .build())
+    .build();
+
+Map<String, String> askUser(List<Question> questions) {
+    // show the question and its options, then return one answer per question
+}
+```
+
+The handler is a normal Java method, so a command line application can read from the console. A web application has to bridge the gap to an asynchronous user interface, usually with a `CompletableFuture` that the handler waits on until the answer arrives over WebSocket or REST.
+
+### Subagents
+
+The [Task tool](https://spring.io/blog/2026/01/27/spring-ai-agentic-patterns-4-task-subagents) lets the main agent hand a piece of work to a separate agent with its own context window, its own system prompt, its own tools, and even its own model. Only the result comes back, so a long research or review step never clutters the main conversation, and a simple job can go to a cheap model while the hard analysis stays with a strong one.
+
+```java
+ChatClient chatClient = builder
+    .defaultTools(TaskTool.builder()
+        .subagentTypes(ClaudeSubagentType.builder().build())
+        .build())
+    .build();
+```
+
+The subagents themselves are Markdown files in an `agents` directory, the same shape as Skills, with a name, a description that tells the main agent when to delegate, a list of allowed and forbidden tools, and the model to use. The main agent picks one by its description.
+
+### Agent-to-Agent (A2A)
+
+Where MCP connects an agent to tools, [A2A](https://spring.io/blog/2026/01/29/spring-ai-agentic-patterns-a2a-integration) connects an agent to other agents, which is the next step once your subagents no longer live in the same application. The protocol itself is implemented by the A2A Java SDK, and [spring-ai-a2a](https://github.com/spring-ai-community/spring-ai-a2a) puts a Spring Boot layer on top of it, so you declare beans instead of writing protocol code.
+
+The server side is a dependency of its own, and it is not part of the BOM above.
+
+```xml
+<dependency>
+    <groupId>org.springaicommunity</groupId>
+    <artifactId>spring-ai-a2a-server-autoconfigure</artifactId>
+    <version>0.3.0</version>
+</dependency>
+```
+
+With it on the classpath you provide two beans. The `AgentCard` is the description other systems read before they talk to you, with a name, a URL, the protocol version, and the list of skills your agent offers. The `AgentExecutor` is what actually answers a request, and `DefaultAgentExecutor` already implements it on top of a `ChatClient`, so all you write is the lambda that pulls the text out of the incoming message and calls your client.
+
+```java
+@Bean
+AgentCard agentCard(@Value("${server.port:8080}") int port) {
+    return new AgentCard.Builder()
+        .name("Support Agent")
+        .description("Answers Spring AI questions and opens support tickets")
+        .url("http://localhost:" + port + "/a2a/")
+        .version("1.0.0")
+        .capabilities(new AgentCapabilities.Builder().streaming(false).build())
+        .skills(Collections.emptyList())
+        .defaultInputModes(List.of("text"))
+        .defaultOutputModes(List.of("text"))
+        .build();
+}
+
+@Bean
+AgentExecutor agentExecutor(ChatClient chatClient) {
+    return new DefaultAgentExecutor(chatClient, (chatClient, requestContext) -> {
+        String userMessage = DefaultAgentExecutor.extractTextFromMessage(requestContext.getMessage());
+        return chatClient.prompt().user(userMessage).call().content();
+    });
+}
+```
+
+The autoconfiguration does the rest. It publishes the card under `/.well-known/agent-card.json` for discovery and accepts the JSON-RPC messages of the protocol, and it routes each of them through your `AgentExecutor`.
+
+On the client side there is no autoconfiguration, you add the `a2a-java-sdk-client` artifact and work with the SDK directly. `A2A.getAgentCard` fetches the card of a remote agent from its well known URL, and `Client.builder(agentCard)` gives you the connection you send messages over. The trick is to wrap that call in an ordinary `@Tool` method, because then delegating to a remote agent looks like any other tool call and the model decides on its own which agent to route to.
+
+```java
+@Service
+public class RemoteAgentConnections {
+    @Tool(description = "Sends a task to a remote agent. Use this to delegate work to specialized agents.")
+    String sendMessage(@ToolParam(description = "The name of the agent") String agentName,
+                    @ToolParam(description = "The task description to send") String task) {
+        // build a Message, send it with the SDK Client, and return the answer
+    }
+}
+```
+```java
+ChatClient chatClient = builder
+    .defaultSystem(promptListingTheRemoteAgents)
+    .defaultTools(remoteAgentConnections)
+    .build();
+```
+
+The series has grown beyond this list as well, with long term memory through `AutoMemoryTools` and an event sourced Session API that is meant to replace `ChatMemory`.
