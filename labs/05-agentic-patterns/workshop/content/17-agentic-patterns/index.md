@@ -1,5 +1,5 @@
 ---
-title: Tool Search
+title: Agentic Patterns - Tool Search
 ---
 
 Your support assistant has a growing number of tools. Three ticket tools run inside the application, and every MCP server you connect adds more on top, like the `fetchReleasesInfo` tool of the Spring Releases MCP server from the previous lab.
@@ -172,7 +172,7 @@ Send a request that needs a tool. Do not set a header, so the controller creates
 
 ```terminal:execute
 command: |
-  curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Please open a high-priority ticket for an SSO login that returns 502 on the Tanzu portal."
+  curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Open a high-priority ticket for an auth issue with the Spring Enterprise Repository."
 session: 1
 ```
 
@@ -186,6 +186,6 @@ With `logging.level.org.springframework.ai=debug` already enabled in `applicatio
 Now ask a question that needs no tool at all. The model answers from the knowledge base and never calls `searchTools`, so tool search costs you nothing when there is nothing to do.
 
 ```terminal:execute
-command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What is Tanzu Spring Runtime?"
+command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What are the key features of VMware Tanzu Spring?"
 session: 1
 ```

@@ -1,0 +1,50 @@
+{
+  "id" : "b957a531-6173-4c7e-8c6d-ce00b416e8a2",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 1)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-EBd49scM8fBsHuKbGxZ1wmWNaJhdf\",\n  \"object\": \"chat.completion\",\n  \"created\": 1786440485,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"Spring AI is a Spring ecosystem project that makes it easier to build AI-powered applications in Java and Kotlin.\\n\\n### What it does\\nIt provides a consistent, Spring-style API for working with:\\n- **Chat models** and text generation\\n- **Embeddings** for semantic search\\n- **Vector stores** for retrieval-augmented generation (RAG)\\n- **Prompt templating** and conversation handling\\n- **Tool/function calling** and structured outputs\\n\\n### Why it’s useful\\nInstead of writing provider-specific code for each AI service, Spring AI helps you:\\n- switch between providers more easily\\n- integrate AI into existing Spring Boot apps\\n- use familiar Spring patterns like auto-configuration and dependency injection\\n\\n### Common use cases\\n- Chatbots and assistants\\n- Document Q&A\\n- Semantic search\\n- Summarization and content generation\\n- AI features inside enterprise applications\\n\\n### In short\\nSpring AI brings AI capabilities into the Spring ecosystem in a clean, idiomatic way, so Java developers can build AI apps with less boilerplate and better integration.\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 24,\n    \"completion_tokens\": 216,\n    \"total_tokens\": 240,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "7ms",
+      "set-cookie" : "__cf_bm=3LZjZwQAcXKkr8Oghd1NkyBEcIYzg6SlkxbZynyZpIw-1786440484.6168888-1.0.1.1-6IROUaY1oFvHQIHDr1ULmZTfOWiAbCJOmbwmOnrdXbUkp.Onc9euUXK03uP9k5sZthRAHAw4kaxo42N1ImMColnCJExDFCrXL.McIAIPMdlfx8mrzYjBVWo9FS3QtYpD; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Tue, 11 Aug 2026 09:58:06 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_4616ee4dfa034f919c430a90cab3eeec",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a2963544dcaade7b-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199974",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Tue, 11 Aug 2026 09:28:06 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "1698",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "b957a531-6173-4c7e-8c6d-ce00b416e8a2",
+  "persistent" : true,
+  "insertionIndex" : 146
+}

@@ -1,0 +1,50 @@
+{
+  "id" : "9d0da8b0-9e90-4f0d-b315-a8022d57f8ce",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a Spring support classifier.\\nReply only with JSON in this form:\\n{\\\"category\\\":\\\"...\\\",\\\"answer\\\":\\\"...\\\"}\\nThe category must be one of: TECHNICAL, BILLING, SECURITY, GENERAL.\\nExamples:\\n- \\\"Why was I billed twice?\\\"     -> {\\\"category\\\":\\\"BILLING\\\",\\\"answer\\\":\\\"...\\\"}\\n- \\\"How do I rotate my API key?\\\" -> {\\\"category\\\":\\\"SECURITY\\\",\\\"answer\\\":\\\"...\\\"}\\n\",\"role\":\"system\"},{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-EBd4CsiAz4b7r8HU7JUAFwFyqYVCp\",\n  \"object\": \"chat.completion\",\n  \"created\": 1786440488,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"category\\\":\\\"GENERAL\\\",\\\"answer\\\":\\\"Spring AI is a Spring project that provides abstractions and integrations for building AI-enabled applications in Java and Kotlin. It helps you work with large language models and related AI services using familiar Spring patterns, such as dependency injection, configuration properties, and auto-configuration. Common features include chat/completions, embeddings, vector stores, prompt management, and support for multiple model providers. If you want, I can also give you a quick overview of how to get started with Spring AI.\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 101,\n    \"completion_tokens\": 107,\n    \"total_tokens\": 208,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "27ms",
+      "set-cookie" : "__cf_bm=1gdeDUmYZinbEiWdPBAqE4GKNaiGFSR923IkiUoj5gw-1786440488.285455-1.0.1.1-Ia2aw4gt554qMmgY1uZyoWJfRISQ1uRTBmJXl5KRpChmhpKXCdnu2RBDSm0ycNfIEsd5q8MTZBqh_k_k8dBM2Xzah8PNXKxdF_V.a0iixDuZ.JkELLdD0Vq7h9V0WxA3; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Tue, 11 Aug 2026 09:58:09 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_fe1715e879124d3096aa72dd2a4e851e",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a296355bcca7cd9b-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199907",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Tue, 11 Aug 2026 09:28:09 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "1082",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "9d0da8b0-9e90-4f0d-b315-a8022d57f8ce",
+  "persistent" : true,
+  "insertionIndex" : 144
+}

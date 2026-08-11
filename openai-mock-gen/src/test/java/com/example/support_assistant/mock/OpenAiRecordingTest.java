@@ -131,8 +131,18 @@ class OpenAiRecordingTest {
         private static final Set<String> VOLATILE_FIELDS = Set.of("model", "temperature", "top_p", "max_tokens",
                 "max_completion_tokens", "n", "user", "stream", "stream_options");
 
-        private static final Pattern PARENT_DOCUMENT_ID_UUID = Pattern.compile(
-                "(?<=parent_document_id: )[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
+        // Embedded text carries document metadata, and several of those values are UUIDs that are
+        // new on every run, such as the parent_document_id a TokenTextSplitter stamps on each
+        // chunk. Match every UUID with a wildcard so the stub stays reusable.
+        private static final Pattern ANY_UUID = Pattern.compile(
+                "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
+
+        // A VectorToolIndex document, embedded when the tool search advisor indexes the tools of a
+        // conversation. Two of its metadata values are volatile (a fresh id and the conversation id
+        // as sessionId), and it keeps its metadata in an immutable map, whose iteration order is
+        // randomized per JVM, so the metadata lines come out in another order in the sample app
+        // than they did here. The tool name alone identifies the document, so match on that.
+        private static final Pattern TOOL_INDEX_TOOL_NAME = Pattern.compile("^toolName: (.+)$", Pattern.MULTILINE);
 
         private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -223,14 +233,24 @@ class OpenAiRecordingTest {
                 return null;
             }
             String text = input.get(0).asText();
-            Matcher matcher = PARENT_DOCUMENT_ID_UUID.matcher(text);
-            if (!matcher.find()) {
+            Matcher toolName = TOOL_INDEX_TOOL_NAME.matcher(text);
+            if (toolName.find()) {
+                return new MatchesJsonPathPattern("$.input[0]",
+                        matching("(?s).*" + Pattern.quote(toolName.group()) + ".*"));
+            }
+            Matcher matcher = ANY_UUID.matcher(text);
+            StringBuilder regex = new StringBuilder();
+            int copiedUpTo = 0;
+            while (matcher.find()) {
+                regex.append(Pattern.quote(text.substring(copiedUpTo, matcher.start())))
+                        .append("[0-9a-fA-F-]{36}");
+                copiedUpTo = matcher.end();
+            }
+            if (copiedUpTo == 0) {
                 return null;
             }
-            String regex = Pattern.quote(text.substring(0, matcher.start()))
-                    + "[0-9a-fA-F-]{36}"
-                    + Pattern.quote(text.substring(matcher.end()));
-            return new MatchesJsonPathPattern("$.input[0]", matching(regex));
+            regex.append(Pattern.quote(text.substring(copiedUpTo)));
+            return new MatchesJsonPathPattern("$.input[0]", matching(regex.toString()));
         }
     }
 

@@ -6,6 +6,7 @@ import org.springframework.ai.chat.client.AdvisorParams;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
 import org.springframework.ai.chat.evaluation.RelevancyEvaluator;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
@@ -21,12 +22,13 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.toolsearch.ToolIndex;
+import org.springframework.ai.tool.toolsearch.index.vectorstore.VectorToolIndex;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -125,7 +127,7 @@ final class ChatFlows {
         assertNotNull(jsonStringResponse, "json content");
         assertTrue(jsonStringResponse.contains("category") && jsonStringResponse.contains("answer"), "json content contains relevant attributes");
 
-        // Lab 04 structured output, the "Return the Record" step, before native output is enabled.
+        // Lab 02 structured output, the "Return the Record" step, before native output is enabled.
         // The ChatClient has only a default system prompt, so .entity() is prompt-based here.
         var promptBasedEntityClient = chatClientBuilder.build().mutate().defaultSystem(systemPrompt).build();
         SupportResponse promptBasedResponse = promptBasedEntityClient.prompt()
@@ -245,6 +247,10 @@ final class ChatFlows {
                     .tools(tools)
                     .call()
                     .entity(SupportResponse.class);
+
+            assertNotNull(response, "structured response");
+            assertNotNull(response.category(), "structured response category");
+            assertNotBlank(response.answer());
         }
 
         // Lab 04-testing
@@ -295,6 +301,43 @@ final class ChatFlows {
                     .tools(tools)
                     .call()
                     .entity(SupportResponse.class);
+
+            assertNotNull(response, "structured response");
+            assertNotNull(response.category(), "structured response category");
+            assertNotBlank(response.answer());
+        }
+
+
+        // Lab 05-agentic-patterns
+        // The advisor indexes the tools into the same vector store the RAG advisor searches, and it
+        // keys that index by conversation id. Keep one conversation id for both questions, so the
+        // tools are indexed once and every tool ends up with a single embedding fixture. A second
+        // fixture for the same tool would hold a slightly different vector, the mock would answer
+        // with either of them, and the retrieved documents of the sample-app would come back in
+        // another order than they did here.
+        var toolIndex = new VectorToolIndex(vectorStore);
+        var toolSearchAdvisor = ToolSearchToolCallingAdvisor.builder()
+                .toolIndex(toolIndex)
+                .maxResults(5)
+                .build();
+
+        for (var toolSearchQuestion : List.of(
+                "Open a high-priority ticket for an auth issue with the Spring Enterprise Repository.",
+                "What are the key features of VMware Tanzu Spring?"
+        )) {
+            response = mcpChatClient.prompt()
+                    .user(u -> u
+                            .text("Answer the following question with a short, well-structured explanation: {question}")
+                            .param("question", toolSearchQuestion))
+                    .advisors(ragAdvisor, toolSearchAdvisor)
+                    .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+                    .tools(tools)
+                    .call()
+                    .entity(SupportResponse.class);
+
+            assertNotNull(response, "structured response");
+            assertNotNull(response.category(), "structured response category");
+            assertNotBlank(response.answer());
         }
     }
 

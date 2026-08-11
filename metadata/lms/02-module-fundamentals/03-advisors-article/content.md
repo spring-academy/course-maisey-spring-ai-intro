@@ -124,4 +124,4 @@ while (!matchesSchema(response) && attempt < maxAttempts) {
 }
 ```
 
-Examples for recursive advisors Spring AI ships are the **`StructuredOutputValidationAdvisor`** that validates the response and retries a few times when it does not match your type and the  **`ToolCallingAdvisor`**, that runs the tool-calling loop until the model asks for no more tools, you will use later.
+Examples for recursive advisors Spring AI ships are the **`StructuredOutputValidationAdvisor`** that is auto-registered when you call `validateSchema()` and validates the response and retries a few times when it does not match your type and the  **`ToolCallingAdvisor`**, that runs the tool-calling loop.

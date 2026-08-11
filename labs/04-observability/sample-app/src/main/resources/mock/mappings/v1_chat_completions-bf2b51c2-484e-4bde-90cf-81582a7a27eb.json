@@ -1,0 +1,50 @@
+{
+  "id" : "bf2b51c2-484e-4bde-90cf-81582a7a27eb",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\",\"role\":\"system\"},{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-EBd407W5RGJPFK2qdL6FE3zlpz4cQ\",\n  \"object\": \"chat.completion\",\n  \"created\": 1786440476,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"Spring AI is Spring’s project for building AI-powered applications in the Spring ecosystem. It gives you a consistent, Spring-style abstraction over different AI providers and models, so you can integrate things like chat, embeddings, image generation, and vector stores without tying your app too tightly to one vendor.\\n\\nWhat it’s good for:\\n- Chat/completions with LLMs\\n- Prompt templating and structured responses\\n- Embeddings for semantic search and retrieval\\n- Vector database integration for RAG-style apps\\n- Tool/function calling patterns\\n- Streaming responses in reactive or callback-based flows\\n\\nWhy people use it:\\n- Familiar Spring Boot auto-configuration and dependency injection\\n- Provider-agnostic APIs\\n- Easier testing and swapping models/providers\\n- Works well for common AI app patterns like RAG, agents, and prompt orchestration\\n\\nTypical use cases:\\n- Chatbots and assistants\\n- Enterprise search over internal documents\\n- Summarization and classification\\n- AI-powered workflows in existing Spring apps\\n\\nOfficial docs:\\n- Spring AI reference documentation: https://docs.spring.io/spring-ai/reference/\\n\\nIf you want, I can also give you:\\n1. a quick architecture overview,\\n2. a “Hello World” Spring AI example, or\\n3. guidance on using Spring AI with OpenAI, Anthropic, or a local model.\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 46,\n    \"completion_tokens\": 272,\n    \"total_tokens\": 318,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "14ms",
+      "set-cookie" : "__cf_bm=Zz2EALtTbmH_RkgQYEH4gi3XvlpcAUMEQX.FFg1mZjs-1786440476.3583267-1.0.1.1-7zMo2vIj1U1K.trqhj8bc7ikymO5O.mJgSrYKxwsZF9k9IMFPqlScz5H.nNFk3VU5DBC6MNBHD_emYTeYdlsKBJLBSuAVhcQtTE_cMMOyXrRUCdkdbJ8jERtOTpw6EDv; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Tue, 11 Aug 2026 09:57:59 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_34e97d3e3dae4032a636cabf5db1e432",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a29635113d5c921b-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199951",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Tue, 11 Aug 2026 09:27:59 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "2486",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "bf2b51c2-484e-4bde-90cf-81582a7a27eb",
+  "persistent" : true,
+  "insertionIndex" : 149
+}
