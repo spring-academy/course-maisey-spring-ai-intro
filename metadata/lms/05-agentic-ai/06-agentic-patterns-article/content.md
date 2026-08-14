@@ -1,6 +1,6 @@
 The patterns from the previous section are just shapes you build with the `ChatClient`, the structured output, and the advisors you already know.
 
-Spring AI is not at the same stage with all of them. Some patterns are already provided out of the box, and this article walks through those in detail. The remaining ones exist as experimental implementations and are planned to become generally available with Spring AI 2.1. For those, the article shows what each one provides and how you would use it in code, but treat the samples as a first impression rather than as a stable API, because they will probably still change.
+Spring AI is not at the same stage with all of them. Some patterns are already provided out of the box, and this article walks through those in detail. The remaining ones exist as experimental implementations and are planned to become generally available in future releases. For those, the article shows what each one provides and how you would use it in code, but treat the samples as a first impression rather than as a stable API, because they will probably still change.
 
 ## Giving an Agent Hundreds of Tools With Tool Search
 
@@ -92,7 +92,7 @@ They are plain tools, so you register them on the `ChatClient` the same way you 
 
 The Spring team introduced each pattern in an [ongoing blog series](https://spring.io/blog/2026/04/15/spring-ai-session-management#agentic-patterns-series), which is the place to look for the full picture. Here is what already exists and how you would use it.
 
-### Skills
+### Agent Skills
 
 The [`SkillsTool`](https://spring.io/blog/2026/01/13/spring-ai-generic-agent-skills) points at one or more directories of skills. Each skill is a folder with a `SKILL.md` file, and the name and the description from its YAML front matter are all that is loaded at startup. The full instructions follow only when the task matches, which is the same load on demand idea as Tool Search, applied to instructions instead of tools.
 
