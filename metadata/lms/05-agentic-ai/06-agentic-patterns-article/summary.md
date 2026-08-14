@@ -1,1 +1,1 @@
-You now understand how Spring AI's Tool Search Tool lets an agent handle large tool catalogs by discovering relevant tools on demand, and what the community agent patterns offer.
+You now understand how the Tool Search Tool of Spring AI lets an agent handle a large tool catalog by discovering the relevant tools on demand, and what the community implementations of the other agentic patterns already offer.

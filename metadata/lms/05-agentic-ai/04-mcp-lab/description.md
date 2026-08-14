@@ -1,1 +1,1 @@
-In this hands-on lab you'll build an MCP server that provides live information about Spring project releases, connect the support assistant to it as an MCP client, and then secure the connection with OAuth 2.0 so that only authorized callers can reach the tools.
+In this hands-on lab you build an MCP server that provides live information about Spring project releases, connect the support assistant to it as an MCP client, and then secure the connection with OAuth 2.0 so that only authorized callers can reach the tools.

@@ -1,1 +1,1 @@
-The recurring workflow patterns for combining model calls, chaining, parallelization, routing, orchestrator-workers, and evaluator-optimizer, and when to reach for each.
+The recurring workflow patterns for combining model calls, namely chaining, parallelization, routing, orchestrator-workers, and evaluator-optimizer, plus the patterns that shape a single agent.

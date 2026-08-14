@@ -1,4 +1,4 @@
-**Prequisites**
-* Developer experience using a modern Java IDE and build tools such as Maven or Gradle
+**Prerequisites**
+* Developer experience with a modern Java IDE and a build tool such as Maven or Gradle
 * Familiarity with Spring Boot
-* Basic understanding of REST APIs
+* A basic understanding of REST APIs

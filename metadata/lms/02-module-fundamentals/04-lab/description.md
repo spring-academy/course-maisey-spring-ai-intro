@@ -1,1 +1,1 @@
-Put the fundamentals of Spring AI into practice. In this hands-on lab you'll start building the support assistant and interact with an LLM from a Spring Boot application, using Spring AI's core abstractions.
+Put the fundamentals of Spring AI into practice. In this hands-on lab you start building the support assistant and talk to an LLM from a Spring Boot application with the core abstractions of Spring AI.

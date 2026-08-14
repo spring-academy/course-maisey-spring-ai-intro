@@ -1,1 +1,1 @@
-Learn how Retrieval Augmented Generation grounds model answers in your own data. You'll understand how embeddings and vector stores enable semantic search and how Spring AI helps you ingest your documents and provide them to the model as context.
+Learn how Retrieval Augmented Generation grounds model answers in your own data. You will understand how embeddings and vector stores enable search by meaning, and how Spring AI helps you ingest your documents and provide them to the model as context.

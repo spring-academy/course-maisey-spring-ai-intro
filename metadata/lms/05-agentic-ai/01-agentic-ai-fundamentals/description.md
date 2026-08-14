@@ -1,1 +1,1 @@
-The key concepts behind agentic AI. How LLM applications move from answering questions to autonomously planning and acting with tools.
+The key concepts behind agentic AI, and how LLM applications move from answering questions to planning and acting with tools on their own.

@@ -1,1 +1,1 @@
-A future lab about Agentic patterns with experimental support in Spring AI.
+A future lab about the agentic patterns that Spring AI supports experimentally.

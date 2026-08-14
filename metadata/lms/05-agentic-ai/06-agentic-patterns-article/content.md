@@ -1,21 +1,18 @@
-The patterns from the previous section are just shapes you build with the `ChatClient`, structured output, and advisors you already know. 
+The patterns from the previous section are just shapes you build with the `ChatClient`, the structured output, and the advisors you already know.
 
-Spring AI is not at the same stage with all of them. Some patterns are already provided out of the box by the framework, and this article walks through those in detail. 
+Spring AI is not at the same stage with all of them. Some patterns are already provided out of the box, and this article walks through those in detail. The remaining ones exist as experimental implementations and are planned to become generally available with Spring AI 2.1. For those, the article shows what each one provides and how you would use it in code, but treat the samples as a first impression rather than as a stable API, because they will probably still change.
 
-The remaining patterns exist as experimental implementations, and they are planned to become generally available with Spring AI 2.1. 
-This article shows you what each of them provides and how you would use it in code, but treat those code samples as a first impression rather than as a stable API, because they will probably still change.
+## Giving an Agent Hundreds of Tools With Tool Search
 
-## Tool Search: Giving an Agent Hundreds of Tools
+You know the problem from the previous section. As soon as an agent has a high number of tools, often because several MCP servers feed into it, sending every tool definition on every request costs a lot of tokens and makes the model pick the wrong tool more often.
 
-You know the problem from the previous section. As soon as an agent has a high number of tools, often because several MCP servers feed into it, sending every tool definition on every request costs a lot of tokens and makes the model pick the wrong tool more often. 
-
-Spring AI's answer, generally available since the 2.0 release, is the **Tool Search Tool**. Instead of loading all tools upfront, the agent *discovers them on demand*.
+The answer of Spring AI, generally available since the 2.0 release, is the **Tool Search Tool**. Instead of loading all tools upfront, the agent *discovers them on demand*.
 
 ### How it works
 
-All your registered tools are indexed into a **`ToolIndex`**, but **not** sent to the model. On the first request the model sees only the Tool Search Tool. When it needs a capability, it calls that search tool  with a search query. The index returns the matching tools, and *their* full definitions are expanded into the next request, so the model now sees the search tool plus the handful of relevant tools, calls them, and produces its answer. Hundreds of tools become reachable while only a few definitions ever enter the context at a time.
+All your registered tools are indexed into a **`ToolIndex`**, but they are **not** sent to the model. On the first request the model sees only the Tool Search Tool. When it needs a capability, it calls that search tool with a search query. The index returns the matching tools, and *their* full definitions are expanded into the next request, so the model now sees the search tool plus the handful of relevant tools, calls them, and produces its answer. Hundreds of tools become reachable while only a few definitions ever enter the context at a time.
 
-This is delivered as an advisor, the **`ToolSearchToolCallingAdvisor`**, which extends the familiar `ToolCallingAdvisor` with the discovery step. You add the dedicated module:
+This is delivered as an advisor, the **`ToolSearchToolCallingAdvisor`**, which extends the familiar `ToolCallingAdvisor` with the discovery step. You add the dedicated module.
 
 ```xml
 <dependency>
@@ -24,7 +21,7 @@ This is delivered as an advisor, the **`ToolSearchToolCallingAdvisor`**, which e
 </dependency>
 ```
 
-Then register the advisor and your tools as usual. Note the tools are configured on the client, but thanks to the advisor they aren't all shipped to the model:
+Then you register the advisor and your tools as usual. Note that the tools are configured on the client, but thanks to the advisor they are not all shipped to the model.
 
 ```java
 var advisor = ToolSearchToolCallingAdvisor.builder()
@@ -50,9 +47,9 @@ How the search itself works is up to you. The `ToolIndex` interface hides the se
 
 | Strategy | Implementation | Best for |
 |----------|----------------|----------|
-| **Semantic** | `VectorToolIndex` | Natural-language queries, fuzzy matching by meaning |
+| **Semantic** | `VectorToolIndex` | Natural language queries, fuzzy matching by meaning |
 | **Keyword** | `LuceneToolIndex` | Exact term matching, known tool names |
-| **Regex** | `RegexToolIndex` | Tool-name patterns like `get_*_data` |
+| **Regex** | `RegexToolIndex` | Tool name patterns such as `get_*_data` |
 
 The semantic `VectorToolIndex` works the same way as the retrieval step in the RAG section, only with tools instead of documents. Each tool description is turned into an embedding and stored in a vector store, the search query is embedded as well, and the tools that come back are the ones closest in meaning. The agent can ask for "something to open a ticket" and still find a tool called `createSupportCase`.
 
@@ -62,11 +59,11 @@ The `LuceneToolIndex` builds on [Apache Lucene](https://lucene.apache.org/), the
 
 If you want to see the workflow patterns as running code rather than as diagrams, the Spring AI team wrote them up in [Building Effective Agents with Spring AI](https://spring.io/blog/2025/01/21/spring-ai-agentic-patterns), and each one has a complete sample implementation in the [agentic-patterns examples](https://github.com/spring-projects/spring-ai-examples/tree/main/agentic-patterns) repository.
 
-### LLM-as-a-Judge and Self-Refine
+### LLM as a Judge and Self-Refine
 
-The evaluator-optimizer pattern is packaged as a reusable advisor. Built on Spring AI's experimental *recursive advisors*, a [`SelfRefineEvaluationAdvisor`](https://spring.io/blog/2025/11/10/spring-ai-llm-as-judge-blog-post) generates a response, has a separate judge model rate it on a structured scale, and retries with that feedback until it passes. Using a different model as the judge avoids the bias a model has towards its own output. Because it is an advisor, you add it with `defaultAdvisors` and the whole evaluate and improve loop happens inside a single `call()`.
+The evaluator-optimizer pattern is packaged as a reusable advisor. Built on the experimental *recursive advisors* of Spring AI, a [`SelfRefineEvaluationAdvisor`](https://spring.io/blog/2025/11/10/spring-ai-llm-as-judge-blog-post) generates a response, has a separate judge model rate it on a structured scale, and retries with that feedback until it passes. Using a different model as the judge avoids the bias a model has towards its own output. Because it is an advisor, you add it with `defaultAdvisors` and the whole evaluate and improve loop happens inside a single `call()`.
 
-## Agentic Patterns in the spring-ai-community project (Experimental)
+## Agentic Patterns in the spring-ai-community Project (Experimental)
 
 Several of the other patterns already have a ready-made implementation as well. Those are maintained in the **`spring-ai-community`** project, and most of them in the [spring-ai-agent-utils](https://github.com/spring-ai-community/spring-ai-agent-utils) repository.
 
@@ -97,7 +94,7 @@ The Spring team introduced each pattern in an [ongoing blog series](https://spri
 
 ### Skills
 
-The [`SkillsTool`](https://spring.io/blog/2026/01/13/spring-ai-generic-agent-skills) points at one or more directories of skills. Each skill is a folder with a `SKILL.md` file, and the name and description from its YAML front-matter are all that is loaded at startup. The full instructions follow only when the task matches, which is the same load-on-demand idea as Tool Search, applied to instructions instead of tools.
+The [`SkillsTool`](https://spring.io/blog/2026/01/13/spring-ai-generic-agent-skills) points at one or more directories of skills. Each skill is a folder with a `SKILL.md` file, and the name and the description from its YAML front matter are all that is loaded at startup. The full instructions follow only when the task matches, which is the same load on demand idea as Tool Search, applied to instructions instead of tools.
 
 ```java
 @Value("classpath:skills")
@@ -109,11 +106,11 @@ ChatClient chatClient = builder
     .build();
 ```
 
-A skill can also ship reference files and scripts, so it is usually combined with the `FileSystemTools` and `ShellTools` from the same library, which let the agent read those files and run those scripts. You can also configure skills in a directory on a disk instead of a classpath resource with e.g. `.addSkillsDirectory(".claude/skills")`.
+A skill can also ship reference files and scripts, so it is usually combined with the `FileSystemTools` and `ShellTools` from the same library, which let the agent read those files and run those scripts. You can also point at a directory on disk instead of a classpath resource, for example with `.addSkillsDirectory(".claude/skills")`.
 
 ### Plan and Execute
 
-The [`TodoWriteTool`](https://spring.io/blog/2026/01/20/spring-ai-agentic-patterns-3-todowrite) lets the agent write its own task list and keep it current while it works. Every item on that list has three fields. `content` says what needs to be done, `activeForm` is the same step worded as something in progress, so it reads well while the agent is working on it, and `status` is one of `pending`, `in_progress`, or `completed`. Only one item may be in progress at a time, which walks the model through the steps one after the other instead of letting it skip ahead. The tool describes itself as being for tasks with three or more steps, so the model decides on its own when a written plan is worth the effort.
+The [`TodoWriteTool`](https://spring.io/blog/2026/01/20/spring-ai-agentic-patterns-3-todowrite) lets the agent write its own task list and keep it current while it works. Every item on that list has three fields. The `content` field says what needs to be done, `activeForm` is the same step worded as something in progress so it reads well while the agent works on it, and `status` is one of `pending`, `in_progress`, or `completed`. Only one item may be in progress at a time, which walks the model through the steps one after the other instead of letting it skip ahead. The tool describes itself as being for tasks with three or more steps, so the model decides on its own when a written plan is worth the effort.
 
 ```java
 ChatClient chatClient = builder
@@ -126,7 +123,7 @@ ChatClient chatClient = builder
     .build();
 ```
 
-Two things matter here. Chat memory is required, because without it the list does not survive from one model call to the next. The event handler is optional and gives you every update the current list of todos and their status to, for example, show the live plan in a user interface.
+Two things matter here. Chat memory is required, because without it the list does not survive from one model call to the next. The event handler is optional and hands you every update of the list and its status, so you can show the live plan in a user interface.
 
 ### Ask-User-Question
 
@@ -200,9 +197,9 @@ AgentExecutor agentExecutor(ChatClient chatClient) {
 }
 ```
 
-The autoconfiguration does the rest. It publishes the card under `/.well-known/agent-card.json` for discovery and accepts the JSON-RPC messages of the protocol, and it routes each of them through your `AgentExecutor`.
+The autoconfiguration does the rest. It publishes the card under `/.well-known/agent-card.json` for discovery, accepts the JSON-RPC messages of the protocol, and routes each of them through your `AgentExecutor`.
 
-On the client side there is no autoconfiguration, you add the `a2a-java-sdk-client` artifact and work with the SDK directly. `A2A.getAgentCard` fetches the card of a remote agent from its well known URL, and `Client.builder(agentCard)` gives you the connection you send messages over. The trick is to wrap that call in an ordinary `@Tool` method, because then delegating to a remote agent looks like any other tool call and the model decides on its own which agent to route to.
+On the client side there is no autoconfiguration, so you add the `a2a-java-sdk-client` artifact and work with the SDK directly. `A2A.getAgentCard` fetches the card of a remote agent from its well known URL, and `Client.builder(agentCard)` gives you the connection you send messages over. The trick is to wrap that call in an ordinary `@Tool` method, because then delegating to a remote agent looks like any other tool call and the model decides on its own which agent to route to.
 
 ```java
 @Service
@@ -214,6 +211,7 @@ public class RemoteAgentConnections {
     }
 }
 ```
+
 ```java
 ChatClient chatClient = builder
     .defaultSystem(promptListingTheRemoteAgents)

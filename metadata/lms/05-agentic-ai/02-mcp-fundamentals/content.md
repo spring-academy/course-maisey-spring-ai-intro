@@ -2,7 +2,7 @@ Every tool your assistant can call so far lives inside its own codebase. You wro
 
 Think about how many AI applications exist today. There are chat assistants, coding assistants inside your editor, and the agents you build yourself. Now think about how many systems they might need to reach, such as your ticket system, your wiki, a database, or a build server. Before MCP, connecting one AI application to one system meant writing a custom integration. Ten AI applications and ten systems meant a hundred separate integrations, and every one of them had to be written and maintained by someone. The work was also not reusable. If a colleague built a good integration for their assistant, you could not simply plug it into yours.
 
-This is the problem the **[Model Context Protocol (MCP)](https://modelcontextprotocol.io)** solves. It is an open-source protocol for connecting AI applications to external systems. A system exposes its capabilities once, and every MCP compatible AI application can use them without custom glue code. The official documentation compares MCP to a USB-C port. Just as USB-C gives you one connector that works with many devices, MCP gives you one way to connect AI applications to external systems. 
+This is the problem the **[Model Context Protocol (MCP)](https://modelcontextprotocol.io)** solves. It is an open-source protocol for connecting AI applications to external systems. A system exposes its capabilities once, and every MCP compatible AI application can use them without custom glue code. The official documentation compares MCP to a USB-C port. Just as USB-C gives you one connector that works with many devices, MCP gives you one way to connect AI applications to external systems.
 
 ![MCP as a standardized protocol connecting AI applications on one side to data sources and tools on the other](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/05-agentic-ai/02-mcp-fundamentals/assets/mcp.svg)
 
@@ -24,7 +24,7 @@ Underneath, MCP is built from two layers. The **data layer** defines the message
 
 A connection today starts with a handshake. The client sends an `initialize` request that says which protocol version it speaks and what it supports. The server answers with the same information about itself. This step is called capability negotiation, and it means neither side ever tries to use a feature the other does not have.
 
-After the handshake the client asks what is available. It, for example, sends `tools/list` and gets back every tool with its name, its description, and a JSON schema describing its parameters. This is exactly the information a model needs to decide whether and how to call something. When the model does decide, the client sends `tools/call` with the arguments, and the server returns the result. Because discovery happens at runtime and not at compile time, a server can change its tools while it is running, and it can notify connected clients so they refresh their list.
+After the handshake the client asks what is available. It sends `tools/list`, for example, and gets back every tool with its name, its description, and a JSON schema describing its parameters. This is exactly the information a model needs to decide whether and how to call something. When the model does decide, the client sends `tools/call` with the arguments, and the server returns the result. Because discovery happens at runtime and not at compile time, a server can change its tools while it is running, and it can notify connected clients so they refresh their list.
 
 ## Two Ways to Connect
 
@@ -68,9 +68,9 @@ Released does not yet mean available. Most of the ecosystem still speaks the old
 
 The biggest shift is from a stateful protocol to a stateless one. In the older revision a connection begins with the mandatory `initialize` handshake and keeps session state afterwards. In the new design that handshake disappears, and each request carries the information about the caller with it. Capability discovery moves from the handshake to an explicit call that a client makes when it wants to know what is available. The practical benefit is operational, because without sticky sessions a remote server can sit behind an ordinary load balancer and scale like any other web service. Streamable HTTP becomes the primary transport, and the older HTTP with SSE transport is on its way out.
 
-Two additions are worth watching. **Tasks** give long running work a standard shape, so a server can return a task identifier immediately and let the client poll for the result instead of holding a connection open. **MCP Apps** let a server offer a small interactive HTML interface that the host renders in a sandboxed inframe, which opens the door to things like configuration wizards inside a chat.
+Two additions are worth watching. **Tasks** give long running work a standard shape, so a server can return a task identifier immediately and let the client poll for the result instead of holding a connection open. **MCP Apps** let a server offer a small interactive HTML interface that the host renders in a sandboxed iframe, which opens the door to things like configuration wizards inside a chat.
 
-Authorization gets stricter as well. Alignment with OAuth 2.1 and OpenID Connect is now mandatory, and a new extension lets administrators centrally decide which servers their organization may use. 
+Authorization gets stricter as well. Alignment with OAuth 2.1 and OpenID Connect is now mandatory, and a new extension lets administrators centrally decide which servers their organization may use.
 
 **Several features are being retired**, including sampling, roots, logging, and dynamic client registration. Sampling in particular is going away because letting a server call back into the client's model created security problems, and the guidance now is that a server should call a model directly if it needs one.
 

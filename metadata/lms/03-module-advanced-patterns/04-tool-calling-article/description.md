@@ -1,1 +1,1 @@
-Learn how tool calling lets a model do more than just answer with text. You'll understand how models can request information and trigger actions in your application and how Spring AI makes it easy to expose your own Java methods as tools to the model.
+Learn how tool calling lets a model do more than answer with text. You will understand how a model can request information and trigger actions in your application, and how Spring AI makes it easy to expose your own Java methods as tools.

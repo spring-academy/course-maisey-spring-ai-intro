@@ -1,1 +1,1 @@
-In this hands-on lab you'll connect the support assistant to external systems by defining tools the model can invoke at runtime. You'll implement a ticket service, and wire it into the ChatClient so the assistant can create tickets on behalf of the user instead of just answering questions.
+In this hands-on lab you connect the support assistant to external systems by defining tools that the model can invoke at runtime. You implement a ticket service and wire it into the ChatClient, so the assistant can create tickets for the user instead of only answering questions.

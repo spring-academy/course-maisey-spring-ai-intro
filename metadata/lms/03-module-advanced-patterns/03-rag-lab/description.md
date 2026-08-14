@@ -1,1 +1,1 @@
-In this hands-on lab you'll apply what you've learned about Retrieval Augmented Generation and enable the support assistant to answer questions from your own documents. You'll ingest them into a vector store and let Spring AI provide relevant content to the model as context.
+In this hands-on lab you apply what you have learned about Retrieval Augmented Generation and let the support assistant answer questions from your own documents. You ingest them into a vector store and let Spring AI provide the relevant content to the model as context.

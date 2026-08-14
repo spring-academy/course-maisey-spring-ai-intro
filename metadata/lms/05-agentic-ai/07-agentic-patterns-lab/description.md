@@ -1,1 +1,1 @@
-Agentic patterns in Spring AI, focusing on the Tool Search Tool for scaling agents to large tool catalogs, plus a look at community agent patterns.
+Agentic patterns in Spring AI, with a focus on the Tool Search Tool that scales an agent to a large tool catalog, plus a look at the community agent patterns.

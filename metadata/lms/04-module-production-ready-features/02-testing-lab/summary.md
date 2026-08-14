@@ -1,1 +1,1 @@
-You wrote tests for AI integrations using Spring AI's mock capabilities and evaluation API to assert response quality.
+You wrote tests for AI integrations with the mocking capabilities and the evaluation API of Spring AI to assert the quality of a response.

@@ -1,1 +1,1 @@
-Learn the fundamentals of Spring AI and how to interact with LLMs from your Spring Boot application. You'll see how Spring AI abstracts away provider-specific APIs and get to know its core abstractions for chatting with models, crafting prompts, and turning model responses into Java objects.
+Learn the fundamentals of Spring AI and how to talk to an LLM from your Spring Boot application. You will see how Spring AI hides provider specific APIs and get to know its core abstractions for chatting with models, writing prompts, and turning model responses into Java objects.

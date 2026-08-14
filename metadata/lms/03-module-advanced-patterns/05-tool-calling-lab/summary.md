@@ -1,1 +1,1 @@
-You learned how to extend an AI model's capabilities with tool calling, defining tools with the @Tool annotation and registering them with the ChatClient so the assistant can create support tickets on behalf of the user.
+You learned how to extend the capabilities of an AI model with tool calling, defining tools with the `@Tool` annotation and registering them on the `ChatClient` so the assistant can create support tickets for the user.
