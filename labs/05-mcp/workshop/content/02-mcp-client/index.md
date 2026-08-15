@@ -53,19 +53,26 @@ The `spring-releases` segment is the custom connection name.
 
 You could pass the callbacks into every `chatClient.prompt()` call or, as in this case, once as default tools on the `ChatClient` bean in `SupportAssistantConfiguration.java`.
 
+```editor:insert-lines-before-line
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+line: 3
+text: import org.springframework.ai.tool.ToolCallbackProvider;
+description: Register the MCP tools as default tools
+cascade: true
+```
+
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
 text: "public ChatClient chatClient(ChatClient.Builder builder,"
-description: "Register the MCP tools as default tools"
 before: 1
 after: 10
 cascade: true
+hidden: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
 hidden: true
-cascade: true
 text: |2
       @Bean
       public ChatClient chatClient(ChatClient.Builder builder,
@@ -81,13 +88,6 @@ text: |2
                   .defaultTools(tools)
                   .build();
       }
-```
-
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-hidden: true
-line: 3
-text: import org.springframework.ai.tool.ToolCallbackProvider;
 ```
 
 Two things changed in the bean. The first one is a new constructor parameter.

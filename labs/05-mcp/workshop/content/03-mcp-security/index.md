@@ -212,19 +212,28 @@ That header is the heart of MCP authorization. The failed request tells the clie
 
 The filter chain already protects the whole endpoint. Because this is ordinary Spring Security, you can also protect a single tool, and you can read the caller inside the tool method.
 
+```editor:insert-lines-before-line
+file: ~/spring-releases-mcp-server/src/main/java/com/example/spring_releases/SpringReleasesInfoService.java
+line: 8
+description: Secure the tool and log the caller
+cascade: true
+text: |2
+  import org.springframework.security.access.prepost.PreAuthorize;
+  import org.springframework.security.core.context.SecurityContextHolder;
+```
+
 ```editor:select-matching-text
 file: ~/spring-releases-mcp-server/src/main/java/com/example/spring_releases/SpringReleasesInfoService.java
 text: "@McpTool(description"
-description: "Secure the tool and log the caller"
 before: 0
 after: 3
 cascade: true
+hidden: true
 ```
 
 ```editor:replace-text-selection
 file: ~/spring-releases-mcp-server/src/main/java/com/example/spring_releases/SpringReleasesInfoService.java
 hidden: true
-cascade: true
 text: |2
       @PreAuthorize("isAuthenticated()")
       @McpTool(description = "Get all releases for a Spring project, including version and support status.")
@@ -232,15 +241,6 @@ text: |2
               @McpToolParam(description = "The project slug, e.g. 'spring-boot', 'spring-framework', 'spring-ai'") String projectSlug) {
           var user = SecurityContextHolder.getContext().getAuthentication().getName();
           log.info("Fetch spring release info for project {} called by {}", projectSlug, user);
-```
-
-```editor:insert-lines-before-line
-file: ~/spring-releases-mcp-server/src/main/java/com/example/spring_releases/SpringReleasesInfoService.java
-hidden: true
-line: 8
-text: |2
-  import org.springframework.security.access.prepost.PreAuthorize;
-  import org.springframework.security.core.context.SecurityContextHolder;
 ```
 
 Two things changed. The first one is a method level rule.
@@ -328,19 +328,31 @@ Configure the `SecurityFilterChain` with the provided `McpClientOAuth2Configurer
 
 ```editor:insert-lines-before-line
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+line: 18
 description: Configure the SecurityFilterChain
 cascade: true
-line: 19
+text: |2
+  import org.springframework.security.web.SecurityFilterChain;
+  import org.springframework.security.config.Customizer;
+  import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+  import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+  import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+  import org.springaicommunity.mcp.security.client.sync.config.McpClientOAuth2Configurer;
+```
+
+```editor:insert-lines-before-line
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+line: 25
+cascade: true
+hidden: true
 text: |2
   @EnableWebSecurity
 ```
 
-
 ```editor:insert-lines-before-line
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-cascade: true
+line: 49
 hidden: true
-line: 43
 text: |2
 
       @Bean
@@ -351,19 +363,6 @@ text: |2
                 .csrf(CsrfConfigurer::disable)
                 .build();
       } 
-```
-
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-hidden: true
-line: 18
-text: |2
-  import org.springframework.security.web.SecurityFilterChain;
-  import org.springframework.security.config.Customizer;
-  import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-  import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-  import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
-  import org.springaicommunity.mcp.security.client.sync.config.McpClientOAuth2Configurer;
 ```
 
 The endpoints of the assistant itself stay open, so nobody has to sign in to use the support assistant without the tools provided by the MCP server.

@@ -32,11 +32,28 @@ Now replace the `ChatModel` in your service with `ChatClient`.
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+text: "import org.springframework.ai.openai.OpenAiChatOptions;"
+before: 0
+after: 7
+description: Switch to ChatClient
+cascade: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+cascade: true
+hidden: true
+text: |
+  import org.springframework.ai.chat.client.ChatClient;
+```
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "private final ChatModel chatModel;"
 before: 0
 after: 0
-description: Switch to ChatClient
 cascade: true
+hidden: true
 ```
 
 ```editor:replace-text-selection
@@ -77,7 +94,6 @@ hidden: true
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
       String generateResponse(String query) {
@@ -86,22 +102,6 @@ text: |2
                   .call()
                   .content();
       }
-```
-
-```editor:select-matching-text
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-text: "import org.springframework.ai.openai.OpenAiChatOptions;"
-before: 0
-after: 7
-cascade: true
-hidden: true
-```
-
-```editor:replace-text-selection
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-hidden: true
-text: |
-  import org.springframework.ai.chat.client.ChatClient;
 ```
 
 
@@ -200,11 +200,28 @@ Now that you have seen streaming work, remove the throwaway endpoint again so th
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
+text: "import org.springframework.web.bind.annotation.RestController;"
+before: 0
+after: 3
+description: Remove the streaming endpoint
+cascade: true
+```
+
+```editor:replace-text-selection
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
+cascade: true
+hidden: true
+text: |
+  import org.springframework.web.bind.annotation.RestController;
+```
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
 text: "String chat(@RequestParam String query) {"
 before: 0
 after: 11
-description: Remove the streaming endpoint
 cascade: true
+hidden: true
 ```
 
 ```editor:replace-text-selection
@@ -228,7 +245,6 @@ hidden: true
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
-cascade: true
 hidden: true
 text: |2
       private final SupportAssistantService service;
@@ -236,22 +252,6 @@ text: |2
       SupportAssistantController(SupportAssistantService service) {
           this.service = service;
       }
-```
-
-```editor:select-matching-text
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
-text: "import org.springframework.web.bind.annotation.RestController;"
-before: 0
-after: 3
-hidden: true
-cascade: true
-```
-
-```editor:replace-text-selection
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantController.java
-hidden: true
-text: |
-  import org.springframework.web.bind.annotation.RestController;
 ```
 
 ## Inline User Template
@@ -387,13 +387,23 @@ text: |
 ```
 
 Inject the resource into the bean and pass it to `defaultSystem`:
+```editor:insert-lines-before-line
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+line: 3
+description: Load the system prompt from a resource file
+cascade: true
+text: |-
+  import org.springframework.beans.factory.annotation.Value;
+  import org.springframework.core.io.Resource;
+```
+
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
 text: "public ChatClient chatClient(ChatClient.Builder builder) {"
 before: 0
 after: 0
-description: Load the system prompt from a resource file
 cascade: true
+hidden: true
 ```
 
 ```editor:replace-text-selection
@@ -416,19 +426,9 @@ hidden: true
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-cascade: true
 hidden: true
 text: |2
                   .defaultSystem(systemPrompt)
-```
-
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-line: 3
-hidden: true
-text: |-
-  import org.springframework.beans.factory.annotation.Value;
-  import org.springframework.core.io.Resource;
 ```
 
 Verify the change took effect by calling the service:

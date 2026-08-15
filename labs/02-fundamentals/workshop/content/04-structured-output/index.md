@@ -151,7 +151,7 @@ Update the bean in `SupportAssistantConfiguration`:
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-text: ".defaultSystem(systemPrompt)"
+text: "import org.springframework.ai.chat.client.ChatClient;"
 before: 0
 after: 0
 description: Enable native structured output on the ChatClient
@@ -160,28 +160,28 @@ cascade: true
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-hidden: true
 cascade: true
-text: |2
-                  .defaultSystem(systemPrompt)
-                  .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
+hidden: true
+text: |
+  import org.springframework.ai.chat.client.ChatClient;
+  import org.springframework.ai.chat.client.AdvisorParams;
 ```
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-text: "import org.springframework.ai.chat.client.ChatClient;"
+text: ".defaultSystem(systemPrompt)"
 before: 0
 after: 0
-hidden: true
 cascade: true
+hidden: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
 hidden: true
-text: |
-  import org.springframework.ai.chat.client.ChatClient;
-  import org.springframework.ai.chat.client.AdvisorParams;
+text: |2
+                  .defaultSystem(systemPrompt)
+                  .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
 ```
 
 Note that `AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT` is not an advisor. It is a `Consumer<ChatClient.AdvisorSpec>` that sets an advisor parameter which switches native output on.

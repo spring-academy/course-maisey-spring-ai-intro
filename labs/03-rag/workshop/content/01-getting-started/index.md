@@ -52,9 +52,20 @@ As already mentioned, this lab uses the in-memory `SimpleVectorStore`. This stor
 
 ```editor:insert-lines-before-line
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+line: 3
 description: Add the SimpleVectorStore bean
 cascade: true
-line: 29
+text: |-
+  import org.springframework.ai.embedding.EmbeddingModel;
+  import org.springframework.ai.vectorstore.SimpleVectorStore;
+  import org.springframework.ai.vectorstore.VectorStore;
+  import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+```
+
+```editor:insert-lines-before-line
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+line: 33
+hidden: true
 text: |2
 
       @ConditionalOnMissingBean(VectorStore.class)
@@ -62,17 +73,6 @@ text: |2
       VectorStore simpleVectorStore(EmbeddingModel embeddingModel) {
           return SimpleVectorStore.builder(embeddingModel).build();
       }
-```
-
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-line: 3
-hidden: true
-text: |-
-  import org.springframework.ai.embedding.EmbeddingModel;
-  import org.springframework.ai.vectorstore.SimpleVectorStore;
-  import org.springframework.ai.vectorstore.VectorStore;
-  import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 ```
 
 `@ConditionalOnMissingBean` makes this bean drop out the moment a real `VectorStore` shows up. For example, if you added the `spring-ai-starter-vector-store-pgvector` starter, its auto-configured PostgreSQL-backed store would take over. Note the `EmbeddingModel` parameter, the store uses it to turn documents into vectors.

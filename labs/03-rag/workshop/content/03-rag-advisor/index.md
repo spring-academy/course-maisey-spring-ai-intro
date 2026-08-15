@@ -45,18 +45,28 @@ text: |2
 ```
 
 Configure and add the QuestionAnswerAdvisor to the ChatClient interaction:
+```editor:insert-lines-before-line
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+line: 3
+description: Configure and add the QuestionAnswerAdvisor
+cascade: true
+text: |-
+  import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+  import org.springframework.ai.vectorstore.SearchRequest;
+  import org.springframework.ai.vectorstore.VectorStore;
+```
+
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "SupportResponse generateResponse(String query, String conversationId) {"
 before: 0
 after: 8
 cascade: true
-description: Configure and add the QuestionAnswerAdvisor 
+hidden: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
       SupportResponse generateResponse(String query, String conversationId) {
@@ -74,16 +84,6 @@ text: |2
                   .call()
                   .entity(SupportResponse.class);
       }
-```
-
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-line: 3
-hidden: true
-text: |-
-  import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
-  import org.springframework.ai.vectorstore.SearchRequest;
-  import org.springframework.ai.vectorstore.VectorStore;
 ```
 
 The `SearchRequest` defines the retrieval. The top 4 most similar chunks, and only if they pass a 0.4 cosine-similarity threshold.
@@ -135,13 +135,24 @@ text: |
 The key change is the closing line: "based on the context **if possible**". That gives the model permission to fall back to general knowledge when retrieval comes up empty, while still preferring the context when it has relevant material.
 
 Inject the resource into the service and pass it to the advisor as a `PromptTemplate`:
+```editor:insert-lines-before-line
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+line: 3
+description: Use the custom RAG prompt
+cascade: true
+text: |-
+  import org.springframework.ai.chat.prompt.PromptTemplate;
+  import org.springframework.beans.factory.annotation.Value;
+  import org.springframework.core.io.Resource;
+```
+
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "private final VectorStore vectorStore;"
 before: 0
 after: 0
-description: Use the custom RAG prompt
 cascade: true
+hidden: true
 ```
 
 ```editor:replace-text-selection
@@ -166,7 +177,6 @@ hidden: true
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
       SupportResponse generateResponse(String query, String conversationId) {
@@ -186,16 +196,6 @@ text: |2
                   .call()
                   .entity(SupportResponse.class);
       }
-```
-
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-line: 3
-hidden: true
-text: |-
-  import org.springframework.ai.chat.prompt.PromptTemplate;
-  import org.springframework.beans.factory.annotation.Value;
-  import org.springframework.core.io.Resource;
 ```
 
 Re-run both queries:

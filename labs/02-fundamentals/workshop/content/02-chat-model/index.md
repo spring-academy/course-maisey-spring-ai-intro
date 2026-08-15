@@ -73,32 +73,32 @@ You should get back a plain-text answer. From here on you only change `generateR
 ## Add a System Message
 
 A raw `String` hides the message roles. Under the hood, a `Prompt` holds an ordered list of `Message` objects, each with a role. The **system** role shapes the model's tone and scope. The **user** role carries the question. Now steer the model with a `SystemMessage`, using the multi-message overload.
+```editor:insert-lines-before-line
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+line: 4
+description: Add a system message
+cascade: true
+text: |-
+  import org.springframework.ai.chat.messages.SystemMessage;
+  import org.springframework.ai.chat.messages.UserMessage;
+```
+
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "return chatModel.call(query);"
 before: 0
 after: 0
-description: Add a system message
 cascade: true
+hidden: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
           return chatModel.call(
                   new SystemMessage("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs."),
                   new UserMessage(query));
-```
-
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-line: 4
-hidden: true
-text: |-
-  import org.springframework.ai.chat.messages.SystemMessage;
-  import org.springframework.ai.chat.messages.UserMessage;
 ```
 
 The answers now reflect the expert persona:
@@ -110,18 +110,27 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 In real apps the user message is rarely a raw string. It is usually a template filled with runtime data. `PromptTemplate` lets you write a message with `{placeholder}` variables and fill them in at call time, so the wording stays in one place.
 
+```editor:insert-lines-before-line
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+line: 4
+description: Apply templated user message
+cascade: true
+text: |-
+  import org.springframework.ai.chat.prompt.PromptTemplate;
+  import java.util.Map;
+```
+
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "return chatModel.call("
 before: 0
 after: 2
-description: Apply templated user message
 cascade: true
+hidden: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
           var userPromptTemplate = PromptTemplate.builder()
@@ -131,15 +140,6 @@ text: |2
           var userMessage = userPromptTemplate.createMessage();
 
           return chatModel.call(new SystemMessage("You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs."), userMessage);
-```
-
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-line: 4
-hidden: true
-text: |-
-  import org.springframework.ai.chat.prompt.PromptTemplate;
-  import java.util.Map;
 ```
 
 Verify the change took effect by calling the service:
@@ -153,13 +153,26 @@ Sometimes you need to override the model or the sampling for a single call, or y
 
 > **Note:** Since Spring AI 2.0, the low-level `ChatModel` API requires provider-specific options. Use the provider's builder such as `OpenAiChatOptions.builder()` instead of the portable `ChatOptions.builder()`. 
 
+```editor:insert-lines-before-line
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+line: 4
+description: Add full Prompt with ChatOptions and ChatResponse
+cascade: true
+text: |-
+  import org.slf4j.Logger;
+  import org.slf4j.LoggerFactory;
+  import org.springframework.ai.openai.OpenAiChatOptions;
+  import org.springframework.ai.chat.prompt.Prompt;
+  import java.util.List;
+```
+
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "private final ChatModel chatModel;"
 before: 0
 after: 0
-description: Add full Prompt with ChatOptions and ChatResponse
 cascade: true
+hidden: true
 ```
 
 ```editor:replace-text-selection
@@ -183,7 +196,6 @@ hidden: true
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-cascade: true
 hidden: true
 text: |2
           var prompt = new Prompt(
@@ -193,18 +205,6 @@ text: |2
           var chatResponse = chatModel.call(prompt);
           log.info("Chat Response: {}", chatResponse);
           return chatResponse.getResult().getOutput().getText();
-```
-
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
-line: 4
-hidden: true
-text: |-
-  import org.slf4j.Logger;
-  import org.slf4j.LoggerFactory;
-  import org.springframework.ai.openai.OpenAiChatOptions;
-  import org.springframework.ai.chat.prompt.Prompt;
-  import java.util.List;
 ```
 
 Verify the change took effect by calling the service:

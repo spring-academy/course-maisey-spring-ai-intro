@@ -142,7 +142,7 @@ Logging a request and response is such a common need that Spring AI already ship
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-text: ".defaultAdvisors(new LoggingAdvisor())"
+text: "import org.springframework.ai.chat.client.ChatClient;"
 before: 0
 after: 0
 description: Use the built-in SimpleLoggerAdvisor
@@ -153,13 +153,15 @@ cascade: true
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
 cascade: true
 hidden: true
-text: |2
-                  .defaultAdvisors(new SimpleLoggerAdvisor(Ordered.LOWEST_PRECEDENCE))
+text: |
+  import org.springframework.ai.chat.client.ChatClient;
+  import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+  import org.springframework.core.Ordered;
 ```
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-text: "import org.springframework.ai.chat.client.ChatClient;"
+text: ".defaultAdvisors(new LoggingAdvisor())"
 before: 0
 after: 0
 cascade: true
@@ -169,10 +171,8 @@ hidden: true
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
 hidden: true
-text: |
-  import org.springframework.ai.chat.client.ChatClient;
-  import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-  import org.springframework.core.Ordered;
+text: |2
+                  .defaultAdvisors(new SimpleLoggerAdvisor(Ordered.LOWEST_PRECEDENCE))
 ```
 
 The `SimpleLoggerAdvisor` logs at `DEBUG` level, so it stays quiet in production by default. Turn on `DEBUG` for the advisor package so you can see its output:

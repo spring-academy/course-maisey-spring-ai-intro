@@ -81,19 +81,26 @@ At startup the auto-configuration walks through every available `ToolCallback`, 
 ## Add the ToolSearchToolCallingAdvisor to the ChatClient
 
 Register the advisor as a default on the `ChatClient` bean so every call goes through it. Update the `chatClient` factory method in `SupportAssistantConfiguration.java`.
+```editor:insert-lines-before-line
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
+line: 3
+text: import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
+description: Add the Tool Search advisor to the ChatClient
+cascade: true
+```
+
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
 text: "public ChatClient chatClient(ChatClient.Builder builder,"
-description: "Add the Tool Search advisor to the ChatClient"
 before: 1
 after: 12
 cascade: true
+hidden: true
 ```
 
 ```editor:replace-text-selection
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
 hidden: true
-cascade: true
 text: |2
       @Bean
       public ChatClient chatClient(ChatClient.Builder builder,
@@ -116,13 +123,6 @@ text: |2
                   .defaultTools(tools)
                   .build();
       }
-```
-
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-hidden: true
-line: 3
-text: import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
 ```
 
 Here is what changed, one piece at a time.
