@@ -2,11 +2,11 @@
 title: The Low-Level ChatModel API
 ---
 
-`ChatModel` is the foundational interface that every chat provider implements (`OpenAiChatModel`, `AnthropicChatModel`, `OllamaChatModel`, ...). Thanks to the starter's auto-configuration, it is already available as a Spring bean. Now use it.
+The starter already put a `ChatModel` bean in your application context, so you can inject it and send your first request. In this step you build up a call to that bean piece by piece, from a plain string to a full `Prompt` with options.
 
 ## Create the Service
 
-Create a service that passes the user's query to the model. `call(String)` is the convenient overload. Spring AI wraps the string in a `Prompt` for you and unwraps the response back to a `String`.
+Create a service that passes the user's query to the model with the `call(String)` overload.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
@@ -72,7 +72,7 @@ You should get back a plain-text answer. From here on you only change `generateR
 
 ## Add a System Message
 
-A raw `String` hides the message roles. Under the hood, a `Prompt` holds an ordered list of `Message` objects, each with a role. The **system** role shapes the model's tone and scope. The **user** role carries the question. Now steer the model with a `SystemMessage`, using the multi-message overload.
+A plain string is always a user message. To give the assistant a persona, send a `SystemMessage` next to the `UserMessage` with the multi-message overload.
 ```editor:insert-lines-before-line
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 line: 4
@@ -108,7 +108,7 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 ## Use a PromptTemplate for the User Message
 
-In real apps the user message is rarely a raw string. It is usually a template filled with runtime data. `PromptTemplate` lets you write a message with `{placeholder}` variables and fill them in at call time, so the wording stays in one place.
+The question of the user is only one part of the message you send. Build the rest of it with a `PromptTemplate`, which fills the `{question}` placeholder at call time.
 
 ```editor:insert-lines-before-line
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
@@ -149,9 +149,7 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 ## Full Prompt with ChatOptions and ChatResponse
 
-Sometimes you need to override the model or the sampling for a single call, or you want the metadata that comes back with the answer. For that, wrap the messages in a `Prompt` together with `ChatOptions`, and read the full `ChatResponse`.
-
-> **Note:** Since Spring AI 2.0, the low-level `ChatModel` API requires provider-specific options. Use the provider's builder such as `OpenAiChatOptions.builder()` instead of the portable `ChatOptions.builder()`. 
+To override the model for this one call and to see what comes back besides the text, wrap the messages in a `Prompt` together with `ChatOptions` and read the full `ChatResponse`. Remember that the low-level API needs the options builder of the provider, so the code uses `OpenAiChatOptions.builder()`.
 
 ```editor:insert-lines-before-line
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
@@ -212,4 +210,4 @@ Verify the change took effect by calling the service:
 curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
 ```
 
-The application logs in the second terminal now include the full `ChatResponse`, with metadata such as the model that served the request and the token usage. Providers bill per token, so `chatResponse.getMetadata().getUsage()` is the foundation for cost monitoring.
+The application logs in the second terminal now show the full `ChatResponse`. Look for the model that served the request and for the token counts under `usage`, which you would use for cost monitoring.

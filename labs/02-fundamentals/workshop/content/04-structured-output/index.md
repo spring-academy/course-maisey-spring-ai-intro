@@ -2,13 +2,13 @@
 title: Structured Output
 ---
 
-The model only ever returns text. To get reliable, structured data out of it, you need to get two things right, how you ask and how you read the answer. First you do both by hand. Then you let Spring AI take over.
+Your endpoint still answers with plain text. In this step you first ask for JSON with a few-shot prompt of your own, and then hand the same job to Spring AI so you get a Java object back.
 
 ## Prompt Engineering and Few-Shot Prompting
 
-Prompt engineering is the practice of shaping the prompt so the model returns what you need. One of the most effective techniques is few-shot prompting, where you show the model a few examples of the exact output you want and it follows the pattern.
+Write the format rules and two examples into the system prompt and send the question as the user message.
 
-Now you make the model return JSON yourself. You write the format rules and two examples in the system prompt, and you send the question as the user message. The prompt has `{` and `}` characters in it. Spring AI normally reads `{...}` as a template variable, so you use the plain `.system(String)` method. This way the braces stay as normal text. Update `generateResponse`.
+The prompt contains `{` and `}` characters. Spring AI normally reads `{...}` as a template variable, so this step uses the plain `.system(String)` method, which leaves the braces as normal text. Update `generateResponse`.
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
@@ -47,13 +47,11 @@ Call the endpoint with a general question:
 curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
 ```
 
-The model replies with JSON, even though the method still returns a plain `String`. The few-shot examples did the steering.
+The model replies with JSON, even though the method still returns a plain `String`. The examples did the steering, and the parsing is still your job.
 
-This works, but it is brittle. The result is text you still have to parse yourself, the model can drift from the format on harder questions, and you carry the example prompt around by hand. Spring AI can do all of this for you, both the prompting and the parsing, returning a real Java object.
+## Let Spring AI Do the Work
 
-## Let Spring AI Do the Work  
-
-Instead of free-form text, ask the model to return a Java type and let Spring AI handle both the prompting and the deserialization. Behind the scenes, Spring AI instructs the model to respond in a matching schema and deserializes the result for you.
+Now ask for a Java type instead. You define the type first and then return it from the service.
 
 ### Define the Response Type
 
@@ -73,7 +71,7 @@ text: |
   }
 ```
 
-Then a record for the structured answer. The `@JsonPropertyDescription` annotations are passed to the model as part of the generated schema, guiding what each field should contain:
+Then a record for the structured answer. Spring AI passes the `@JsonPropertyDescription` annotations to the model as part of the generated schema, so they tell it what belongs in each field.
 
 ```editor:append-lines-to-file
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportResponse.java
@@ -145,9 +143,9 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 ### Enable Native Structured Output
 
-The `.entity(...)` call so far is **prompt-based**. Spring AI adds the format instructions to the prompt and trusts the model to follow them. Many providers, OpenAI among them, can do better and enforce the shape at the API level, a feature called **native structured output**. You turn it on once on the `ChatClient` bean, and every `.entity(...)` call then uses it.
+Your `.entity(...)` call is still prompt based, and **native structured output** is off by default. The model behind this lab supports it, so switch it on once on the `ChatClient` bean and every `.entity(...)` call uses it from then on.
 
-Update the bean in `SupportAssistantConfiguration`:
+Update the bean in `SupportAssistantConfiguration`.
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java

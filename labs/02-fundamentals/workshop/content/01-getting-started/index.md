@@ -30,7 +30,7 @@ curl https://start.spring.io/starter.zip \
   -o sample-app.zip
 ```
 
-This workshop uses an **OpenAI compatible mock API**, but Spring AI ships a starter for every common provider. Swapping `spring-ai-openai` for `spring-ai-anthropic`, `spring-ai-ollama`, or `spring-ai-bedrock-converse` would pull the matching starter instead.
+This workshop talks to an **OpenAI compatible mock API**, so the project asks for the OpenAI starter. Another provider would only change that one dependency.
 
 Now look at what the starter added to the project. First the provider-specific dependency.
 
@@ -39,20 +39,16 @@ file: ~/sample-app/pom.xml
 text: "spring-ai-starter-model-openai"
 ```
 
-Next the Spring AI BOM (Bill of Materials), which makes sure all Spring AI artifacts resolve to consistent and compatible versions.
+Next the Spring AI BOM.
 
 ```editor:select-matching-text
 file: ~/sample-app/pom.xml
 text: "spring-ai-bom"
 ```
 
-The starter pulls in the provider implementation together with the Spring Boot auto-configuration. That auto-configuration wires up a `ChatModel` and a `ChatClient.Builder` bean for you.
+The auto-configuration that comes with the starter wires up a `ChatModel` and a `ChatClient.Builder` bean for you, which is all you need to start.
 
 ## Configure Spring AI
-
-Spring AI configuration is fully declarative. Each provider has its own property namespace for the API key, base URL, default model, sampling options, and so on.
-
-The shape is the same everywhere. For example Anthropic uses `spring.ai.anthropic.api-key` and `spring.ai.anthropic.chat.model`, while a local Ollama needs no API key at all and only wants `spring.ai.ollama.chat.model`.
 
 Have a look at the existing `application.properties`.
 
@@ -88,8 +84,6 @@ text: |
   spring.ai.openai.chat.model=gpt-5.4-mini
   spring.ai.openai.chat.temperature=0.7
 ```
-
-Because the API key, model, and other options live outside the code, you can tune behavior or switch models without changing any code.
 
 The `base-url` points the OpenAI client at the local mock API instead of `https://api.openai.com`. The starter still requires an `api-key`, so `mock-api-key` is just a placeholder that the mock accepts.
 

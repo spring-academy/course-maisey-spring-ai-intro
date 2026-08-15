@@ -2,7 +2,7 @@
 title: The Fluent ChatClient API
 ---
 
-`ChatModel` works, but everyday code reads better with the fluent `ChatClient`. It wraps a `ChatModel`, lets you compose a prompt, invoke the model, and shape the response in a single readable chain.
+Now rewrite the same service with the fluent `ChatClient` and see how much of the code above it replaces. Along the way you move the system prompt out of the service and into a file.
 
 ## Switch to ChatClient
 
@@ -112,9 +112,7 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 ## Add a Streaming Endpoint
 
-Models generate text token by token. Swap `.call()` for `.stream()` to get a reactive `Flux<String>` and stream tokens to the client as soon as they arrive. This is what powers the "typewriter" effect in chatbots.
-
-To keep this focused, you add the whole streaming call as a throwaway endpoint directly in the controller, and remove it again at the end of this section. The rest of the lab stays on the blocking `.call()`. 
+The same chain streams when you swap `.call()` for `.stream()`. To keep this short you add the streaming call as a throwaway endpoint directly in the controller and remove it again at the end of this section. The rest of the lab stays on the blocking `.call()`.
 
 Inject the `ChatClient` into the controller so the streaming method can use it directly.
 
@@ -320,7 +318,7 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 ## Move the System Prompt to a Default
 
-Repeating the system prompt on every call is duplication. Put it on the `ChatClient` bean as a default, and every call through that client picks it up automatically. A per-call `.system(...)` would still win if you ever need to override.
+Repeating the system prompt on every call is duplication. Move it to the `ChatClient` bean as a default instead, where every call through that client picks it up.
 
 Update the bean in `SupportAssistantConfiguration`:
 
@@ -438,7 +436,7 @@ curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me abou
 
 ## Access the Full Response
 
-`.content()` is a shortcut for the text. When you also want metadata (token counts for billing, finish reason, model id, ...), ask for the full `ChatResponse` instead:
+Ask for the full `ChatResponse` instead of `.content()` to get the metadata of the call back as well.
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
