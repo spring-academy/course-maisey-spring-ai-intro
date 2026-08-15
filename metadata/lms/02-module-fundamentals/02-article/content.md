@@ -310,7 +310,7 @@ SupportResponse answer = chatClient.prompt()
         .useProviderStructuredOutput());
 ```
 
-The second way uses directly the Advisors API, which the structured output support of Spring AI is built on and which the next section covers in detail. You can configure it as a default on the `ChatClient` bean, or attach it to a single request.
+The second way uses directly the Advisors API, which the structured output support of Spring AI is built on and which a later section of this module covers in detail. You can configure it as a default on the `ChatClient` bean, or attach it to a single request.
 
 ```java
 ChatClient chatClient(ChatClient.Builder builder) {

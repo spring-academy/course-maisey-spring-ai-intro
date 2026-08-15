@@ -1,0 +1,10 @@
+pathways:
+  default: workshop
+
+  paths:
+    workshop:
+      title: "Spring AI - Advisors"
+
+      steps:
+      - 01-advisors
+      - 02-chat-memory

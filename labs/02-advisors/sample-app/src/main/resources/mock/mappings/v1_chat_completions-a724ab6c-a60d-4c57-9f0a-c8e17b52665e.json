@@ -1,0 +1,50 @@
+{
+  "id" : "a724ab6c-a60d-4c57-9f0a-c8e17b52665e",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}]}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-EBd4c5aYG1hspuK5KA4wUPXHqbwvt\",\n  \"object\": \"chat.completion\",\n  \"created\": 1786440514,\n  \"model\": \"gpt-5.4-mini-2026-03-17\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"Spring AI is Spring’s project for building AI-powered applications with the familiar Spring programming model. It provides abstractions and auto-configuration for working with:\\n\\n- **Chat models / LLMs** for text generation\\n- **Embeddings** for semantic search and retrieval\\n- **Vector stores** for retrieval-augmented generation (RAG)\\n- **Prompt templates** and structured output\\n- **Tool/function calling** and AI workflows\\n\\nIt aims to make it easier to switch between AI providers while keeping your application code consistent and Spring-like.\\n\\nA few common use cases:\\n- Chatbots and assistants\\n- Document Q&A with RAG\\n- Semantic search\\n- Content generation and summarization\\n- Agent-style integrations with external tools\\n\\nOfficial docs:\\n- Spring AI reference documentation: https://docs.spring.io/spring-ai/reference/\\n\\nIf you want, I can also give you:\\n1. a quick-start example,\\n2. the main Spring AI modules, or\\n3. how Spring AI compares to LangChain-style frameworks.\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 46,\n    \"completion_tokens\": 209,\n    \"total_tokens\": 255,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "14ms",
+      "set-cookie" : "__cf_bm=BpPLWglL9FgBI2nRI85g92NLkNXATmybL2io79e7PJM-1786440514.5017476-1.0.1.1-sfw5LUehs857HWORgHcm9MGzgZaRSP9ktk4LMKwNRHLnK1QSGbRfUTcteJfbTMCXaBjC7BlGS7Xt6XsooCthZH0DnA0SFaMFY4kgXIcHICFQ4iCLsIoOaZo6CWXuNjIh; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Tue, 11 Aug 2026 09:58:36 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_7bce200d90d04a0d972955ccc9f1ca1b",
+      "x-ratelimit-limit-tokens" : "200000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a29635ffae4de0d7-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "199951",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Tue, 11 Aug 2026 09:28:36 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "1750",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "a724ab6c-a60d-4c57-9f0a-c8e17b52665e",
+  "persistent" : true,
+  "insertionIndex" : 94
+}

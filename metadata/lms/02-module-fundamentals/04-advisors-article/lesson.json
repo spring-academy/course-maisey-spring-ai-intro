@@ -1,0 +1,12 @@
+{
+    "id": "spring-maisey-fundamentals-module-advisors-article",
+    "slug": "spring-ai-advisors-article",
+    "title": "Spring AI Fundamentals: The Advisors API",
+    "status": "live",
+    "type": "article",
+    "duration": 900,
+    "order": 4,
+    "settings": {
+        "manualCompletion": true
+    }
+}

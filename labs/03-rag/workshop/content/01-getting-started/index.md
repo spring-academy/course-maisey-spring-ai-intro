@@ -4,7 +4,7 @@ title: Getting Started
 
 In this lab, you'll add **Retrieval Augmented Generation (RAG)** to the support assistant: index a small Markdown knowledge base, retrieve the most relevant chunks per query, and have the model answer grounded in them.
 
-Your starting point in `~/sample-app` is the assistant from the **Spring AI fundamentals** lab, a `ChatClient` with a default system prompt and a `/api/v1/chat` endpoint returning a structured `SupportResponse` record.
+Your starting point in `~/sample-app` is the assistant from the **advisors** lab, a `ChatClient` with a default system prompt, a logging and a memory advisor, and a `/api/v1/chat` endpoint returning a structured `SupportResponse` record.
 
 {{< note >}}
 Every call to OpenAI in this lab is mocked. The application sends its requests to a local mock server that returns predefined responses, so you do not need a real API key. The application code stays exactly the same as it would be against the real OpenAI service.

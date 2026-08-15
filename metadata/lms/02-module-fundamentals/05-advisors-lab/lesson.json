@@ -1,0 +1,14 @@
+{
+    "id": "spring-maisey-fundamentals-module-advisors-lab",
+    "slug": "spring-ai-advisors-lab",
+    "title": "Lab - Spring AI Fundamentals: The Advisors API",
+    "status": "live",
+    "type": "lab",
+    "entitlements": ["auth"],
+    "duration": 900,
+    "order": 5,
+    "settings": {
+        "educates": "spring-maisey-advisors",
+        "manualCompletion": true
+    }
+}

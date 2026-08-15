@@ -1,0 +1,3 @@
+You built a support assistant with Spring AI, starting from an empty project and ending with a chat endpoint that returns structured data. You first talked to the model through the low level `ChatModel` API, then moved to the fluent `ChatClient`, streamed a response, moved the system prompt into a default on the client bean and from there into a file, and finally let Spring AI turn the answer of the model into a `SupportResponse` record instead of plain text.
+
+In the next section you learn about the **Advisors** API, the mechanism Spring AI uses to add cross-cutting behavior around every call, including the structured output parsing you just used.
