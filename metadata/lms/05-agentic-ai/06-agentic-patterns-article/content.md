@@ -1,6 +1,6 @@
 The patterns from the previous section are just shapes you build with the `ChatClient`, the structured output, and the advisors you already know.
 
-Spring AI is not at the same stage with all of them. Some patterns are already provided out of the box, and this article walks through those in detail. The remaining ones exist as experimental implementations and are planned to become generally available in future releases. For those, the article shows what each one provides and how you would use it in code, but treat the samples as a first impression rather than as a stable API, because they will probably still change.
+Spring AI is continuously evolving. Some patterns are already provided out of the box, and this article walks through those in detail. The remaining ones exist as experimental implementations and are planned to become generally available in future releases. For those, the article shows what each one provides and how you would use it in code, but treat the samples as a first impression rather than as a stable API, because they will probably still change.
 
 ## Giving an Agent Hundreds of Tools With Tool Search
 
