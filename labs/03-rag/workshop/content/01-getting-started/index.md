@@ -6,18 +6,13 @@ In this lab, you'll add **Retrieval Augmented Generation (RAG)** to the support 
 
 Your starting point in `~/sample-app` is the assistant from the **advisors** lab, a `ChatClient` with a default system prompt, a logging and a memory advisor, and a `/api/v1/chat` endpoint returning a structured `SupportResponse` record.
 
-{{< note >}}
-Every call to OpenAI in this lab is mocked. The application sends its requests to a local mock server that returns predefined responses, so you do not need a real API key. The application code stays exactly the same as it would be against the real OpenAI service.
-{{< /note >}}
-
 ## Add the RAG Dependencies
 
 To keep things simple, this lab uses an in-memory vector store. For production you would normally use an external service instead, which needs an extra dependency such as `spring-ai-starter-vector-store-pgvector`. Embedding models can also need their own dependency depending on the provider. For example `spring-ai-starter-model-bedrock-converse` covers chat but does **not** ship an embedding model, so on AWS Bedrock you would add the broader `spring-ai-starter-model-bedrock` starter next to it. Some providers such as Anthropic do not offer an embedding model at all, so there you would use a different provider for the embeddings.
 
-Two additional Spring AI modules are needed.
-
-- `spring-ai-vector-store-advisor` connects the vector store to the chat pipeline. Before the model is called it searches the store for the content that is most relevant to the user question and adds that content to the prompt, so the answer is grounded in your own data.
-- `spring-ai-markdown-document-reader` reads Markdown files and splits them into smaller pieces of text that can be stored in the vector store.
+Two additional Spring AI modules are needed for this lab:
+- `spring-ai-vector-store-advisor` contains the advisors that work with a `VectorStore`, the `QuestionAnswerAdvisor` and the `VectorStoreChatMemoryAdvisor`.
+- `spring-ai-markdown-document-reader` provides the `DocumentReader` implementation for Markdown documents. Other formats have their own module, such as `spring-ai-tika-document-reader` for PDF files.
 
 ```editor:insert-lines-before-line
 file: ~/sample-app/pom.xml

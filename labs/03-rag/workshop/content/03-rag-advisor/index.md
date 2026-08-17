@@ -7,13 +7,21 @@ Spring AI's `QuestionAnswerAdvisor` plugs retrieval into the existing `ChatClien
 ## Add the QuestionAnswerAdvisor
 
 Inject the `VectorStore` into `SupportAssistantService`:
+```editor:insert-lines-before-line
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
+line: 3
+description: Inject the `VectorStore`
+cascade: true
+text: |-
+  import org.springframework.ai.vectorstore.VectorStore;
+```
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantService.java
 text: "private final ChatClient chatClient;"
 before: 0
 after: 0
-description: Inject the `VectorStore`
 cascade: true
+hidden: true
 ```
 
 ```editor:replace-text-selection
@@ -53,7 +61,6 @@ cascade: true
 text: |-
   import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
   import org.springframework.ai.vectorstore.SearchRequest;
-  import org.springframework.ai.vectorstore.VectorStore;
 ```
 
 ```editor:select-matching-text

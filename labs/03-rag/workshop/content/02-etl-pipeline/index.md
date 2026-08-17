@@ -81,29 +81,68 @@ text: |
   }
 ```
 
-The three Spring AI building blocks involved:
+The three stages of the pipeline are three Spring AI building blocks. 
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/KnowledgeBaseIndexer.java
+text: "var documentReaderConfig = MarkdownDocumentReaderConfig.builder()"
+before: 0
+after: 6
+description: MarkdownDocumentReader
+```
 
-- **`MarkdownDocumentReader`** — *extracts* the `Document` objects from the Markdown files.
-- **`TokenTextSplitter`** — *transforms* each document into smaller chunks sized for the embedding model.
-- **`VectorStore.add(...)`** — embeds and *loads* them. The embedding model you configured in the previous step is invoked here.
+**Extract.** The `MarkdownDocumentReader` reads the Markdown files and returns them as `Document` objects. How you extract and split your data matters for more than the embedding step, because these chunks are the exact text the chat model later receives as context. 
 
-How you extract and split your data matters for more than just the embedding step. The chunks that come out of this pipeline are the exact text the chat model later receives as context, so cleaner and better sized chunks lead to better answers. Expect to come back and tweak this step once you see how your data behaves in real queries.
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/KnowledgeBaseIndexer.java
+text: ".withHorizontalRuleCreateDocument(true)"
+before: 0
+after: 0
+description: withHorizontalRuleCreateDocument(true)
+```
 
-The reader and the splitter are tuned for the knowledge base through their configurations.
+This starts a new `Document` at every horizontal rule, so you get one document per section instead of one large document per file. 
 
-`MarkdownDocumentReaderConfig` controls how a Markdown file becomes documents:
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/KnowledgeBaseIndexer.java
+text: ".withIncludeBlockquote(true)"
+before: 0
+after: 1
+description: withIncludeBlockquote(true) and withIncludeCodeBlock(true)
+```
 
-- **`withHorizontalRuleCreateDocument(true)`** starts a new `Document` at every horizontal rule (`---`). Look at [tanzu-spring.md](~/sample-app/src/main/resources/knowledge-base/tanzu-spring.md) and you see each top level section is separated by a `---`. So instead of one large document per file you get one document per section, which keeps related content together and cuts across topics only at natural boundaries.
-- **`withIncludeCodeBlock(true)`** keeps the content of fenced code blocks in the documents.
-- **`withIncludeBlockquote(true)`** keeps the content of blockquotes in the documents. Both are excluded by default, so turning them on makes sure no part of the source text is dropped before embedding.
+Blockquotes and fenced code blocks are dropped by default. Turning both on makes sure no part of the source text is lost before embedding.
 
-`TokenTextSplitter` then caps the size of each section:
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/KnowledgeBaseIndexer.java
+text: "var tokenTextSplitter = TokenTextSplitter.builder()"
+before: 0
+after: 3
+description: TokenTextSplitter
+```
 
-- **`withMinChunkLengthToEmbed(25)`** skips chunks shorter than 25 characters. Tiny fragments such as a lone heading carry little meaning, so this avoids embedding and storing noise.
+**Transform.** The `TokenTextSplitter` cuts each document into chunks that fit the embedding model. With `withMinChunkLengthToEmbed(25)` it skips chunks shorter than 25 characters, because a tiny fragment such as a lone heading carries little meaning and would only add noise to the store.
 
-The **`@EventListener(ApplicationReadyEvent.class)`** annotation tells Spring to call the `index()` method automatically once the application has fully started. Spring publishes an `ApplicationReadyEvent` when the context is ready to serve requests, so the pipeline runs a single time at startup and populates the vector store before any user query arrives.
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/KnowledgeBaseIndexer.java
+text: "vectorStore.add(splitDocuments);"
+before: 0
+after: 0
+description: vectorStore.add(splitDocuments)
+```
 
-Running the pipeline at startup is only for demonstration purposes. It re-reads and re-embeds every document on every restart, and it does not notice when a source document changes while the application is running. In a real system you keep the vector store up to date by indexing outside the application lifecycle. You trigger indexing when a document is added, changed, or removed, for example through a scheduled job that picks up new and modified files, a message on a queue, or a webhook from your content system. You also store an identifier and a version or checksum with each chunk so you can update or delete only the affected entries instead of rebuilding the whole store.
+**Load.** This one line embeds every chunk and stores it. The embedding model you configured in the previous step is called here.
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/KnowledgeBaseIndexer.java
+text: "@EventListener(ApplicationReadyEvent.class)"
+before: 0
+after: 1
+description: "@EventListener(ApplicationReadyEvent.class)"
+```
+
+Spring publishes an `ApplicationReadyEvent` when the context is ready to serve requests, so this annotation runs the pipeline once at startup and fills the vector store before the first user query arrives.
+
+Doing it at startup is fine for this lab, but not for a real system. It re-embeds every document on every restart and it never notices a document that changes while the application runs. In production you index outside the application lifecycle, triggered when a document is added, changed, or removed, for example by a scheduled job, a message on a queue, or a webhook from your content system. You also store an identifier and a version or checksum with each chunk, so you can update or delete only the affected entries instead of rebuilding the whole store.
 
 ## Watch the Logs
 

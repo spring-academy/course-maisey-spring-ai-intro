@@ -182,8 +182,6 @@ text: |2
                   .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
 ```
 
-Note that `AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT` is not an advisor. It is a `Consumer<ChatClient.AdvisorSpec>` that sets an advisor parameter which switches native output on.
-
 Rerun the `curl` to verify it still works:
 ```execute
 curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"

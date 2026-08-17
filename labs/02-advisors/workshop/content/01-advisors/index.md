@@ -51,13 +51,13 @@ text: |
   }
 ```
 
-Three things are worth a closer look. 
+Three things are worth a closer look.
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/LoggingAdvisor.java
 text: 'log.info("Request to model: {}", request.prompt().getContents());'
 before: 0
 after: 0
-description: The before step, which sees the request on the way in
+description: request.prompt()
 ```
 
 This is the *before* work. The `request.prompt()` gives you the full `Prompt` that is about to go to the model, so you can inspect it or even change it before the model sees it.
@@ -67,7 +67,7 @@ file: ~/sample-app/src/main/java/com/example/support_assistant/LoggingAdvisor.ja
 text: "ChatClientResponse response = chain.nextCall(request);"
 before: 0
 after: 0
-description: The call that hands the request to the rest of the chain
+description: chain.nextCall(request)
 ```
 
 This single call invokes the rest of the chain and, eventually, the model. Everything you write above it runs on the way in, and everything below it runs on the way out.
@@ -77,7 +77,7 @@ file: ~/sample-app/src/main/java/com/example/support_assistant/LoggingAdvisor.ja
 text: "public int getOrder() {"
 before: 0
 after: 2
-description: The order that decides the position in the chain
+description: getOrder()
 ```
 
 `getOrder()` decides where this advisor sits in the chain, where a lower value runs earlier on the way in. We return `Ordered.LOWEST_PRECEDENCE` so the logger runs last on the way in and logs the final request, after every other advisor has changed it.
@@ -162,6 +162,7 @@ The `SimpleLoggerAdvisor` logs at `DEBUG` level, so it stays quiet in production
 file: ~/sample-app/src/main/resources/application.properties
 description: Enable DEBUG logging for the advisor package
 text: |
+
   logging.level.org.springframework.ai.chat.client.advisor=DEBUG
 ```
 
