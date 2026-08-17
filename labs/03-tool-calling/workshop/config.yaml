@@ -7,5 +7,4 @@ pathways:
 
       steps:
       - 01-getting-started
-      - 02-ticket-persistence
-      - 03-tool-calling
+      - 02-tool-calling
