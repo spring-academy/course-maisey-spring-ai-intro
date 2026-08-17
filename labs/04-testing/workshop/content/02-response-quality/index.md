@@ -71,10 +71,26 @@ text: |
   }
 ```
 
-Two patterns to notice:
+Two patterns to notice.
+```editor:select-matching-text
+file: ~/sample-app/src/test/java/com/example/support_assistant/ChatResponseTest.java
+text: "assertThat(response)"
+before: 0
+after: 2
+description: "isNotNull().isNotBlank()"
+```
 
-- **`isNotNull().isNotBlank()`** Catches outright API failures and empty responses.
-- **`satisfiesAnyOf(...)`** The test passes as long as *at least one* of the expected concepts appears. Any decent answer to "Tell me about Spring AI" mentions at least one of spring / java / ai / abstraction, regardless of exact wording.
+The first test only checks that something came back. It catches outright API failures and empty responses.
+
+```editor:select-matching-text
+file: ~/sample-app/src/test/java/com/example/support_assistant/ChatResponseTest.java
+text: ".satisfiesAnyOf("
+before: 0
+after: 5
+description: "satisfiesAnyOf(...)"
+```
+
+The second test passes as long as *at least one* of the expected concepts appears. Any decent answer to "Tell me about Spring AI" mentions at least one of spring, java, ai, or abstraction, regardless of exact wording.
 
 ## Run It
 

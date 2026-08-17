@@ -71,12 +71,45 @@ text: |
 ```
 
 Here is what happens, step by step.
+```editor:select-matching-text
+file: ~/sample-app/src/test/java/com/example/support_assistant/RagEvaluationTest.java
+text: "var chatResponse = chatClient.prompt()"
+before: 0
+after: 5
+description: Run the RAG query
+```
 
-1. **Run the RAG query** with the same `ChatClient` and `QuestionAnswerAdvisor` your real service uses. Ask for `.chatResponse()` and not `.content()`, because you need the metadata.
-2. **Pull the retrieved documents** out of the response metadata under `QuestionAnswerAdvisor.RETRIEVED_DOCUMENTS`. These are the chunks the advisor fetched from the vector store before asking the model.
-3. **Build an `EvaluationRequest`** from the question, the retrieved context, and the generated answer.
-4. **Ask the `RelevancyEvaluator`** to judge. It is just another `ChatClient` call under the hood, using the same `ChatClient.Builder` you injected, with a built in prompt that asks "given this context, is this answer relevant?"
-5. **Assert the verdict**.
+The query runs with the same `ChatClient` and `QuestionAnswerAdvisor` your real service uses. Ask for `.chatResponse()` and not `.content()`, because you need the metadata.
+
+```editor:select-matching-text
+file: ~/sample-app/src/test/java/com/example/support_assistant/RagEvaluationTest.java
+text: "var evaluationRequest = new EvaluationRequest("
+before: 0
+after: 4
+description: Build an EvaluationRequest
+```
+
+The request is built from the question, the retrieved context, and the generated answer. The retrieved documents come out of the response metadata under `QuestionAnswerAdvisor.RETRIEVED_DOCUMENTS`. These are the chunks the advisor fetched from the vector store before asking the model.
+
+```editor:select-matching-text
+file: ~/sample-app/src/test/java/com/example/support_assistant/RagEvaluationTest.java
+text: "var evaluatorChatClientBuilder = chatClientBuilder.defaultOptions(ChatOptions.builder().model(\"gpt-5.4-nano\"));"
+before: 0
+after: 2
+description: Ask the RelevancyEvaluator to judge
+```
+
+The evaluator is just another `ChatClient` call under the hood, using the same `ChatClient.Builder` you injected, with a built in prompt that asks "given this context, is this answer relevant?"
+
+```editor:select-matching-text
+file: ~/sample-app/src/test/java/com/example/support_assistant/RagEvaluationTest.java
+text: "assertThat(evaluationResponse.isPass())"
+before: 0
+after: 2
+description: Assert the verdict
+```
+
+The test passes when the judge says the answer is grounded in the retrieved chunks.
 
 The `KnowledgeBaseIndexer` reindexes the Markdown knowledge base into the in-memory vector store on every application start, including the test's `@SpringBootTest` context, so the test always has fresh data. There is no extra setup.
 
