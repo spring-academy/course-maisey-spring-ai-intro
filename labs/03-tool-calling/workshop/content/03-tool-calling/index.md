@@ -54,9 +54,25 @@ text: |
 ```
 
 Two annotations do most of the work.
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportTicketService.java
+text: '@Tool(description = "Create a new support ticket.'
+before: 0
+after: 1
+description: '@Tool(description = "...")'
+```
 
-- **`@Tool(description = "...")`** explains what the tool does, written for the model to read. This is the most important text in the whole step. The model reads it to decide if it should call the tool, so say clearly when the tool should be used. In this example the model should call it when the user "explicitly requests to create, open, or file a support ticket".
-- **`@ToolParam(description = "...")`** explains each parameter. The model reads these to fill in the arguments correctly. Spring AI turns enum types into the choices the model can pick from.
+The description is written for the model, not for you, and it is the most important text in this step. The model reads it to decide whether to call the tool, so it says clearly that the user has to ask for a ticket. The name of the tool comes from the method name.
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/java/com/example/support_assistant/SupportTicketService.java
+text: '@ToolParam(description = "Brief summary of the issue (max 100 chars)") String summary,'
+before: 0
+after: 2
+description: '@ToolParam(description = "...")'
+```
+
+Each parameter gets its own description, which the model reads to fill in the arguments. For the two enum types Spring AI puts the possible values into the schema, so the model is instructed to only pick one of them.
 
 ## Register the Tools on the ChatClient
 
