@@ -6,34 +6,9 @@ In the article you met the **advisor**, an interceptor that wraps a `ChatClient`
 
 In this lab you add advisors to the support assistant. You first write your own logging advisor, then replace it with the built-in one, and finally add conversation memory so the assistant can follow up on what was said before.
 
-## Start the Support Assistant
-
-Your starting point in `~/sample-app` is the assistant from the previous lab, a `ChatClient` with a default system prompt and a `/api/v1/chat` endpoint that returns a structured `SupportResponse` record.
-
-{{< note >}}
-Every call to OpenAI in this lab is mocked. The application sends its requests to a local mock server that returns predefined responses, so you do not need a real API key. The application code stays exactly the same as it would be against the real OpenAI service.
-{{< /note >}}
-
-```terminal:execute
-command: cd ~/sample-app && ./mvnw spring-boot:run
-session: 2
-```
-
-{{< note >}}
-Wait for "Started SupportAssistantApplication" in the logs before you continue.
-{{< /note >}}
-
-Call the endpoint to confirm that everything works.
-
-```execute
-curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
-```
-
-You should get back a JSON object with a `category` and an `answer` field. Keep the app running in the second terminal. Spring Boot Developer Tools restarts it whenever the compiled classes change, so from here on each step is a small edit and a `curl`.
-
 ## Write a Custom Logging Advisor
 
-A blocking advisor implements the `CallAdvisor` interface. There is one method to fill in, `adviseCall`, plus a name and an order. Inside `adviseCall` you do your *before* work, call `chain.nextCall(request)` to pass control down the chain toward the model, and then do your *after* work with the response.
+A blocking advisor implements the `CallAdvisor` interface. There is one method to fill in, `adviseCall`, plus a name and an order.
 
 Create the advisor class:
 
@@ -76,8 +51,7 @@ text: |
   }
 ```
 
-Three things are worth a closer look. Click each line below to highlight it in the editor.
-
+Three things are worth a closer look. 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/java/com/example/support_assistant/LoggingAdvisor.java
 text: 'log.info("Request to model: {}", request.prompt().getContents());'
@@ -129,7 +103,14 @@ text: |2
                   .defaultAdvisors(new LoggingAdvisor())
 ```
 
-Call the endpoint again:
+
+Start the application and wait for "Started SupportAssistantApplication" in the logs before you continue.
+```terminal:execute
+command: cd ~/sample-app && ./mvnw spring-boot:run
+session: 2
+```
+
+Call the endpoint:
 ```execute
 curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=Tell me about Spring AI"
 ```
