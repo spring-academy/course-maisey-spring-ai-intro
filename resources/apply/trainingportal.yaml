@@ -76,4 +76,10 @@ spec:
       deadline: 60m
       overdue: 2m
       reserved: ${TRAINING_PORTAL_RESERVED}
+    - name: spring-maisey-complete
+      expires: 15m
+      orphaned: 10m
+      deadline: 15m
+      overdue: 2m
+      reserved: ${TRAINING_PORTAL_RESERVED}
 
