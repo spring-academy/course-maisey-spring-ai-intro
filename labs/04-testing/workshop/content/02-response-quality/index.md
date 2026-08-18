@@ -16,7 +16,6 @@ description: Create ChatResponseTest.java
 cascade: true
 ```
 
-~/sample-app/src/test/java/com/example/support_assistant
 ```editor:append-lines-to-file
 file: ~/sample-app/src/test/java/com/example/support_assistant/ChatResponseTest.java
 hidden: true

@@ -80,13 +80,13 @@ text: |
       ports:
         - "5556:8080"
       healthcheck:
-        test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"status\": \"UP\"' <&3"]
+        test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /realms/spring/protocol/openid-connect/certs HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"keys\"' <&3"]
         interval: 5s
         timeout: 5s
         retries: 30
 ```
 
-The health check matters more than it looks. Keycloak needs a few seconds before it answers, and Spring Boot waits for the container to report that it is healthy before it continues to start your application. Without the health check the MCP server would try to read the Keycloak configuration too early and fail.
+The health check matters more than it looks. It asks for the signing keys of the `spring` realm, so the container only reports healthy once Keycloak answers and the realm import has finished. Spring Boot waits for that before it continues to start your application. Without the health check the MCP server would try to read the Keycloak configuration too early and fail.
 
 Add the `spring-boot-docker-compose` dependency.
 
