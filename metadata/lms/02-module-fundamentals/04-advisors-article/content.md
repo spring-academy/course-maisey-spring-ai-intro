@@ -123,4 +123,4 @@ while (!matchesSchema(response) && attempt < maxAttempts) {
 }
 ```
 
-Spring AI ships two recursive advisors. The **`StructuredOutputValidationAdvisor`** is registered automatically when you call `validateSchema()`, and it validates the response and retries a few times when it does not match your type. The **`ToolCallingAdvisor`** runs the tool calling loop you will meet in the advanced patterns module.
+Spring AI ships two recursive advisors. The **`StructuredOutputValidationAdvisor`** validates the response and retries a few times when it does not match your type. You do not register it yourself. Just like native structured output, you switch it on in the `entity()` call with `spec -> spec.schemaValidation()`, and Spring AI adds the advisor to the chain for you. The **`ToolCallingAdvisor`** runs the tool calling loop you will meet in the advanced patterns module.

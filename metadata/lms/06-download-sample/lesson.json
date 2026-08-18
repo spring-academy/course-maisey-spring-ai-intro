@@ -1,7 +1,7 @@
 {
     "id": "spring-maisey-complete-lab",
     "slug": "spring-ai-complete-lab",
-    "title": "Download Support Assistant Sample Code",
+    "title": "Download Sample Code",
     "status": "live",
     "type": "lab",
     "entitlements": ["auth"],

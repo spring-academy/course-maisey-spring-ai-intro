@@ -3,7 +3,7 @@ pathways:
 
   paths:
     workshop:
-      title: "Download support assistant sample code"
+      title: "Download sample code"
 
       steps:
       - 01-download
