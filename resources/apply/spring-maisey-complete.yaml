@@ -12,7 +12,7 @@ spec:
     image: jdk21-environment:*
     files:
       - http:
-          url: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)/spring-maisey-tool-calling.tar.gz"
+          url: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)/spring-maisey-complete.tar.gz"
   request:
     parameters:
     - name: USER_DOMAIN
