@@ -1,0 +1,1 @@
+You now have the sample code on your own machine. Use it as a starting point for your own experiments. Swap the knowledge base for your documents, add your own tools, try a different model or provider, and see how the assistant behaves. From here it is a small step to your first own Spring AI application.

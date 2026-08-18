@@ -1,0 +1,9 @@
+pathways:
+  default: workshop
+
+  paths:
+    workshop:
+      title: "Download support assistant sample code"
+
+      steps:
+      - 01-download
