@@ -9,6 +9,6 @@
     "order": 6,
     "settings": {
         "educates": "spring-maisey-complete",
-        "manualCompletion": true
+        "manualCompletion": false
     }
 }
