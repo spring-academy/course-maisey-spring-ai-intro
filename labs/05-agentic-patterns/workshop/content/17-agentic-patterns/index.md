@@ -42,120 +42,57 @@ text: |2
 
   		<dependency>
   			<groupId>org.springframework.ai</groupId>
-  			<artifactId>spring-ai-tool-search-advisor</artifactId>
+  			<artifactId>spring-ai-starter-tool-search-advisor</artifactId>
   		</dependency>
 ```
 
-The dependency brings in the `ToolSearchToolCallingAdvisor`, the `ToolIndex` interface, and `VectorToolIndex`, the index implementation that searches by meaning.
+The starter brings the `ToolSearchToolCallingAdvisor` together with its auto configuration, plus the `ToolIndex` interface and `VectorToolIndex`, the index implementation that searches by meaning.
 
-## Configure the ToolIndex
+## Enable Tool Search
 
-`VectorToolIndex` works with the `VectorStore` you already have. The same `SimpleVectorStore` that holds your knowledge base documents will now also hold the tool descriptions, stored as separate vectors.
+With the starter you do not write any wiring code. Three properties are enough.
 
-Add the bean to `SupportAssistantConfiguration.java`.
+```editor:append-lines-to-file
+file: ~/sample-app/src/main/resources/application.properties
+description: Enable the Tool Search advisor
+text: |
 
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-cascade: true
-description: "Configure the ToolIndex"
-line: 3
-text: |-
-  import org.springframework.ai.tool.toolsearch.ToolIndex;
-  import org.springframework.ai.tool.toolsearch.index.vectorstore.VectorToolIndex;
+  spring.ai.chat.client.tool-search-advisor.enabled=true
+  spring.ai.chat.client.tool-search-advisor.tool-index-type=vector
+  spring.ai.chat.client.tool-search-advisor.max-results=5
 ```
 
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-line: 71
-hidden: true
-text: |2
-
-      @Bean
-      ToolIndex toolIndex(VectorStore vectorStore) {
-          return new VectorToolIndex(vectorStore);
-      }
-```
-
-At startup the auto-configuration walks through every available `ToolCallback`, the local ones as well as the ones from your MCP servers, and adds the name and description of each of them to the index.
-
-## Add the ToolSearchToolCallingAdvisor to the ChatClient
-
-Register the advisor as a default on the `ChatClient` bean so every call goes through it. Update the `chatClient` factory method in `SupportAssistantConfiguration.java`.
-```editor:insert-lines-before-line
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-line: 3
-text: import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
-description: Add the Tool Search advisor to the ChatClient
-cascade: true
-```
+Here is what each of them does.
 
 ```editor:select-matching-text
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-text: "public ChatClient chatClient(ChatClient.Builder builder,"
-before: 1
-after: 12
-cascade: true
-hidden: true
-```
-
-```editor:replace-text-selection
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-hidden: true
-text: |2
-      @Bean
-      public ChatClient chatClient(ChatClient.Builder builder,
-                                   @Value("classpath:/prompts/system-prompt.st") Resource systemPrompt,
-                                   ChatMemory chatMemory,
-                                   ToolCallbackProvider tools,
-                                   ToolIndex toolIndex) {
-          var toolSearchAdvisor = ToolSearchToolCallingAdvisor.builder()
-                  .toolIndex(toolIndex)
-                  .maxResults(5)
-                  .build();
-
-          return builder
-                  .defaultSystem(systemPrompt)
-                  .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
-                  .defaultAdvisors(
-                          new SimpleLoggerAdvisor(Ordered.LOWEST_PRECEDENCE),
-                          MessageChatMemoryAdvisor.builder(chatMemory).build(),
-                          toolSearchAdvisor)
-                  .defaultTools(tools)
-                  .build();
-      }
-```
-
-Here is what changed, one piece at a time.
-
-```editor:select-matching-text
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-text: "ToolIndex toolIndex) {"
-before: 4
-after: 0
-description: "The ToolIndex bean is injected alongside the ToolCallbackProvider"
-```
-
-First, the **`ToolIndex` is injected** next to the existing `ToolCallbackProvider`, because the advisor needs the index to run its search.
-
-```editor:select-matching-text
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-text: "var toolSearchAdvisor = ToolSearchToolCallingAdvisor.builder()"
+file: ~/sample-app/src/main/resources/application.properties
+text: "spring.ai.chat.client.tool-search-advisor.enabled=true"
 before: 0
-after: 3
-description: "Build the ToolSearchToolCallingAdvisor and cap it at 5 results per turn"
+after: 0
+description: Turn the advisor on
 ```
 
-Next, the **advisor is built from that index**. With `maxResults(5)` only the five best matching tools are added to the next model call. Pick that number based on how many tools you have and how much context you want to spend on them.
+The auto configuration creates an instance and adds the  `ToolSearchToolCallingAdvisor`to the `ChatClient.Builder` for you, so the `chatClient` bean in `SupportAssistantConfiguration.java` stays exactly as it is and every `chatClient.prompt()` chain picks the advisor up. From now on `createTicket`, `retrieveTickets`, `retrieveOpenTickets`, and `fetchReleasesInfo` are no longer part of every prompt.
 
 ```editor:select-matching-text
-file: ~/sample-app/src/main/java/com/example/support_assistant/SupportAssistantConfiguration.java
-text: "MessageChatMemoryAdvisor.builder(chatMemory).build(),"
-before: 2
-after: 1
-description: "toolSearchAdvisor is registered next to the logger and memory advisors"
+file: ~/sample-app/src/main/resources/application.properties
+text: "spring.ai.chat.client.tool-search-advisor.tool-index-type=vector"
+before: 0
+after: 0
+description: Search the tools by meaning
 ```
 
-Finally, the **`toolSearchAdvisor` is added to `defaultAdvisors`**, next to the logger and memory advisors the bean already has, so every `chatClient.prompt()` chain picks it up automatically. From now on `createTicket`, `retrieveTickets`, `retrieveOpenTickets`, and `fetchReleasesInfo` are no longer part of every prompt.
+The `vector` type creates a `VectorToolIndex` bean that works with the `VectorStore` you already have. The same `SimpleVectorStore` that holds your knowledge base documents now also holds the tool descriptions, stored as separate vectors. At startup the auto configuration walks through every available `ToolCallback`, the local ones as well as the ones from your MCP servers, and adds the name and description of each of them to the index.
+
+```editor:select-matching-text
+file: ~/sample-app/src/main/resources/application.properties
+text: "spring.ai.chat.client.tool-search-advisor.max-results=5"
+before: 0
+after: 0
+description: Cap the search at 5 results per turn
+```
+
+Only the five best matching tools are added to the next model call. Pick that number based on how many tools you have and how much context you want to spend on them.
 
 The advisor needs more than one model call to do its work. In the first call the model searches for tools, and in the second one it calls them. This only works because the `ChatMemory` you configured earlier keeps the result of the search in the conversation.
 

@@ -12,25 +12,30 @@ The answer of Spring AI, generally available since the 2.0 release, is the **Too
 
 All your registered tools are indexed into a **`ToolIndex`**, but they are **not** sent to the model. On the first request the model sees only the Tool Search Tool. When it needs a capability, it calls that search tool with a search query. The index returns the matching tools, and *their* full definitions are expanded into the next request, so the model now sees the search tool plus the handful of relevant tools, calls them, and produces its answer. Hundreds of tools become reachable while only a few definitions ever enter the context at a time.
 
-This is delivered as an advisor, the **`ToolSearchToolCallingAdvisor`**, which extends the familiar `ToolCallingAdvisor` with the discovery step. You add the dedicated module.
+This is delivered as an advisor, the **`ToolSearchToolCallingAdvisor`**, which extends the familiar `ToolCallingAdvisor` with the discovery step. The easiest way to get it is the starter, because it brings the advisor together with its auto configuration.
 
 ```xml
 <dependency>
     <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-tool-search-advisor</artifactId>
+    <artifactId>spring-ai-starter-tool-search-advisor</artifactId>
 </dependency>
 ```
 
-Then you register the advisor and your tools as usual. Note that the tools are configured on the client, but thanks to the advisor they are not all shipped to the model.
+From there you turn it on with configuration properties instead of writing any wiring code.
+
+```properties
+spring.ai.chat.client.tool-search-advisor.enabled=true
+spring.ai.chat.client.tool-search-advisor.tool-index-type=vector
+spring.ai.chat.client.tool-search-advisor.max-results=5
+```
+
+Under the hood the auto configuration does two things for you. It creates the `ToolIndex` bean of the type you asked for, here the vector based one that reuses the `VectorStore` of your application, and it adds the `ToolSearchToolCallingAdvisor` with your settings to the `ChatClient.Builder`.
+
+That leaves your own configuration unchanged. You register your tools as usual, and thanks to the advisor they are not all shipped to the model.
 
 ```java
-var advisor = ToolSearchToolCallingAdvisor.builder()
-    .toolIndex(toolIndex)
-    .build();
-
 ChatClient chatClient = builder
     .defaultTools(supportTools)  // hundreds of tools registered, NOT all sent to the model
-    .defaultAdvisors(advisor)    // activates the Tool Search Tool
     .build();
 
 String answer = chatClient.prompt("""
@@ -39,6 +44,14 @@ String answer = chatClient.prompt("""
         """)
     .call()
     .content();
+```
+
+If you need more control than the properties give you, the `spring-ai-tool-search-advisor` module without the starter contains the advisor alone. You then build a `ToolIndex` and the advisor yourself and add it with `defaultAdvisors`.
+
+```java
+var advisor = ToolSearchToolCallingAdvisor.builder()
+    .toolIndex(toolIndex)
+    .build();
 ```
 
 ### Choosing how tools are searched
