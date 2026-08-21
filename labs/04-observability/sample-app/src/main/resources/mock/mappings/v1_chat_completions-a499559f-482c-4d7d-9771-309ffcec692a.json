@@ -1,0 +1,50 @@
+{
+  "id" : "a499559f-482c-4d7d-9771-309ffcec692a",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Use the following retrieved context to answer the user's question. Follow these rules:\\n\\n1. If the answer can be found in the context, base your answer strictly on that context.\\n2. If the context does not contain the information needed to answer, rely on your own general knowledge to answer.\\n3. If you are unsure or the question cannot be answered from either the context or your own knowledge, say so clearly rather than guessing.\\n4. Do not fabricate facts, sources, or citations.\\n\\n---\\nContext:\\nApplication Advisor automatically generates pull requests when new Spring dependency versions become available. Each pull request includes updates to both build configuration and Java source files, so it integrates into CI/CD pipelines without manual work.\\nOpenRewrite integration: uses OpenRewrite recipes internally but hides the complexity. Developers review pull requests instead of finding and configuring recipes themselves. Synchronized multi-project upgrades: identifies Spring projects that must upgrade together. For example, an app using Spring Web 5.3.x with Spring Security 5.8 is upgraded so both move to 6.0.x together for a successful build. Incremental updates: enables continuous, small-scale dependency upgrades and API-breaking changes through regular pull requests, keeping systems current with minimal disruption. CI pipeline compatibility: generated pull requests fit into existing continuous integration workflows.\\nAll committers for Spring Boot, Spring Framework, and the broader open-source Spring portfolio are part of the Tanzu team. Patches, including day-zero security fixes, come directly from the original authors of the code and are validated for compliance. This is the core security advantage of the subscription.\\nhttps://enterprise.spring.io/lts-releasesExtended enterprise support for Spring open-source projects, OpenJDK, and Apache Tomcat. It lets organizations align their upgrade timeline with business and technology goals instead of the standard open-source support windows.\\n---\\n\\nQuestion:\\nAnswer the following question with a short, well-structured explanation: Tell me about breaking changes in Spring Framework 7\\n\",\"role\":\"user\"}],\"reasoning_effort\":\"none\",\"response_format\":{\"json_schema\":{\"name\":\"json_schema\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"answer\":{\"type\":\"string\",\"description\":\"The helpful answer to the customer's question\"},\"category\":{\"type\":\"string\",\"enum\":[\"TECHNICAL\",\"BILLING\",\"SECURITY\",\"GENERAL\"],\"description\":\"The category of the support question: TECHNICAL, BILLING, SECURITY, or GENERAL\"}},\"required\":[\"answer\",\"category\"],\"additionalProperties\":false},\"strict\":true},\"type\":\"json_schema\"}}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-EFLMc2KwchITMnonjg8pHyI2YQ1w3\",\n  \"object\": \"chat.completion\",\n  \"created\": 1787325750,\n  \"model\": \"gpt-5.6-sol\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"answer\\\":\\\"Spring Framework 7 is a major release, so it includes breaking changes that typically require source-code and dependency updates. Key areas include:\\\\n\\\\n- **Baseline upgrades:** Java 17+ is required, with Jakarta EE 11 APIs such as Servlet 6.1, JPA 3.2, and Bean Validation 3.1.\\\\n- **Dependency alignment:** Applications generally need to upgrade related Spring projects together—for example, Spring Boot and Spring Security—to compatible generations.\\\\n- **API cleanup:** Deprecated APIs may be removed, and framework contracts or configuration patterns can change, requiring Java source updates.\\\\n- **Migration approach:** Upgrade incrementally, compile and test after each step, and use OpenRewrite-based tooling where appropriate. Spring Application Advisor can automate coordinated dependency and source-code changes through CI-friendly pull requests.\\\\n\\\\nReview the official Spring Framework 7 migration guide for the authoritative list of changes: https://github.com/spring-projects/spring-framework/wiki/Upgrading-to-Spring-Framework-7.x\\\",\\\"category\\\":\\\"TECHNICAL\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 512,\n    \"completion_tokens\": 224,\n    \"total_tokens\": 736,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"cache_write_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "69ms",
+      "set-cookie" : "__cf_bm=06u2BM__.OR71r6j7r39N3HVd2dmnLrBoshWlXn5N2g-1787325750.0325336-1.0.1.1-ZthrTrb_NFeV_46dud1GNQuMhula9f5I79BbKveyWQapc_sTpb1gM9J_sCnFV29qQWN4ALVkXjlofC33vnBbc8diogEvht1gyN_8heQTxXRbHX0SjAQuvAshZ4rIb_MX; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 21 Aug 2026 15:52:34 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_7c865ef26c5049589f6552b5099fa905",
+      "x-ratelimit-limit-tokens" : "500000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a2eaa231bce99287-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "499418",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Fri, 21 Aug 2026 15:22:34 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "4330",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "a499559f-482c-4d7d-9771-309ffcec692a",
+  "persistent" : true,
+  "insertionIndex" : 109
+}

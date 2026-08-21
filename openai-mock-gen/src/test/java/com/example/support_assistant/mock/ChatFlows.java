@@ -10,12 +10,16 @@ import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCalli
 import org.springframework.ai.chat.evaluation.RelevancyEvaluator;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.evaluation.EvaluationRequest;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
 import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
 import org.springframework.ai.tool.ToolCallback;
@@ -34,6 +38,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -58,6 +63,15 @@ final class ChatFlows {
     static void exercise(ChatModel chatModel, ChatClient.Builder chatClientBuilder, EmbeddingModel embeddingModel) throws IOException {
         // Lab 02-fundamentals
         assertNotBlank(chatModel.call("Tell me about Spring AI"));
+
+        var userPromptTemplate = PromptTemplate.builder()
+                .template("Answer the following question with a short, well-structured explanation: {question}")
+                .variables(Map.of("question", "Tell me about Spring AI"))
+                .build();
+        var prompt = new Prompt(
+                List.of(new SystemMessage(SYSTEM_PROMPT), userPromptTemplate.createMessage()),
+                OpenAiChatOptions.builder().model("gpt-5.4-mini").temperature(0.0).build());
+        assertNotNull(chatModel.call(prompt));
 
         var chatClient = chatClientBuilder.build();
 

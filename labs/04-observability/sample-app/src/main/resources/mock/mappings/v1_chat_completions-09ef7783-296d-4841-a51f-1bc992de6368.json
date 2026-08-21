@@ -1,0 +1,50 @@
+{
+  "id" : "09ef7783-296d-4841-a51f-1bc992de6368",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a Spring support classifier.\\nReply only with JSON in this form:\\n{\\\"category\\\":\\\"...\\\",\\\"answer\\\":\\\"...\\\"}\\nThe category must be one of: TECHNICAL, BILLING, SECURITY, GENERAL.\\nExamples:\\n- \\\"Why was I billed twice?\\\"     -> {\\\"category\\\":\\\"BILLING\\\",\\\"answer\\\":\\\"...\\\"}\\n- \\\"How do I rotate my API key?\\\" -> {\\\"category\\\":\\\"SECURITY\\\",\\\"answer\\\":\\\"...\\\"}\\n\",\"role\":\"system\"},{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}],\"reasoning_effort\":\"none\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-EFLMCufwggeIzJsyoxo2i5CcRZ7Tg\",\n  \"object\": \"chat.completion\",\n  \"created\": 1787325724,\n  \"model\": \"gpt-5.6-sol\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"category\\\":\\\"GENERAL\\\",\\\"answer\\\":\\\"Spring AI is a Spring Framework project for building AI-powered Java applications. It provides portable abstractions and Spring Boot integrations for chat and embedding models, image generation, vector stores, tool/function calling, structured outputs, document ingestion, retrieval-augmented generation (RAG), and observability. It supports multiple model providers and vector databases, helping developers switch implementations while using familiar Spring patterns such as dependency injection, configuration properties, and auto-configuration.\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 101,\n    \"completion_tokens\": 100,\n    \"total_tokens\": 201,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"cache_write_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "11ms",
+      "set-cookie" : "__cf_bm=jC.nWvAxGWJoSbyOKq2MgiCX_ZbQrFSiRulTGmQpbpw-1787325724.3900347-1.0.1.1-9fs_237Cb7q2Q24x5o.Byd35vL9mYiKQMANimGSSvNM0n8TveEMLxc29luLpy1gyjTwKEna0Vi_Y82BNmAfPC3zHCwlVQYDPka66ZknP3yZQ.cp3foEdDJMeJUsmE0mU; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 21 Aug 2026 15:52:08 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_41adda8eea884122ad63325b69603ad9",
+      "x-ratelimit-limit-tokens" : "500000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a2eaa1916f7d0567-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "499908",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Fri, 21 Aug 2026 15:22:08 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "3558",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "09ef7783-296d-4841-a51f-1bc992de6368",
+  "persistent" : true,
+  "insertionIndex" : 149
+}

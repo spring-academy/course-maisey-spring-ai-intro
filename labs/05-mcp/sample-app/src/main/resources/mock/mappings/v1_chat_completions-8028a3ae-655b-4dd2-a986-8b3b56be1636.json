@@ -1,0 +1,50 @@
+{
+  "id" : "8028a3ae-655b-4dd2-a986-8b3b56be1636",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about breaking changes in Spring Framework 7\\n\\nContext information is below, surrounded by ---------------------\\n\\n---------------------\\nApplication Advisor automatically generates pull requests when new Spring dependency versions become available. Each pull request includes updates to both build configuration and Java source files, so it integrates into CI/CD pipelines without manual work.\\nOpenRewrite integration: uses OpenRewrite recipes internally but hides the complexity. Developers review pull requests instead of finding and configuring recipes themselves. Synchronized multi-project upgrades: identifies Spring projects that must upgrade together. For example, an app using Spring Web 5.3.x with Spring Security 5.8 is upgraded so both move to 6.0.x together for a successful build. Incremental updates: enables continuous, small-scale dependency upgrades and API-breaking changes through regular pull requests, keeping systems current with minimal disruption. CI pipeline compatibility: generated pull requests fit into existing continuous integration workflows.\\nAll committers for Spring Boot, Spring Framework, and the broader open-source Spring portfolio are part of the Tanzu team. Patches, including day-zero security fixes, come directly from the original authors of the code and are validated for compliance. This is the core security advantage of the subscription.\\nhttps://enterprise.spring.io/lts-releasesExtended enterprise support for Spring open-source projects, OpenJDK, and Apache Tomcat. It lets organizations align their upgrade timeline with business and technology goals instead of the standard open-source support windows.\\n---------------------\\n\\nGiven the context and provided history information and not prior knowledge,\\nreply to the user comment. If the answer is not in the context, inform\\nthe user that you can't answer the question.\\n\",\"role\":\"user\"}],\"reasoning_effort\":\"none\",\"response_format\":{\"json_schema\":{\"name\":\"json_schema\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"answer\":{\"type\":\"string\",\"description\":\"The helpful answer to the customer's question\"},\"category\":{\"type\":\"string\",\"enum\":[\"TECHNICAL\",\"BILLING\",\"SECURITY\",\"GENERAL\"],\"description\":\"The category of the support question: TECHNICAL, BILLING, SECURITY, or GENERAL\"}},\"required\":[\"answer\",\"category\"],\"additionalProperties\":false},\"strict\":true},\"type\":\"json_schema\"}}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-EFLMXwk4hgYleDDqr324UyCakL5iT\",\n  \"object\": \"chat.completion\",\n  \"created\": 1787325745,\n  \"model\": \"gpt-5.6-sol\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"answer\\\":\\\"The provided context does not describe the breaking changes in Spring Framework 7, so I can’t answer that from the supplied information. It only explains automated dependency upgrades, synchronized Spring project migrations, CI/CD integration, and enterprise support. For authoritative migration information, consult the official [Spring Framework documentation](https://docs.spring.io/spring-framework/reference/).\\\",\\\"category\\\":\\\"TECHNICAL\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 459,\n    \"completion_tokens\": 87,\n    \"total_tokens\": 546,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"cache_write_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "63ms",
+      "set-cookie" : "__cf_bm=9ICrf2z6vGUOPIeAuMy4c0CoFHmKvWxI06.qEuw8q4U-1787325745.1082282-1.0.1.1-4t6AdIqhx_EN8GhIGOE129L7AG_dbYd1UTyp3VyMsTK_avqbodTs5.351qWxPnbQ.pf3zXAVyjDdvFHZ2nQEgtyDuJ_Pw7u8.Cl.rS8rreOqZMyi4x9GCBCXhK5IWjGt; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 21 Aug 2026 15:52:27 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_624782d0c3cc42c7a8db150b29392714",
+      "x-ratelimit-limit-tokens" : "500000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a2eaa212e81d170e-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "499469",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Fri, 21 Aug 2026 15:22:27 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "1985",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "8028a3ae-655b-4dd2-a986-8b3b56be1636",
+  "persistent" : true,
+  "insertionIndex" : 113
+}

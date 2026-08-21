@@ -1,0 +1,50 @@
+{
+  "id" : "a69cdcfa-1ffe-4a33-993d-199c683b4af8",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about Spring AI\",\"role\":\"user\"}],\"reasoning_effort\":\"none\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 1)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-EFLM3VvVH2SMVTLZSqBz9V3eite5G\",\n  \"object\": \"chat.completion\",\n  \"created\": 1787325715,\n  \"model\": \"gpt-5.6-sol\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"## Spring AI\\n\\n**Spring AI** is an open-source Spring project for building AI-powered Java applications. It brings familiar Spring patterns—such as dependency injection, auto-configuration, and portable abstractions—to generative AI development.\\n\\n### Key capabilities\\n- **Model integration:** Connects to providers such as OpenAI, Anthropic, Google, Amazon Bedrock, Azure OpenAI, and local models through Ollama.\\n- **Unified APIs:** Offers abstractions like `ChatModel`, reducing provider-specific code and making models easier to swap.\\n- **Prompt and output handling:** Supports prompt templates, structured outputs, streaming responses, and multimodal content.\\n- **Tool calling:** Lets models invoke application functions or external services.\\n- **RAG support:** Provides document loading, text splitting, embeddings, vector-store integration, and retrieval-augmented generation.\\n- **Conversation features:** Includes chat memory and advisor-based request/response processing.\\n- **Spring Boot integration:** Uses starters, configuration properties, and dependency injection for quick setup.\\n\\nA typical use case is a Spring Boot chatbot that retrieves relevant company documents from a vector database, adds them to the prompt, and asks an LLM to produce a grounded answer. Spring AI is especially useful for Java teams that want to add generative AI while staying within the Spring ecosystem.\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 24,\n    \"completion_tokens\": 266,\n    \"total_tokens\": 290,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"cache_write_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "3ms",
+      "set-cookie" : "__cf_bm=DjOFECzWv12K8V7RUxyyOJHSr4Qgan9wzU_uPUiUxYE-1787325714.9205732-1.0.1.1-XxAoHdsyXoAxVTNgLKdkmUWXD7sWosK1KPQzP2_TAdQ73FBz0dx1DVSPRG0tyzfUlArkduYD4ojPHJXvwA6VydmVOdO_tQ_b9Fj9txU72aF4DSshCJ7lxJJmlS5fVZls; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 21 Aug 2026 15:51:59 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_223c0b6cb31f4190978ae6db638bbaf9",
+      "x-ratelimit-limit-tokens" : "500000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a2eaa15638f3927e-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "499974",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Fri, 21 Aug 2026 15:21:59 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "4469",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "a69cdcfa-1ffe-4a33-993d-199c683b4af8",
+  "persistent" : true,
+  "insertionIndex" : 151
+}

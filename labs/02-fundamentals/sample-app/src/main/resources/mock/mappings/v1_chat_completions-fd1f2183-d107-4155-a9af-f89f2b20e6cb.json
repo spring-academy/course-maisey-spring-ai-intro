@@ -1,0 +1,50 @@
+{
+  "id" : "fd1f2183-d107-4155-a9af-f89f2b20e6cb",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Use the following retrieved context to answer the user's question. Follow these rules:\\n\\n1. If the answer can be found in the context, base your answer strictly on that context.\\n2. If the context does not contain the information needed to answer, rely on your own general knowledge to answer.\\n3. If you are unsure or the question cannot be answered from either the context or your own knowledge, say so clearly rather than guessing.\\n4. Do not fabricate facts, sources, or citations.\\n\\n---\\nContext:\\nCommercial offering for Spring from Broadcom/VMware. Source: https://enterprise.spring.ioTanzu Spring is the commercial subscription that adds enterprise support, extended releases, security, compliance, and productivity tooling on top of the open-source Spring portfolio, OpenJDK, and Apache Tomcat.\\nSpring Boot and related projects: In addition to 13 months of open-source support from release date, VMware Tanzu Spring provides a minimum of 1 additional year of support for minor versions. The final minor version of each major release receives an additional 5 years of enterprise support (7 years). OpenJDK: support follows the BellSoft Liberica distribution timelines. Tomcat: extended support for versions no longer maintained by Apache, including CVE fixes.\\nContact / talk to sales: https://go-vmware.broadcom.com/contact-us Spring Enterprise subscription and repository configuration: https://techdocs.broadcom.com/us/en/vmware-tanzu/spring/tanzu-spring/commercial/spring-tanzu/spring-enterprise-subscription.html Broadcom investment in Spring and Java ecosystem security: https://news.broadcom.com/releases/broadcom-expands-investment-in-spring-and-java-ecosystem-security\\nMore than 50 projects are supported, plus the OpenJDK and Apache Tomcat runtimes. The supported projects, grouped by category:Runtimes OpenJDK Apache Tomcat VMware tc ServerCore framework Spring Framework Spring Boot Reactor AspectJSpring Cloud Spring Cloud Commons Spring Cloud Config Spring Cloud Netflix Spring Cloud Bus Spring Cloud CircuitBreaker Spring Cloud CloudFoundry Spring Cloud Open Service Broker Spring Cloud Consul Spring Cloud Sleuth Spring Cloud Zookeeper Spring Cloud Kubernetes Spring Cloud OpenFeign Spring Cloud Gateway Spring Cloud Function Spring Cloud Contract Spring Cloud Task Spring Cloud Vault Spring Cloud Data FlowSpring Data Spring Data Commons Spring Data KeyValue Spring Data LDAP Spring Data JDBC Spring Data JPA Spring Data Relational Spring Data MongoDB Spring Data Redis Spring Data REST Spring Data for Apache CassandraMessaging and streams Spring AMQP Spring for Apache Kafka Spring for Apache Pulsar Spring Cloud Stream Spring Cloud Stream Binder for Apache Kafka Spring Cloud Stream Binder for RabbitMQ Spring Cloud Stream Binder for Kafka Streams Spring Cloud Stream ApplicationsSecurity and authorization Spring Security Spring Authorization Server Spring Session Spring CredHub Spring Vault Spring Kerberos Spring LDAPObservability and integration Micrometer Micrometer Tracing Spring IntegrationWeb and API Spring for GraphQL Spring Web Flow Spring Web Services Spring HATEOAS Spring REST DocsOther projects Spring AI Spring Batch Spring Retry Spring Statemachine Spring Shell Spring Tools\\n---\\n\\nQuestion:\\nAnswer the following question with a short, well-structured explanation: Does VMware Tanzu Spring provide commercial support for Micrometer?\\n\",\"role\":\"user\"}],\"reasoning_effort\":\"none\",\"response_format\":{\"json_schema\":{\"name\":\"json_schema\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"answer\":{\"type\":\"string\",\"description\":\"The helpful answer to the customer's question\"},\"category\":{\"type\":\"string\",\"enum\":[\"TECHNICAL\",\"BILLING\",\"SECURITY\",\"GENERAL\"],\"description\":\"The category of the support question: TECHNICAL, BILLING, SECURITY, or GENERAL\"}},\"required\":[\"answer\",\"category\"],\"additionalProperties\":false},\"strict\":true},\"type\":\"json_schema\"}}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-EFLMarlUdweBQxagFv9qsRYqPoqID\",\n  \"object\": \"chat.completion\",\n  \"created\": 1787325748,\n  \"model\": \"gpt-5.6-sol\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"answer\\\":\\\"Yes. VMware Tanzu Spring provides commercial support for **Micrometer**, including **Micrometer Tracing**, as part of its supported observability and integration projects. The subscription adds enterprise support, extended releases, security, compliance, and productivity tooling on top of the open-source Spring portfolio.\\\\n\\\\nOfficial overview: https://enterprise.spring.io\\\",\\\"category\\\":\\\"TECHNICAL\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 757,\n    \"completion_tokens\": 84,\n    \"total_tokens\": 841,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"cache_write_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "106ms",
+      "set-cookie" : "__cf_bm=oObKdiJC2b0VLWfnB5sP4D5TDtB7QEy6IMXY9kjWFGI-1787325747.723994-1.0.1.1-6rIdHEwrWL2Ms9oVwZXvOynXQE3UMkwCVxnfWmrPGCrOvS8d845g6VawgDuG4Qm0LFTD_z3Slr9.dCA98QMfgoPv_1CEKU9MV5gEorXGkQUPUQZbB_2xeQftWGYtvuQ.; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 21 Aug 2026 15:52:29 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_03a4eb22b37849e281a19465aa5320b2",
+      "x-ratelimit-limit-tokens" : "500000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a2eaa2234b1f70a8-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "499114",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Fri, 21 Aug 2026 15:22:29 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "1881",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "fd1f2183-d107-4155-a9af-f89f2b20e6cb",
+  "persistent" : true,
+  "insertionIndex" : 111
+}
