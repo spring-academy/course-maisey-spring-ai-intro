@@ -10,9 +10,9 @@ The answer of Spring AI, generally available since the 2.0 release, is the **Too
 
 ### How it works
 
-All your registered tools are indexed into a **`ToolIndex`**, but they are **not** sent to the model. On the first request the model sees only the Tool Search Tool. When it needs a capability, it calls that search tool with a search query. The index returns the matching tools, and *their* full definitions are expanded into the next request, so the model now sees the search tool plus the handful of relevant tools, calls them, and produces its answer. Hundreds of tools become reachable while only a few definitions ever enter the context at a time.
+All your registered tools go into a **`ToolIndex`**, but they are **not** sent to the model. In the first request the model only sees the Tool Search Tool. When it needs a capability, it calls that search tool with a query. The index returns the tools that match, and only their full definitions are added to the next request. The model now sees the search tool plus a few relevant tools, calls them, and writes its answer. Hundreds of tools stay available this way, and only a few definitions are in the context at a time.
 
-This is delivered as an advisor, the **`ToolSearchToolCallingAdvisor`**, which extends the familiar `ToolCallingAdvisor` with the discovery step. The easiest way to get it is the starter, because it brings the advisor together with its auto configuration.
+Spring AI provides this as an advisor, the **`ToolSearchToolCallingAdvisor`**. It is the `ToolCallingAdvisor` you already know, with the search step added. The easiest way to use it is the starter, because it contains the advisor and its auto configuration.
 
 ```xml
 <dependency>
@@ -21,17 +21,15 @@ This is delivered as an advisor, the **`ToolSearchToolCallingAdvisor`**, which e
 </dependency>
 ```
 
-From there you turn it on with configuration properties instead of writing any wiring code.
+One property switches it on. You do not have to write any code for the setup.
 
 ```properties
 spring.ai.chat.client.tool-search-advisor.enabled=true
-spring.ai.chat.client.tool-search-advisor.tool-index-type=vector
-spring.ai.chat.client.tool-search-advisor.max-results=5
 ```
 
-Under the hood the auto configuration does two things for you. It creates the `ToolIndex` bean of the type you asked for, here the vector based one that reuses the `VectorStore` of your application, and it adds the `ToolSearchToolCallingAdvisor` with your settings to the `ChatClient.Builder`.
+The auto configuration does two things. It creates a `ToolIndex` bean of the type you selected, and it adds the `ToolSearchToolCallingAdvisor` to the `ChatClient.Builder`. The advisor replaces the default `ToolCallingAdvisor`, so tool calling works as before and only gets the search step in front of it.
 
-That leaves your own configuration unchanged. You register your tools as usual, and thanks to the advisor they are not all shipped to the model.
+Your own configuration stays the same. You register your tools as before, and the advisor makes sure that not all of them are sent to the model.
 
 ```java
 ChatClient chatClient = builder
@@ -46,27 +44,44 @@ String answer = chatClient.prompt("""
     .content();
 ```
 
-If you need more control than the properties give you, the `spring-ai-tool-search-advisor` module without the starter contains the advisor alone. You then build a `ToolIndex` and the advisor yourself and add it with `defaultAdvisors`.
+### What you can configure
 
-```java
-var advisor = ToolSearchToolCallingAdvisor.builder()
-    .toolIndex(toolIndex)
-    .build();
-```
+Only `enabled` is required. All other properties have a default that works, and they all start with `spring.ai.chat.client.tool-search-advisor`.
+
+The property you change most often is `max-results`. It defines how many tools one search returns, and with that how many tool definitions are added to the context. A small number keeps the prompt cheap. A larger number makes it more likely that the right tool is in the result.
+
+`reference-tool-name-accumulation` is `true` by default. The tools from earlier searches then stay available in the conversation. If you set it to `false`, only the tools from the last search stay available, which keeps long conversations shorter.
+
+The model receives built-in instructions that explain the search tool to it. With `system-message-suffix` you can customize them.
+
+The most important property is `tool-index-type`, because it defines how the search works.
 
 ### Choosing how tools are searched
 
-How the search itself works is up to you. The `ToolIndex` interface hides the search implementation from the rest of the setup, and Spring AI ships three of them out of the box.
+The `ToolIndex` interface hides the search implementation from the rest of your setup. Spring AI provides three implementations.
 
-| Strategy | Implementation | Best for |
-|----------|----------------|----------|
-| **Semantic** | `VectorToolIndex` | Natural language queries, fuzzy matching by meaning |
-| **Keyword** | `LuceneToolIndex` | Exact term matching, known tool names |
-| **Regex** | `RegexToolIndex` | Tool name patterns such as `get_*_data` |
+| `tool-index-type` | Implementation | Best for | Needs |
+|----------|----------------|----------|-------|
+| `regex` (default) | `RegexToolIndex` | Tool name patterns such as `get_*_data` | Nothing extra |
+| `lucene` | `LuceneToolIndex` | Exact term matching, known tool names | Lucene, included in the starter |
+| `vector` | `VectorToolIndex` | Natural language queries, matching by meaning | A `VectorStore` bean |
 
-The semantic `VectorToolIndex` works the same way as the retrieval step in the RAG section, only with tools instead of documents. Each tool description is turned into an embedding and stored in a vector store, the search query is embedded as well, and the tools that come back are the ones closest in meaning. The agent can ask for "something to open a ticket" and still find a tool called `createSupportCase`.
+The `RegexToolIndex` is the default, so you get it when you do not set `tool-index-type`. It matches the query as a regular expression against the tool names. It needs no extra dependency and no model call, which makes it the cheapest option. It works well when your tools follow a strict naming scheme. It is also the most limited one, because the model has to know that scheme to find a tool.
 
-The `LuceneToolIndex` builds on [Apache Lucene](https://lucene.apache.org/), the open source search library that also powers Elasticsearch and Solr. It indexes the words of your tool names and descriptions and matches the query against those words, so there is no model call and no embedding involved, which makes it fast and cheap. The trade-off is that it only finds a tool when the query uses similar wording.
+The `VectorToolIndex` searches by meaning. It works like the retrieval step in the RAG section, only with tools instead of documents. Each tool description becomes an embedding and is stored in a vector store. The search query becomes an embedding as well, and the index returns the tools that are closest in meaning. The agent can ask for "something to open a ticket" and still find a tool with the name `createSupportCase`.
+
+The `LuceneToolIndex` uses [Apache Lucene](https://lucene.apache.org/), the open source search library that also powers Elasticsearch and Solr. It indexes the words in your tool names and descriptions and compares the query with these words. There is no model call and no embedding, so it is fast and cheap. The disadvantage is that it only finds a tool when the query uses similar words. With `lucene.min-score-threshold` you define how good a match has to be before it is returned.
+
+### Building the advisor yourself
+
+If the properties are not enough for your use case, use the `spring-ai-tool-search-advisor` module without the starter. It contains only the advisor. You then create the index and the advisor yourself, and you register the advisor with `defaultAdvisors`.
+
+```java
+var advisor = ToolSearchToolCallingAdvisor.builder()
+    .toolIndex(new VectorToolIndex(vectorStore))
+    .maxResults(5)
+    .build();
+```
 
 ## Implementations for the Workflow Patterns (Experimental)
 

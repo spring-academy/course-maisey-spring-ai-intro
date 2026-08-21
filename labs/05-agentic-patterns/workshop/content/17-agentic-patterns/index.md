@@ -72,7 +72,7 @@ after: 0
 description: Turn the advisor on
 ```
 
-The auto configuration creates an instance and adds the  `ToolSearchToolCallingAdvisor`to the `ChatClient.Builder` for you, so the `chatClient` bean in `SupportAssistantConfiguration.java` stays exactly as it is and every `chatClient.prompt()` chain picks the advisor up. From now on `createTicket`, `retrieveTickets`, `retrieveOpenTickets`, and `fetchReleasesInfo` are no longer part of every prompt.
+This single flag is all the wiring you need. The auto configuration builds a `ToolSearchToolCallingAdvisor` and adds it to every `ChatClient.Builder` in the application, so your `chatClient` bean in `SupportAssistantConfiguration.java` stays exactly as it is and every `chatClient.prompt()` chain runs through the advisor. Your tools stay registered on the client, but from now on `createTicket`, `retrieveTickets`, `retrieveOpenTickets`, and `fetchReleasesInfo` are no longer sent with every prompt. The model has to search for them first.
 
 ```editor:select-matching-text
 file: ~/sample-app/src/main/resources/application.properties
