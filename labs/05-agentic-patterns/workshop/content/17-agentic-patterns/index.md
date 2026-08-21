@@ -115,12 +115,12 @@ session: 1
 
 With `logging.level.org.springframework.ai=debug` already enabled in `application.properties`, you can follow the whole flow in the assistant's logs.
 
-1. A first model call where `searchTools` is the only tool that is offered.
-2. The model calls `searchTools` with the intent of the user as the query.
+1. A first model call where `toolSearchTool` is the only tool that is offered.
+2. The model calls `toolSearchTool` with the intent of the user as the query.
 3. The advisor searches the `ToolIndex` and returns the top 5 hits, and `createTicket` should be one of them.
 4. A second model call that offers only those matched tools, and the model picks `createTicket`.
 
-Now ask a question that needs no tool at all. The model answers from the knowledge base and never calls `searchTools`, so tool search costs you nothing when there is nothing to do.
+Now ask a question that needs no tool at all. The model answers from the knowledge base and never calls `toolSearchTool`, so tool search costs you nothing when there is nothing to do.
 
 ```terminal:execute
 command: curl -G "http://localhost:8080/api/v1/chat" --data-urlencode "query=What are the key features of VMware Tanzu Spring?"
