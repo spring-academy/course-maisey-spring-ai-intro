@@ -43,7 +43,7 @@ Also import the **Spring AI BOM** so every Spring AI artifact resolves to one co
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-bom</artifactId>
-            <version>2.0.0</version>
+            <version>2.0.1</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -54,7 +54,7 @@ Also import the **Spring AI BOM** so every Spring AI artifact resolves to one co
 ```groovy
 // Gradle: build.gradle
 dependencies {
-    implementation platform('org.springframework.ai:spring-ai-bom:2.0.0')
+    implementation platform('org.springframework.ai:spring-ai-bom:2.0.1')
 }
 ```
 
@@ -68,9 +68,10 @@ spring.ai.openai.api-key=${OPENAI_API_KEY}
 # The endpoint, point it at a mock, a gateway, or a compatible API when needed
 spring.ai.openai.base-url=https://api.openai.com
 # The model to use, for example gpt-5.5 or gpt-5.4-mini
-spring.ai.openai.chat.model=gpt-5.4-mini
+spring.ai.openai.chat.model=gpt-5.6-sol
 # Request parameters such as sampling randomness. Lower is more deterministic, higher more creative
 spring.ai.openai.chat.temperature=0.7
+spring.ai.openai.chat.reasoning-effort=none
 ```
 
 Because the model and the other options live outside your code, you can tune the behavior or switch models without touching a single class.

@@ -81,7 +81,8 @@ text: |
 
   spring.ai.openai.api-key=mock-api-key
   spring.ai.openai.base-url=http://localhost:8081/v1
-  spring.ai.openai.chat.model=gpt-5.4-mini
+  spring.ai.openai.chat.model=gpt-5.6-sol
+spring.ai.openai.chat.reasoning-effort=none
   spring.ai.openai.chat.temperature=0.7
 ```
 

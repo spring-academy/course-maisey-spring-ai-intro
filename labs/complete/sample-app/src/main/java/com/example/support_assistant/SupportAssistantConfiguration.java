@@ -1,11 +1,8 @@
 package com.example.support_assistant;
 
 import org.springaicommunity.mcp.security.client.sync.config.McpClientOAuth2Configurer;
-import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.ai.tool.toolsearch.ToolIndex;
-import org.springframework.ai.tool.toolsearch.index.vectorstore.VectorToolIndex;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,20 +31,13 @@ public class SupportAssistantConfiguration {
     public ChatClient chatClient(ChatClient.Builder builder,
                                  @Value("classpath:/prompts/system-prompt.st") Resource systemPrompt,
                                  ChatMemory chatMemory,
-                                 ToolCallbackProvider tools,
-                                 ToolIndex toolIndex) {
-        var toolSearchAdvisor = ToolSearchToolCallingAdvisor.builder()
-                .toolIndex(toolIndex)
-                .maxResults(5)
-                .build();
-
+                                 ToolCallbackProvider tools) {
         return builder
                 .defaultSystem(systemPrompt)
                 .defaultAdvisors(AdvisorParams.ENABLE_NATIVE_STRUCTURED_OUTPUT)
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(Ordered.LOWEST_PRECEDENCE),
-                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
-                        toolSearchAdvisor)
+                        MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .defaultTools(tools)
                 .build();
     }
@@ -75,10 +65,5 @@ public class SupportAssistantConfiguration {
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .csrf(CsrfConfigurer::disable)
                 .build();
-    }
-
-    @Bean
-    ToolIndex toolIndex(VectorStore vectorStore) {
-        return new VectorToolIndex(vectorStore);
     }
 }

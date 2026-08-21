@@ -1,0 +1,50 @@
+{
+  "id" : "5c229008-b0e1-4d8b-a118-01e2d08739b3",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a Spring support classifier.\\nReply only with JSON in this form:\\n{\\\"category\\\":\\\"...\\\",\\\"answer\\\":\\\"...\\\"}\\nThe category must be one of: TECHNICAL, BILLING, SECURITY, GENERAL.\\nExamples:\\n- \\\"Why was I billed twice?\\\"     -> {\\\"category\\\":\\\"BILLING\\\",\\\"answer\\\":\\\"...\\\"}\\n- \\\"How do I rotate my API key?\\\" -> {\\\"category\\\":\\\"SECURITY\\\",\\\"answer\\\":\\\"...\\\"}\\n\",\"role\":\"system\"},{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}],\"reasoning_effort\":\"none\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-EFINbexCfr2nJcGMLzxTUq7S7zfCj\",\n  \"object\": \"chat.completion\",\n  \"created\": 1787314279,\n  \"model\": \"gpt-5.6-sol\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"category\\\":\\\"GENERAL\\\",\\\"answer\\\":\\\"Spring AI is an open-source Spring Framework project for building AI-powered Java applications. It provides Spring-style abstractions and integrations for chat and embedding models, vector databases, tool/function calling, structured outputs, prompt templates, document ingestion, retrieval-augmented generation (RAG), and observability. It supports multiple providers, including OpenAI, Anthropic, Azure OpenAI, Amazon Bedrock, Google Vertex AI, and local models through Ollama. Its goal is to make AI application development familiar to Spring developers through dependency injection, auto-configuration, and portable APIs.\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 101,\n    \"completion_tokens\": 125,\n    \"total_tokens\": 226,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"cache_write_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "11ms",
+      "set-cookie" : "__cf_bm=xjZkAuGVHcVPAi4TzUcFO7MxfUxA9mVe2J7yfAYu.hs-1787314278.7575188-1.0.1.1-kJGtw3jCkw8278EGn_ekRs4DRgfWXelz3baf3nmBg9RJvnBew4DVArFgJluDYBCfCV4fjhZLSlj878zApNQNFT18Hz0hVsBJ6G272r59ADmsuJqE6_do1nKOaLf3.1S_; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 21 Aug 2026 12:41:21 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_884d85a84b434876970c05844e754378",
+      "x-ratelimit-limit-tokens" : "500000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a2e98a223e71de7b-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "499908",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Fri, 21 Aug 2026 12:11:21 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "2709",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "5c229008-b0e1-4d8b-a118-01e2d08739b3",
+  "persistent" : true,
+  "insertionIndex" : 146
+}

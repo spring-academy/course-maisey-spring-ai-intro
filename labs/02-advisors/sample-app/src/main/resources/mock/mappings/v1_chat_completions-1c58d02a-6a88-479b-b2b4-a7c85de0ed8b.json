@@ -1,0 +1,50 @@
+{
+  "id" : "1c58d02a-6a88-479b-b2b4-a7c85de0ed8b",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about Spring AI\",\"role\":\"user\"},{\"role\":\"assistant\",\"content\":\"{\\\"answer\\\":\\\"Spring AI is a Spring ecosystem project for building AI-powered Java applications. It provides Spring-friendly abstractions and integrations for:\\\\n\\\\n- Chat and text-generation models through a portable `ChatClient` API\\\\n- Embeddings and vector databases for retrieval-augmented generation (RAG)\\\\n- Tool/function calling and structured outputs\\\\n- Image, audio, and moderation models where supported\\\\n- Prompt templates, conversation memory, observability, and model evaluation\\\\n- Major providers such as OpenAI, Anthropic, Google, Amazon Bedrock, Azure OpenAI, and local models through Ollama\\\\n\\\\nIt follows familiar Spring patterns, including dependency injection, auto-configuration, and Spring Boot starters, making it easier to switch providers and integrate AI into existing Spring applications.\\\\n\\\\nOfficial documentation: https://docs.spring.io/spring-ai/reference/\\\",\\\"category\\\":\\\"TECHNICAL\\\"}\"},{\"content\":\"Answer the following question with a short, well-structured explanation: What did I just ask you about?\",\"role\":\"user\"}],\"reasoning_effort\":\"none\",\"response_format\":{\"json_schema\":{\"name\":\"json_schema\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"answer\":{\"type\":\"string\",\"description\":\"The helpful answer to the customer's question\"},\"category\":{\"type\":\"string\",\"enum\":[\"TECHNICAL\",\"BILLING\",\"SECURITY\",\"GENERAL\"],\"description\":\"The category of the support question: TECHNICAL, BILLING, SECURITY, or GENERAL\"}},\"required\":[\"answer\",\"category\"],\"additionalProperties\":false},\"strict\":true},\"type\":\"json_schema\"}}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 4)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-EFINknjoIxi01jtrpgkqxkZHyA1i6\",\n  \"object\": \"chat.completion\",\n  \"created\": 1787314288,\n  \"model\": \"gpt-5.6-sol\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"answer\\\":\\\"You asked about **Spring AI**—what it is and the main capabilities it provides for building AI-powered Java applications with Spring.\\\",\\\"category\\\":\\\"GENERAL\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 351,\n    \"completion_tokens\": 40,\n    \"total_tokens\": 391,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"cache_write_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "38ms",
+      "set-cookie" : "__cf_bm=Dw2cq9H1Wye7E_TQnTenBY6ZDaz87Y_z8KWopjIKd58-1787314288.205541-1.0.1.1-cJYHejm3b2kMT0J.kcL4vK876V8IcLyvvE0bcVoFtU16G_n1HY3PVuuJPHH7puDoH34eM4EYCal2a2onXdr85iEKxmwEVInsg8_kZRBCzmyju7l.pN3YxiMi2Wf8APhD; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 21 Aug 2026 12:41:30 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_717665495e614f5dbf6c586bec60693e",
+      "x-ratelimit-limit-tokens" : "500000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a2e98a5d4cd60c5a-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "499679",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Fri, 21 Aug 2026 12:11:30 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "1692",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "1c58d02a-6a88-479b-b2b4-a7c85de0ed8b",
+  "persistent" : true,
+  "insertionIndex" : 143
+}
