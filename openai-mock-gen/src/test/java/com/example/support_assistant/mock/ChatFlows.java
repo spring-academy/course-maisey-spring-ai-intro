@@ -360,7 +360,7 @@ final class ChatFlows {
 
             @Override
             public String call(String toolInput) {
-                return "[{\"version\":\"2.0.1-SNAPSHOT\",\"status\":\"SNAPSHOT\",\"current\":false},{\"version\":\"2.0.0\",\"status\":\"GENERAL_AVAILABILITY\",\"current\":true},{\"version\":\"1.1.8\",\"status\":\"GENERAL_AVAILABILITY\",\"current\":false},{\"version\":\"1.1.9-SNAPSHOT\",\"status\":\"SNAPSHOT\",\"current\":false},{\"version\":\"1.0.9\",\"status\":\"GENERAL_AVAILABILITY\",\"current\":false}]";
+                return "[{\"version\":\"2.0.2-SNAPSHOT\",\"status\":\"SNAPSHOT\",\"current\":false},{\"version\":\"2.0.1\",\"status\":\"GENERAL_AVAILABILITY\",\"current\":true},{\"version\":\"1.1.8\",\"status\":\"GENERAL_AVAILABILITY\",\"current\":false},{\"version\":\"1.1.9-SNAPSHOT\",\"status\":\"SNAPSHOT\",\"current\":false},{\"version\":\"1.0.9\",\"status\":\"GENERAL_AVAILABILITY\",\"current\":false}]";
             }
         };
     }
