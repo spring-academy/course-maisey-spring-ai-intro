@@ -40,9 +40,12 @@ String answer = chatClient.prompt("""
         My Spring AI application fails to start after the upgrade to 2.0.
         Open a support ticket for it and tell me the ticket number.
         """)
+    .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "user-42"))
     .call()
     .content();
 ```
+
+The advisor keeps one index per session, so every request has to carry a session id. It reads that id from the advisor context under the `ChatMemory.CONVERSATION_ID` key, the same key you already use for the chat memory. When your application works with a memory advisor, the id is therefore already in the context and you get the session scoping for free.
 
 ### What you can configure
 
@@ -62,11 +65,13 @@ The `ToolIndex` interface hides the search implementation from the rest of your 
 
 | `tool-index-type` | Implementation | Best for | Needs |
 |----------|----------------|----------|-------|
-| `regex` (default) | `RegexToolIndex` | Tool name patterns such as `get_*_data` | Nothing extra |
-| `lucene` | `LuceneToolIndex` | Exact term matching, known tool names | Lucene, included in the starter |
-| `vector` | `VectorToolIndex` | Natural language queries, matching by meaning | A `VectorStore` bean |
+| `regex` (default) | `RegexToolIndex` | Few tools, predictable wording | Nothing extra |
+| `lucene` | `LuceneToolIndex` | Many tools, free phrasing | Lucene, included in the starter |
+| `vector` | `VectorToolIndex` | Many tools, matching by meaning | A `VectorStore` bean |
 
-The `RegexToolIndex` is the default, so you get it when you do not set `tool-index-type`. It matches the query as a regular expression against the tool names. It needs no extra dependency and no model call, which makes it the cheapest option. It works well when your tools follow a strict naming scheme. It is also the most limited one, because the model has to know that scheme to find a tool.
+The `RegexToolIndex` is the default, so you get it when you do not set `tool-index-type`. Its name promises less than it does, because you never write a regular expression yourself. The index builds one for you out of the query of the model. It lowercases the words, removes stop words, escapes special characters, and joins the rest with an OR into a case insensitive pattern such as `(?i)(open|support|ticket)`. A very long query is cut off at 200 characters. The pattern then runs against the names and the descriptions of all registered tools, and the matches are scored. If you need a different strategy, you can extend the class and convert the query in your own way.
+
+This costs you no extra dependency and no model call, which makes it the cheapest of the three. It is also the most limited one, because it compares words and not meaning. A tool is only found when the query uses words that appear in its name or description.
 
 The `VectorToolIndex` searches by meaning. It works like the retrieval step in the RAG section, only with tools instead of documents. Each tool description becomes an embedding and is stored in a vector store. The search query becomes an embedding as well, and the index returns the tools that are closest in meaning. The agent can ask for "something to open a ticket" and still find a tool with the name `createSupportCase`.
 
