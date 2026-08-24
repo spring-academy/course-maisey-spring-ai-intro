@@ -1,6 +1,11 @@
 The patterns from the previous section are just shapes you build with the `ChatClient`, the structured output, and the advisors you already know.
 
-Spring AI is continuously evolving. Some patterns are already provided out of the box, and this article walks through those in detail. The remaining ones exist as experimental implementations and are planned to become generally available in future releases. For those, the article shows what each one provides and how you would use it in code, but treat the samples as a first impression rather than as a stable API, because they will probably still change.
+Spring AI is still evolving, and today the single agent with harness patterns around one loop is where the framework is most mature. 
+Complex multi-agent orchestration is not part of the API yet, which matches the state of the industry, where its value is still being proven.
+
+That said, the Spring AI team is already preparing the next steps, with durable multi-agent orchestration and higher level, more opinionated agentic abstractions targeted at the coming releases.
+
+Some patterns are already provided out of the box, and this article walks through those in detail. The remaining ones exist as experimental implementations and are planned to become generally available in future releases. For those, the article shows what each one provides and how you would use it in code, but treat the samples as a first impression rather than as a stable API, because they will probably still change.
 
 ## Giving an Agent Hundreds of Tools With Tool Search
 
@@ -94,7 +99,7 @@ If you want to see the workflow patterns as running code rather than as diagrams
 
 ### LLM as a Judge and Self-Refine
 
-The evaluator-optimizer pattern is packaged as a reusable advisor. Built on the experimental *recursive advisors* of Spring AI, a [`SelfRefineEvaluationAdvisor`](https://spring.io/blog/2025/11/10/spring-ai-llm-as-judge-blog-post) generates a response, has a separate judge model rate it on a structured scale, and retries with that feedback until it passes. Using a different model as the judge avoids the bias a model has towards its own output. Because it is an advisor, you add it with `defaultAdvisors` and the whole evaluate and improve loop happens inside a single `call()`.
+The evaluator-optimizer pattern is packaged as a reusable advisor. Built on the experimental *recursive advisors* of Spring AI, a [`SelfRefineEvaluationAdvisor`](https://spring.io/blog/2025/11/10/spring-ai-llm-as-judge-blog-post) generates a response, has a separate judge model rate it on a structured scale, and retries with that feedback until it passes. Using a different model as the judge avoids the bias a model has towards its own output. Because it is an advisor, you add it with `defaultAdvisors` and the whole evaluate and improve loop happens inside a single `call()`. This is the first of the two multi-agent setups from the previous section, and Spring AI makes it a one line change to your client.
 
 ## Agentic Patterns in the spring-ai-community Project (Experimental)
 
@@ -188,7 +193,7 @@ ChatClient chatClient = builder
     .build();
 ```
 
-The subagents themselves are Markdown files in an `agents` directory, the same shape as Skills, with a name, a description that tells the main agent when to delegate, a list of allowed and forbidden tools, and the model to use. The main agent picks one by its description.
+The subagents themselves are Markdown files in an `agents` directory, the same shape as Skills, with a name, a description that tells the main agent when to delegate, a list of allowed and forbidden tools, and the model to use. The main agent picks one by its description. This is the second multi-agent setup, and note how the main agent stays in charge. It delegates a task and reads the result, which is what keeps such a system easy to follow.
 
 ### Agent-to-Agent (A2A)
 

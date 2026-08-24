@@ -23,6 +23,24 @@ Both approaches have their place, so the trade-offs between them are worth keepi
 
 Many developers want to start with a fully autonomous agent, because it is the most exciting option. But for well defined tasks a workflow usually gives you better predictability and consistency at a lower cost, which matches what enterprise applications need most, namely reliability and maintainability.
 
+## One Agent or Many
+
+A second distinction matters just as much. A **single agent** keeps everything in one place. It has one loop, one context, one set of tools, and one prompt, which makes it simple to build and easy to follow. A **multi-agent system** divides the work between several specialized agents. Each of them has its own context, its own tools, and its own prompt, and they pass results to each other. That gives you clear boundaries and lets each part grow on its own, but someone has to coordinate the agents.
+
+Start with a single agent, and let a test prove that it is not enough. The [guidance of Microsoft on this question](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ai-agents/single-agent-multiple-agents) gives the same advice, and it warns about two assumptions in particular. The first one is that clear roles in your task, such as a planner, a reviewer, and an executor, need one agent each. A single agent can often play all of these roles with different prompts and with tools that are only allowed in certain steps. The second one is that a lot of data needs several agents. Most of these problems come from the retrieval and not from the architecture, so better chunking, better search, and a larger context window help more than a second agent does.
+
+There are three situations where several agents are the right choice from the start.
+
+- **Security and compliance boundaries.** When rules demand that data stays separated, each part needs its own agent with its own permissions. A common example from financial services is one agent that prepares a transaction and a second one that validates it.
+- **Several teams.** When different teams own different knowledge areas, one agent per team lets each of them work and release on its own schedule.
+- **Planned growth.** When the roadmap already lists many features, data sources, or business units, one agent for all of it becomes hard to maintain. More than three to five clearly different functions in one agent is a good warning sign.
+
+In every other case the second agent has a price. Each handoff adds latency, each agent needs its own prompt, its own monitoring, and its own error handling, and the same context is often processed more than once, which raises the cost. A single agent has its limits as well. Its context window fills up, and it needs the permissions for everything it might do, which makes the principle of least privilege harder to apply.
+
+Two simple multi-agent shapes are worth the effort in practice. In the first one, "LLM as a judge", a second agent judges the work of the first one. In the second one, an agent gives a well described subtask to a specialized agent and receives only the result. Both keep one agent in charge, so the system stays easy to follow.
+
+Complex multi-agent orchestration is a different story. Many agents that run for a long time, work in parallel, and negotiate with each other are still proving their value. They also bring problems that a single agent does not have. Agents disagree with each other, the work has to survive a restart, and every extra agent adds cost and latency.
+
 ## The Autonomous Agent You Have Already Built
 
 You may not have noticed it, but you have already run an autonomous agent. The tool calling loop from the tool calling section is the simplest form of one. The model receives a set of tools, calls them, sees the results, and decides what to do next, until it considers the task complete. Add RAG and a handful of tools to that loop, and you have an assistant that finds its own way through a request.
