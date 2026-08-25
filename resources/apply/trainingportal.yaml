@@ -64,6 +64,12 @@ spec:
       deadline: 80m
       overdue: 2m
       reserved: ${TRAINING_PORTAL_RESERVED}
+    - name: spring-maisey-agentic-patterns-experimental
+      expires: 40m
+      orphaned: 10m
+      deadline: 80m
+      overdue: 2m
+      reserved: ${TRAINING_PORTAL_RESERVED}
     - name: spring-maisey-observability
       expires: 30m
       orphaned: 10m

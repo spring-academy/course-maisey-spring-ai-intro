@@ -1,0 +1,54 @@
+{
+  "id" : "dd309c73-1732-4fb1-aeb2-295509bf2107",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Tell me about Spring AI\",\"role\":\"user\"}],\"reasoning_effort\":\"none\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-ET6na3bOXjjpK7Fkj1o9zRuOkpFuZ\",\n  \"object\": \"chat.completion\",\n  \"created\": 1790606354,\n  \"model\": \"gpt-5.6-sol\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"**Spring AI** is a Spring project for building AI-powered Java applications using familiar Spring conventions and abstractions.\\n\\n### Key capabilities\\n\\n- **Portable model APIs** for chat, text, image, audio, and embedding models across providers such as OpenAI, Anthropic, Azure OpenAI, Amazon Bedrock, Google Vertex AI, and local models through Ollama.\\n- **`ChatClient` fluent API** for sending prompts, configuring system/user messages, mapping model output to Java types, and streaming responses.\\n- **Tool calling** so models can invoke application-provided Java functions or methods.\\n- **Retrieval-Augmented Generation (RAG)** using document ingestion, embeddings, vector stores, and retrieval advisors.\\n- **Vector-store integrations** with databases and services such as PostgreSQL/PGVector, Redis, Elasticsearch, MongoDB Atlas, Pinecone, and others.\\n- **Prompt templates, structured output, chat memory, and multimodality**.\\n- **Spring Boot auto-configuration** and observability through the broader Spring ecosystem.\\n- **Model Context Protocol (MCP)** support for building MCP clients and servers.\\n\\nA minimal `ChatClient` example looks like:\\n\\n```java\\n@RestController\\nclass AiController {\\n\\n    private final ChatClient chatClient;\\n\\n    AiController(ChatClient.Builder builder) {\\n        this.chatClient = builder.build();\\n    }\\n\\n    @GetMapping(\\\"/ai\\\")\\n    String generate(@RequestParam String message) {\\n        return chatClient.prompt()\\n                .user(message)\\n                .call()\\n                .content();\\n    }\\n}\\n```\\n\\nYou would also add the appropriate Spring AI model starter and configure the provider’s API key and model properties. Exact dependencies and configuration vary by provider and Spring AI version.\\n\\nOfficial documentation:\\n\\n- [Spring AI reference documentation](https://docs.spring.io/spring-ai/reference/)\\n- [Spring AI project page](https://spring.io/projects/spring-ai)\\n- [Getting started](https://docs.spring.io/spring-ai/reference/getting-started.html)\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 46,\n    \"completion_tokens\": 406,\n    \"total_tokens\": 452,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"cache_write_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "5ms",
+      "set-cookie" : "__cf_bm=WMtz0Ha_mVaqSKgyBnYjFFzVGNRuSdxKwlq6ZtqQJ6o-1790606353.696081-1.0.1.1-p2RzwwbBBsAntDxrdgz58gtlc6QI4lyWkcvvBb.KNvirDq0Qp1aFqKjbnTCQJNlmUOtwpjyvMILhBWz3BfGlAqp5yb_vjv_KQJAA83FH_EJSufOMTXOEcMm5anXZ4Wu1; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 28 Sep 2026 15:09:20 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_c6497325bf6040858bce5301f501a60f",
+      "x-ratelimit-limit-tokens" : "500000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a4237f0e9f725d1a-FRA",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "499951",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Mon, 28 Sep 2026 14:39:20 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "6935",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "dd309c73-1732-4fb1-aeb2-295509bf2107",
+  "persistent" : true,
+  "priority" : 1,
+  "metadata" : {
+    "flow" : "testing"
+  },
+  "insertionIndex" : 66
+}

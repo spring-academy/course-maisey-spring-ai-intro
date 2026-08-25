@@ -15,7 +15,7 @@ You don't have to run this. The generated project is already prepared for you in
 
 ```bash
   curl https://start.spring.io/starter.zip \
-    -d dependencies=web,spring-ai-mcp-server,devtools \
+    -d dependencies=web,actuator,spring-ai-mcp-server,devtools \
     -d type=maven-project \
     -d groupId=com.example \
     -d artifactId=spring-releases-mcp-server \

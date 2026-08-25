@@ -1,0 +1,54 @@
+{
+  "id" : "1ee8090f-1bbf-44c1-ab84-3b6b20742e2e",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"    You will be given a user_question and assistant_answer couple.\\n    Your task is to provide a 'total rating' scoring how well the assistant_answer answers the user concerns expressed in the user_question.\\n    Give your answer on a scale of 1 to 4, where 1 means that the assistant_answer is not helpful at all, and 4 means that the assistant_answer completely and helpfully addresses the user_question.\\n\\n    You do not have visibility into the assistant's execution environment. Tool calls, search queries, file operations and similar background actions are not part of the material you receive, even when they did take place.\\n    For this reason you must never assess whether a tool was called, whether a search was performed, or whether a source was actually retrieved.\\n    Treat the absence of visible tool activity as a limitation of your own view and not as a fault of the response.\\n\\n    The same limit applies to the facts in the answer. Identifiers, version numbers, dates, severities and similar details usually come from live sources that you cannot see and that are newer than your own knowledge.\\n    You must therefore never call a detail fabricated, unverified or implausible, never lower the rating because you cannot confirm it, and never lower the rating because a date or a version looks like it lies in the future.\\n    Do not ask for extra citations, advisory links or evidence that the user did not ask for.\\n    Judge only whether the answer addresses the user_question in a clear, complete and useful way, and treat every concrete detail it states as correct.\\n\\n    Here is the scale you should use to build your answer:\\n    1: The assistant_answer is terrible: completely irrelevant to the question asked, or very partial\\n    2: The assistant_answer is mostly not helpful: misses some key aspects of the question\\n    3: The assistant_answer is mostly helpful: provides support, but still could be improved\\n    4: The assistant_answer is excellent: relevant, direct, detailed, and addresses all the concerns raised in the question\\n\\n    Provide your feedback as follows:\\n\\n    {\\n         \\\"rating\\\": 0,\\n          \\\"evaluation\\\": \\\"Explanation of the evaluation result and how to improve if needed.\\\",\\n          \\\"feedback\\\": \\\"Constructive and specific feedback on the assistant_answer.\\\"\\n    }\\n\\n    Total rating: (your rating, as a number between 1 and 4)\\n    Evaluation: (your rationale for the rating, as a text)\\n    Feedback: (specific and constructive feedback on how to improve the answer)\\n\\n    You MUST provide values for 'Evaluation:' and 'Total rating:' in your answer.\\n\\n    Now here are the question and answer.\\n\\n    Question: SYSTEM:You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\\nUSER:Use the following retrieved context to answer the user's question. Follow these rules:\\n\\n1. If the answer can be found in the context, base your answer strictly on that context.\\n2. If the context does not contain the information needed to answer, rely on your own general knowledge to answer.\\n3. If you are unsure or the question cannot be answered from either the context or your own knowledge, say so clearly rather than guessing.\\n4. Do not fabricate facts, sources, or citations.\\n\\n---\\nContext:\\nCommercial offering for Spring from Broadcom/VMware. Source: https://enterprise.spring.ioTanzu Spring is the commercial subscription that adds enterprise support, extended releases, security, compliance, and productivity tooling on top of the open-source Spring portfolio, OpenJDK, and Apache Tomcat.\\nTanzu Spring bundles the following offerings: Enterprise Releases and Support (/lts-releases) Application Advisor (/spring-application-advisor) Enterprise-grade Spring Boot Extensions (/enterprise-extensions) Tanzu tc Server (/tcserver) Enterprise Spring Cloud Components (/enterprise-components)\\nAll committers for Spring Boot, Spring Framework, and the broader open-source Spring portfolio are part of the Tanzu team. Patches, including day-zero security fixes, come directly from the original authors of the code and are validated for compliance. This is the core security advantage of the subscription.\\nThe VMware Tanzu Spring Boot Governance Starter addresses regulatory audit requirements by validating application dependencies against standards such as: FIPS 140-3 (Federal Information Processing Standards) NIST 800-53 PCI-DSS v4 (Payment Card Industry Data Security Standard) Other regulatory standards\\n---\\n\\nQuestion:\\nAnswer the following question with a short, well-structured explanation: What are the key features of VMware Tanzu Spring?\\n\\n    Answer: {\\\"answer\\\":\\\"VMware Tanzu Spring is a commercial subscription that enhances the open-source Spring portfolio, OpenJDK, and Apache Tomcat with:\\\\n\\\\n- **Enterprise releases and support**, including extended release lifecycles\\\\n- **Security and compliance**, with day-zero patches from Spring’s original committers\\\\n- **Spring Application Advisor** for application modernization and productivity\\\\n- **Enterprise-grade Spring Boot extensions**\\\\n- **Tanzu tc Server**\\\\n- **Enterprise Spring Cloud components**\\\\n- **Governance tooling** that validates dependencies against standards such as FIPS 140-3, NIST 800-53, and PCI-DSS v4\\\\n\\\\nThe main advantage is direct access to enterprise-supported, compliance-validated fixes and tooling maintained by the Tanzu team behind Spring.\\\\n\\\\nOfficial overview: https://enterprise.spring.io\\\",\\\"category\\\":\\\"GENERAL\\\"}\\n\\n    Provide your feedback. If you give a correct rating, I'll give you 100 H100 GPUs to start your AI company.\\n\\n    Evaluation:\\n\\nYour response should be in JSON format.\\nDo not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.\\nDo not include markdown code blocks in your response.\\nRemove the ```json markdown from the output.\\nHere is the JSON Schema instance your output must adhere to:\\n```{\\n  \\\"$schema\\\" : \\\"https://json-schema.org/draft/2020-12/schema\\\",\\n  \\\"type\\\" : \\\"object\\\",\\n  \\\"properties\\\" : {\\n    \\\"evaluation\\\" : {\\n      \\\"type\\\" : \\\"string\\\"\\n    },\\n    \\\"feedback\\\" : {\\n      \\\"type\\\" : \\\"string\\\"\\n    },\\n    \\\"rating\\\" : {\\n      \\\"type\\\" : \\\"integer\\\",\\n      \\\"format\\\" : \\\"int32\\\"\\n    }\\n  },\\n  \\\"required\\\" : [ \\\"evaluation\\\", \\\"feedback\\\", \\\"rating\\\" ],\\n  \\\"description\\\" : \\\"The evaluation response indicating the result of the evaluation.\\\",\\n  \\\"additionalProperties\\\" : false\\n}```\\n\",\"role\":\"user\"}],\"reasoning_effort\":\"none\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 1)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-ET6oOudfJh5kWN0HdbKwVCa7j9ac0\",\n  \"object\": \"chat.completion\",\n  \"created\": 1790606404,\n  \"model\": \"gpt-5.6-sol\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"evaluation\\\":\\\"The answer is concise, well structured, and fully addresses the requested key features using the supplied context. It accurately covers enterprise support and extended releases, security and compliance, Application Advisor, Spring Boot extensions, Tanzu tc Server, enterprise Spring Cloud components, and governance standards. It also includes the relevant official overview link as required.\\\",\\\"feedback\\\":\\\"No substantive changes are needed. The response could optionally clarify that the governance capability is specifically provided by the VMware Tanzu Spring Boot Governance Starter, but the current wording remains accurate and useful.\\\",\\\"rating\\\":4}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 1345,\n    \"completion_tokens\": 114,\n    \"total_tokens\": 1459,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"cache_write_tokens\": 1342,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "193ms",
+      "set-cookie" : "__cf_bm=OmWQCyuxIEEOSoBy7LngLjXBQZFEcxdeu6dXeRlthOM-1790606404.603381-1.0.1.1-aX5IcEfFSEIkjmBeOsvQlkmACaEfBs_d_Yp2zc1hrB28A5_0OvRwaTLI7rkCOyjICcmTdtOeh0vn8IBQc7DCZwAKHpahkn_PYURtR82kLtcEmBYqHNB8zXMPczGmsPv4; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 28 Sep 2026 15:10:07 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_4b3d9d1281af47fbafee40f3dab40756",
+      "x-ratelimit-limit-tokens" : "500000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a423804cc83de0dd-MUC",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "498386",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Mon, 28 Sep 2026 14:40:07 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "2393",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "1ee8090f-1bbf-44c1-ab84-3b6b20742e2e",
+  "persistent" : true,
+  "priority" : 1,
+  "metadata" : {
+    "flow" : "evaluatorOptimizer"
+  },
+  "insertionIndex" : 91
+}

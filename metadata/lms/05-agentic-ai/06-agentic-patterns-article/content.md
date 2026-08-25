@@ -99,7 +99,7 @@ If you want to see the workflow patterns as running code rather than as diagrams
 
 ### LLM as a Judge and Self-Refine
 
-The evaluator-optimizer pattern is packaged as a reusable advisor. Built on the experimental *recursive advisors* of Spring AI, a [`SelfRefineEvaluationAdvisor`](https://spring.io/blog/2025/11/10/spring-ai-llm-as-judge-blog-post) generates a response, has a separate judge model rate it on a structured scale, and retries with that feedback until it passes. Using a different model as the judge avoids the bias a model has towards its own output. Because it is an advisor, you add it with `defaultAdvisors` and the whole evaluate and improve loop happens inside a single `call()`. This is the first of the two multi-agent setups from the previous section, and Spring AI makes it a one line change to your client.
+The evaluator-optimizer pattern is packaged as a reusable advisor. Built on the experimental *recursive advisors* of Spring AI, a [`SelfRefineEvaluationAdvisor`](https://spring.io/blog/2025/11/10/spring-ai-llm-as-judge-blog-post) generates a response, has a separate judge model rate it on a structured scale, and retries with that feedback until it passes. Using a different model as the judge avoids the bias a model has towards its own output. Because it is an advisor, you add it with `defaultAdvisors` and the whole evaluate and improve loop happens inside a single `call()`. This is the first of the two multi-agent setups from the previous section, and Spring AI makes it a one line change to your client. A sample implementation is available [here](https://github.com/spring-projects/spring-ai-examples/blob/main/advisors/evaluation-recursive-advisor-demo/src/main/java/com/example/advisor/SelfRefineEvaluationAdvisor.java).
 
 ## Agentic Patterns in the spring-ai-community Project (Experimental)
 
@@ -113,7 +113,7 @@ They are plain tools, so you register them on the `ChatClient` the same way you 
         <dependency>
             <groupId>org.springaicommunity</groupId>
             <artifactId>spring-ai-agent-utils-bom</artifactId>
-            <version>0.10.0</version>
+            <version>0.11.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -139,8 +139,10 @@ The [`SkillsTool`](https://spring.io/blog/2026/01/13/spring-ai-generic-agent-ski
 private Resource skillsResource;
 
 ChatClient chatClient = builder
-    .defaultToolCallbacks(SkillsTool.builder().addSkillsResource(skillsResource).build()
-    .defaultTools(FileSystemTools.builder().build(), ShellTools.builder().build())
+    .defaultTools(
+        SkillsTool.builder().addSkillsResource(skillsResource).build(),
+        FileSystemTools.builder().build(), 
+        ShellTools.builder().build())
     .build();
 ```
 

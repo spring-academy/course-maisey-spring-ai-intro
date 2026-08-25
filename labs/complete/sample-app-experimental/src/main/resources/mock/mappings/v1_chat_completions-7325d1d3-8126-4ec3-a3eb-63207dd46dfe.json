@@ -1,0 +1,54 @@
+{
+  "id" : "7325d1d3-8126-4ec3-a3eb-63207dd46dfe",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about Spring AI\",\"role\":\"user\"}],\"reasoning_effort\":\"none\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 1)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-ET6mmj1ieXZqy5UysjTS5RTZGExbH\",\n  \"object\": \"chat.completion\",\n  \"created\": 1790606304,\n  \"model\": \"gpt-5.6-sol\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"## Spring AI\\n\\n**Spring AI** is an open-source Spring project for building AI-powered Java applications. It applies familiar Spring concepts—dependency injection, auto-configuration, and portable abstractions—to generative AI development.\\n\\n### Main capabilities\\n\\n- **Model integrations:** Connects to providers such as OpenAI, Anthropic, Google, Amazon Bedrock, Azure OpenAI, and local models through Ollama.\\n- **Unified APIs:** Offers common interfaces for chat, embeddings, image generation, and other model operations.\\n- **Prompt handling:** Supports prompt templates, structured outputs, and conversation history.\\n- **Tool calling:** Lets models invoke Java methods or external services.\\n- **RAG support:** Helps implement retrieval-augmented generation using document ingestion, text splitting, embeddings, and vector databases.\\n- **Spring Boot integration:** Provides starters, configuration properties, observability, and dependency injection.\\n\\n### Typical use cases\\n\\nSpring AI is useful for chatbots, document search and question answering, AI assistants, content generation, summarization, and workflows that combine language models with business systems.\\n\\nIn short, it aims to make AI application development in Java feel like conventional Spring development while reducing dependence on any single model provider.\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 24,\n    \"completion_tokens\": 245,\n    \"total_tokens\": 269,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"cache_write_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "3ms",
+      "set-cookie" : "__cf_bm=Wg7CEaMtLgRdAOx.k0AQu0bRKUsC4_n9VWDEHi_sjCY-1790606304.352779-1.0.1.1-Js9w_JMBrg9hKZP7rhuxP96Z5hLL05KiCyy1KSvu4AxKQYJExQ7Di3CYfl5C67.z9vZMdExHNCnmYIAOCkHw.DDPfal54uQ4TxhA39xFu0fpwxoXLEmSYOcPafpNiSPG; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 28 Sep 2026 15:08:29 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_ef8bd2fd8a974b3c9b6ea99ebcb80bc1",
+      "x-ratelimit-limit-tokens" : "500000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a4237dda3e1fd2a6-FRA",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "499974",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Mon, 28 Sep 2026 14:38:29 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "4482",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "7325d1d3-8126-4ec3-a3eb-63207dd46dfe",
+  "persistent" : true,
+  "priority" : 1,
+  "metadata" : {
+    "flow" : "fundamentals"
+  },
+  "insertionIndex" : 33
+}

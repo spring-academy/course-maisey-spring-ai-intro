@@ -13,10 +13,16 @@ import com.github.tomakehurst.wiremock.matching.EqualToJsonPattern;
 import com.github.tomakehurst.wiremock.matching.MatchesJsonPathPattern;
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
+import com.github.tomakehurst.wiremock.recording.RecordSpecBuilder;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
+import com.github.tomakehurst.wiremock.common.Metadata;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
@@ -42,13 +48,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.recordSpec;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.newRequestPattern;
 
 @Order(1)
 @EnabledIfEnvironmentVariable(named = "OPENAI_API_KEY", matches = ".+")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
 class OpenAiRecordingTest {
 
@@ -61,10 +71,25 @@ class OpenAiRecordingTest {
             .withRootDirectory(WIREMOCK_ROOT.toString())
             .extensions(new StripVolatileFieldsTransformer()));
 
+    // Set by the flow that is being recorded, read by the transformer below, which stamps it into
+    // the metadata of every stub that flow produced. That tag is what makes a single flow
+    // re-recordable: its own stubs can be dropped without touching the ones of the other flows.
+    private static volatile String currentFlow;
+
+    // Higher precedence than WireMock's default of 5, see the transformer below.
+    private static final int RECORDED_STUB_PRIORITY = 1;
+
     static {
-        clearRecordedFixtures();
+        // No fixtures are cleared here. The server loads the ones already on disk, and they carry a
+        // higher priority than the proxy the recorder registers, so a request a previously recorded
+        // flow covers is served from that stub instead of being proxied to the API and recorded a
+        // second time. Each flow drops its own stubs before it records.
         recordingServer.start();
-        recordingServer.startRecording(recordSpec()
+    }
+
+    private static RecordSpecBuilder flowRecordSpec(String flow) {
+        currentFlow = flow;
+        return recordSpec()
                 .forTarget(OPENAI_TARGET)
                 .matchRequestBodyWithEqualToJson(true, true)
                 // Collapse repeated identical requests (e.g. a query embedded once per RAG loop, or
@@ -73,23 +98,71 @@ class OpenAiRecordingTest {
                 // exact recorded order/count. The workshop replays each request standalone, so a
                 // scenario stub sitting at a non-Started state returns 404.
                 .ignoreRepeatRequests()
-                .transformers(StripVolatileFieldsTransformer.NAME)
-                .build());
+                .transformers(StripVolatileFieldsTransformer.NAME);
     }
 
-    private static void clearRecordedFixtures() {
-        for (String subDirectory : List.of("mappings", "__files")) {
-            Path directory = WIREMOCK_ROOT.resolve(subDirectory);
-            if (!Files.isDirectory(directory)) {
-                continue;
+    /**
+     * Drops whatever the named flow recorded last time and records it again. Everything the flow
+     * shares with the others stays in place, so a single flow can be re-recorded on its own with
+     * {@code -Dtest=OpenAiRecordingTest#planAndExecute} without spending an API call on the rest.
+     */
+    private void record(String flow, ThrowingRunnable body) {
+        removeRecordedFixtures(flow);
+        recordInto(flow, body);
+    }
+
+    /** Records without dropping what the flow recorded before, for stubs the other flows share. */
+    private void recordInto(String flow, ThrowingRunnable body) {
+        recordingServer.startRecording(flowRecordSpec(flow).build());
+        try {
+            body.run();
+        }
+        catch (RuntimeException | Error e) {
+            throw e;
+        }
+        catch (Throwable e) {
+            throw new IllegalStateException("Flow " + flow + " failed", e);
+        }
+        finally {
+            // Keep whatever was recorded even when the flow failed one of its assertions, so a
+            // single unmet expectation does not leave the fixture set of that flow empty.
+            recordingServer.stopRecording();
+        }
+    }
+
+    @FunctionalInterface
+    interface ThrowingRunnable {
+        void run() throws Exception;
+    }
+
+    /**
+     * Removes the stubs of one flow, from the running server and from disk. Stub files carry the
+     * flow in their metadata; the response bodies WireMock stored next to them under __files are
+     * named in the stub, so they go with it.
+     */
+    private static void removeRecordedFixtures(String flow) {
+        recordingServer.removeStubsByMetadata(matchingJsonPath("$.flow", equalTo(flow)));
+
+        Path mappings = WIREMOCK_ROOT.resolve("mappings");
+        if (!Files.isDirectory(mappings)) {
+            return;
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        try (Stream<Path> files = Files.list(mappings)) {
+            for (Path file : files.toList()) {
+                JsonNode mapping = objectMapper.readTree(file.toFile());
+                if (!flow.equals(mapping.path("metadata").path("flow").asText(null))) {
+                    continue;
+                }
+                String bodyFileName = mapping.path("response").path("bodyFileName").asText(null);
+                if (bodyFileName != null && !bodyFileName.isBlank()) {
+                    Files.deleteIfExists(WIREMOCK_ROOT.resolve("__files").resolve(bodyFileName));
+                }
+                Files.deleteIfExists(file);
             }
-            try (Stream<Path> entries = Files.walk(directory)) {
-                entries.filter(path -> !path.equals(directory))
-                        .sorted(Comparator.reverseOrder())
-                        .forEach(OpenAiRecordingTest::deleteQuietly);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to clear " + directory, e);
-            }
+        }
+        catch (IOException e) {
+            throw new RuntimeException("Failed to remove the recorded fixtures of flow " + flow, e);
         }
     }
 
@@ -103,7 +176,8 @@ class OpenAiRecordingTest {
     }
 
     @AfterAll
-    static void stopRecordingServer() {
+    void publishFixtures() throws IOException {
+        copyFixturesOntoClasspath();
         recordingServer.stop();
     }
 
@@ -116,12 +190,81 @@ class OpenAiRecordingTest {
     @Autowired
     private EmbeddingModel embeddingModel;
 
-    @Test
-    void recordChatFlows() throws IOException {
-        ChatFlows.exercise(chatModel, chatClientBuilder, embeddingModel);
+    private ChatFlows flows;
 
-        recordingServer.stopRecording();
-        copyFixturesOntoClasspath();
+    @BeforeAll
+    void recordSharedSetup() {
+        // Only embeddings of the knowledge base, and every flow below shares them, so they are not
+        // dropped first: on a run that records a single flow they are served by the stubs already
+        // on disk and nothing is sent to the API. Start from an empty folder
+        // (generate-openai-mocks.sh --fresh) to record them again.
+        recordInto("setup", () -> this.flows = new ChatFlows(chatModel, chatClientBuilder, embeddingModel));
+    }
+
+    @Test
+    @Order(1)
+    void fundamentals() {
+        record("fundamentals", flows::fundamentals);
+    }
+
+    @Test
+    @Order(2)
+    void advisors() {
+        record("advisors", flows::advisors);
+    }
+
+    @Test
+    @Order(3)
+    void rag() {
+        record("rag", flows::rag);
+    }
+
+    @Test
+    @Order(4)
+    void toolCalling() {
+        record("toolCalling", flows::toolCalling);
+    }
+
+    @Test
+    @Order(5)
+    void testing() {
+        record("testing", flows::testing);
+    }
+
+    @Test
+    @Order(6)
+    void mcp() {
+        record("mcp", flows::mcp);
+    }
+
+    @Test
+    @Order(7)
+    void toolSearch() {
+        record("toolSearch", flows::toolSearch);
+    }
+
+    @Test
+    @Order(8)
+    void evaluatorOptimizer() {
+        record("evaluatorOptimizer", flows::evaluatorOptimizer);
+    }
+
+    @Test
+    @Order(9)
+    void agentSkills() {
+        record("agentSkills", flows::agentSkills);
+    }
+
+    @Test
+    @Order(10)
+    void planAndExecute() {
+        record("planAndExecute", flows::planAndExecute);
+    }
+
+    @Test
+    @Order(11)
+    void humanInTheLoop() {
+        record("humanInTheLoop", flows::humanInTheLoop);
     }
 
     static final class StripVolatileFieldsTransformer extends StubMappingTransformer {
@@ -158,6 +301,14 @@ class OpenAiRecordingTest {
 
         @Override
         public StubMapping transform(StubMapping stubMapping, FileSource files, Parameters parameters) {
+            stubMapping.setMetadata(Metadata.metadata().attr("flow", currentFlow).build());
+            // Outrank the catch-all proxy stub the recorder registers, which sits at WireMock's
+            // default priority of 5 and, being added last, otherwise wins every match. With that
+            // priority a recording proxies and re-records even the requests the stubs on disk
+            // already cover, and a second stub for the same embedding input holds a slightly
+            // different vector: the mock then answers with either of them and the documents the
+            // RAG advisor retrieves come back in another order than they did while recording.
+            stubMapping.setPriority(RECORDED_STUB_PRIORITY);
             RequestPattern request = stubMapping.getRequest();
             List<ContentPattern<?>> bodyPatterns = request.getBodyPatterns();
             if (bodyPatterns == null || bodyPatterns.isEmpty()) {

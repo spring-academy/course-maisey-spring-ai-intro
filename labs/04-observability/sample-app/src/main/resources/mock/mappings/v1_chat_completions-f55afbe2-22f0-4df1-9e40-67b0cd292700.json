@@ -1,0 +1,54 @@
+{
+  "id" : "f55afbe2-22f0-4df1-9e40-67b0cd292700",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\\n\",\"role\":\"system\"},{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about breaking changes in Spring Framework 7\\n\\nContext information is below, surrounded by ---------------------\\n\\n---------------------\\nOpenRewrite integration: uses OpenRewrite recipes internally but hides the complexity. Developers review pull requests instead of finding and configuring recipes themselves. Synchronized multi-project upgrades: identifies Spring projects that must upgrade together. For example, an app using Spring Web 5.3.x with Spring Security 5.8 is upgraded so both move to 6.0.x together for a successful build. Incremental updates: enables continuous, small-scale dependency upgrades and API-breaking changes through regular pull requests, keeping systems current with minimal disruption. CI pipeline compatibility: generated pull requests fit into existing continuous integration workflows.\\nApplication Advisor automatically generates pull requests when new Spring dependency versions become available. Each pull request includes updates to both build configuration and Java source files, so it integrates into CI/CD pipelines without manual work.\\nAll committers for Spring Boot, Spring Framework, and the broader open-source Spring portfolio are part of the Tanzu team. Patches, including day-zero security fixes, come directly from the original authors of the code and are validated for compliance. This is the core security advantage of the subscription.\\nSpring Boot and related projects: In addition to 13 months of open-source support from release date, VMware Tanzu Spring provides a minimum of 1 additional year of support for minor versions. The final minor version of each major release receives an additional 5 years of enterprise support (7 years). OpenJDK: support follows the BellSoft Liberica distribution timelines. Tomcat: extended support for versions no longer maintained by Apache, including CVE fixes.\\n---------------------\\n\\nGiven the context and provided history information and not prior knowledge,\\nreply to the user comment. If the answer is not in the context, inform\\nthe user that you can't answer the question.\\n\",\"role\":\"user\"}],\"reasoning_effort\":\"none\",\"response_format\":{\"json_schema\":{\"name\":\"json_schema\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"answer\":{\"type\":\"string\",\"description\":\"The helpful answer to the customer's question\"},\"category\":{\"type\":\"string\",\"enum\":[\"TECHNICAL\",\"BILLING\",\"SECURITY\",\"GENERAL\"],\"description\":\"The category of the support question: TECHNICAL, BILLING, SECURITY, or GENERAL\"}},\"required\":[\"answer\",\"category\"],\"additionalProperties\":false},\"strict\":true},\"type\":\"json_schema\"}}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-ET6nBgFwhZtJ6PurXmPSE0GpfD31H\",\n  \"object\": \"chat.completion\",\n  \"created\": 1790606329,\n  \"model\": \"gpt-5.6-sol\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"{\\\"answer\\\":\\\"The provided context does not list the breaking changes in Spring Framework 7, so I can’t accurately summarize them from this information. It only describes automated upgrades through Application Advisor, synchronized Spring project updates, CI integration, and enterprise support. For authoritative migration details, consult the official Spring Framework documentation: https://docs.spring.io/spring-framework/reference/\\\",\\\"category\\\":\\\"TECHNICAL\\\"}\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 502,\n    \"completion_tokens\": 86,\n    \"total_tokens\": 588,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"cache_write_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "69ms",
+      "set-cookie" : "__cf_bm=fx6YallU4A5RllUqhRGtTf7vVq.qttwkOCc2G_vh1Tg-1790606329.014708-1.0.1.1-0u1CGTK2RbCtGKdSW3OAG2zwJVtpmH5K46CI3f03LYexz9tJUHqQeR4lXXKg5C_d69xrOwV3fNcBapnNxs22oGCf6e3hqdIjpoXFHQQZb5s.m_MIvC9y.ROIoSnEbfCe; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 28 Sep 2026 15:08:50 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_f8a6ac9372944d5eac8f5cf2e9fb3db9",
+      "x-ratelimit-limit-tokens" : "500000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a4237e745a41dbeb-FRA",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "499421",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Mon, 28 Sep 2026 14:38:50 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "1715",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "f55afbe2-22f0-4df1-9e40-67b0cd292700",
+  "persistent" : true,
+  "priority" : 1,
+  "metadata" : {
+    "flow" : "rag"
+  },
+  "insertionIndex" : 50
+}

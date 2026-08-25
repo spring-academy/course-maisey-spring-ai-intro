@@ -1,0 +1,54 @@
+{
+  "id" : "742c585c-dceb-4e1e-b288-ac993a9c39a8",
+  "name" : "v1_chat_completions",
+  "request" : {
+    "url" : "/v1/chat/completions",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"messages\":[{\"content\":\"You are a support agent for the Spring framework. Answer clearly and always include a link to the relevant official docs when one exists, never inventing URLs.\",\"role\":\"system\"},{\"content\":\"Answer the following question with a short, well-structured explanation: Tell me about Spring AI\",\"role\":\"user\"}],\"reasoning_effort\":\"none\"}",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    }, {
+      "matchesJsonPath" : "$[?(@.stream != true)]"
+    }, {
+      "matchesJsonPath" : "$[?(@.messages.length() == 2)]"
+    }, {
+      "matchesJsonPath" : "$[?(!@.response_format)]"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "body" : "{\n  \"id\": \"chatcmpl-ET6mXsa6XTFqRc1m90sy9WBeSJ3P0\",\n  \"object\": \"chat.completion\",\n  \"created\": 1790606289,\n  \"model\": \"gpt-5.6-sol\",\n  \"choices\": [\n    {\n      \"index\": 0,\n      \"message\": {\n        \"role\": \"assistant\",\n        \"content\": \"## Spring AI\\n\\n**Spring AI** is a Spring project for building applications that use generative AI while following familiar Spring conventions.\\n\\n### Key capabilities\\n\\n- **Portable model APIs** for chat, embeddings, text-to-image, audio, and moderation across multiple AI providers.\\n- **`ChatClient` fluent API**, similar in style to Spring’s `WebClient`.\\n- **Structured output** mapping model responses to Java types.\\n- **Tool calling**, allowing models to invoke application functions and services.\\n- **Retrieval-Augmented Generation (RAG)** with document ingestion, embedding models, and vector stores.\\n- **Conversation memory**, prompt templates, observability, and evaluation support.\\n- **Spring Boot starters and auto-configuration** for straightforward setup.\\n\\nSpring AI helps reduce provider-specific code, making it easier to integrate models from providers such as OpenAI, Anthropic, Google, Amazon, Microsoft, and local runtimes.\\n\\n**Official documentation:** https://docs.spring.io/spring-ai/reference/\",\n        \"refusal\": null,\n        \"annotations\": []\n      },\n      \"finish_reason\": \"stop\"\n    }\n  ],\n  \"usage\": {\n    \"prompt_tokens\": 59,\n    \"completion_tokens\": 202,\n    \"total_tokens\": 261,\n    \"prompt_tokens_details\": {\n      \"cached_tokens\": 0,\n      \"cache_write_tokens\": 0,\n      \"audio_tokens\": 0\n    },\n    \"completion_tokens_details\": {\n      \"reasoning_tokens\": 0,\n      \"audio_tokens\": 0,\n      \"accepted_prediction_tokens\": 0,\n      \"rejected_prediction_tokens\": 0\n    }\n  },\n  \"service_tier\": \"default\",\n  \"system_fingerprint\": null\n}\n",
+    "headers" : {
+      "Server" : "cloudflare",
+      "x-ratelimit-reset-tokens" : "8ms",
+      "set-cookie" : "__cf_bm=CQVwqCFn8A_NCB2VlGqSK_bmNzuQT73kxmfv9OUoJQk-1790606289.0115752-1.0.1.1-36.e5sYmgw7LklDg1sfJfsqFTOTrR3oEpYP53HOV7uaC4IXKdMvlp16DO8YoHVAx6n7YXekDWkRrXzIx2W2sjKPXm4g2fBeIFD0GPYdBC9h5IsBn4JzmVBZ01aNgE2WU; HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 28 Sep 2026 15:08:13 GMT",
+      "Access-Control-Expose-Headers" : [ "CF-Ray", "X-Request-ID", "CF-Ray" ],
+      "Strict-Transport-Security" : "max-age=31536000; includeSubDomains; preload",
+      "openai-project" : "proj_okCLGHUXd9bQZbzoedFu4HU4",
+      "Content-Type" : "application/json",
+      "x-request-id" : "req_d407fe2a616d415381a3e8a33a91f348",
+      "x-ratelimit-limit-tokens" : "500000",
+      "openai-organization" : "user-supbrlztho9miuyaxmhcilzo",
+      "CF-Ray" : "a4237d7a58fcdc6c-FRA",
+      "X-Content-Type-Options" : "nosniff",
+      "x-ratelimit-reset-requests" : "120ms",
+      "x-ratelimit-remaining-tokens" : "499933",
+      "x-openai-proxy-wasm" : "v0.1",
+      "x-ratelimit-remaining-requests" : "499",
+      "Date" : "Mon, 28 Sep 2026 14:38:13 GMT",
+      "CF-Cache-Status" : "DYNAMIC",
+      "x-ratelimit-limit-requests" : "500",
+      "openai-version" : "2020-10-01",
+      "openai-processing-ms" : "4560",
+      "alt-svc" : "h3=\":443\"; ma=86400"
+    }
+  },
+  "uuid" : "742c585c-dceb-4e1e-b288-ac993a9c39a8",
+  "persistent" : true,
+  "priority" : 1,
+  "metadata" : {
+    "flow" : "fundamentals"
+  },
+  "insertionIndex" : 35
+}

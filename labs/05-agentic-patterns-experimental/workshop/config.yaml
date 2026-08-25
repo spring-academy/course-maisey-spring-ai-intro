@@ -1,0 +1,13 @@
+pathways:
+  default: workshop
+
+  paths:
+    workshop:
+      title: "Spring AI - Agentic Patterns (Experimental)"
+
+      steps:
+      - 01-getting-started
+      - 02-evaluator-optimizer
+      - 03-agent-skills
+      - 04-plan-and-execute
+      - 05-human-in-the-loop
