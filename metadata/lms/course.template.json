@@ -5,7 +5,7 @@
   "status": "live",
   "level": "beginner",
   "entitlements": ["auth"],
-  "order": 650,
+  "order": 150,
   "instructors": ["spring-timo-salm"],
   "topics": ["ai"],
   "settings": {
