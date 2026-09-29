@@ -1,0 +1,1 @@
+You now understand what A2A is, how a client agent finds a remote agent through its Agent Card, how a task moves through its lifecycle, and how the results come back. You also know how A2A and MCP work together, with MCP connecting an agent to tools and A2A connecting it to other agents.

@@ -1,0 +1,12 @@
+{
+    "id": "spring-maisey-agentic-ai-module-a2a-article",
+    "slug": "a2a-spring-ai",
+    "title": "A2A With Spring AI (Experimental)",
+    "status": "live",
+    "type": "article",
+    "duration": 900,
+    "order": 7,
+    "settings": {
+        "manualCompletion": true
+    }
+}

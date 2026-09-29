@@ -1,0 +1,12 @@
+{
+    "id": "spring-maisey-agentic-ai-module-a2a-fundamentals",
+    "slug": "a2a-fundamentals",
+    "title": "Agent2Agent Protocol (A2A)",
+    "status": "live",
+    "type": "article",
+    "duration": 900,
+    "order": 6,
+    "settings": {
+        "manualCompletion": true
+    }
+}

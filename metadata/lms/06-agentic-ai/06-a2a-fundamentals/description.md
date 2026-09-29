@@ -1,0 +1,1 @@
+How the Agent2Agent protocol lets independent agents discover each other with Agent Cards and work together on task.

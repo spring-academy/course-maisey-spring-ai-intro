@@ -1,0 +1,1 @@
+You now know how to expose a Spring AI application as an A2A server with an `AgentCard` and your own `AgentExecutor` that returns a structured result, and how to delegate work to remote agents by wrapping the A2A Java SDK client in a tool.

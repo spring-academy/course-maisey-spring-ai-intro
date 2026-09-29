@@ -199,64 +199,6 @@ The subagents themselves are Markdown files in an `agents` directory, the same s
 
 ### Agent-to-Agent (A2A)
 
-Where MCP connects an agent to tools, [A2A](https://spring.io/blog/2026/01/29/spring-ai-agentic-patterns-a2a-integration) connects an agent to other agents, which is the next step once your subagents no longer live in the same application. The protocol itself is implemented by the A2A Java SDK, and [spring-ai-a2a](https://github.com/spring-ai-community/spring-ai-a2a) puts a Spring Boot layer on top of it, so you declare beans instead of writing protocol code.
-
-The server side is a dependency of its own, and it is not part of the BOM above.
-
-```xml
-<dependency>
-    <groupId>org.springaicommunity</groupId>
-    <artifactId>spring-ai-a2a-server-autoconfigure</artifactId>
-    <version>0.3.0</version>
-</dependency>
-```
-
-With it on the classpath you provide two beans. The `AgentCard` is the description other systems read before they talk to you, with a name, a URL, the protocol version, and the list of skills your agent offers. The `AgentExecutor` is what actually answers a request, and `DefaultAgentExecutor` already implements it on top of a `ChatClient`, so all you write is the lambda that pulls the text out of the incoming message and calls your client.
-
-```java
-@Bean
-AgentCard agentCard(@Value("${server.port:8080}") int port) {
-    return new AgentCard.Builder()
-        .name("Support Agent")
-        .description("Answers Spring AI questions and opens support tickets")
-        .url("http://localhost:" + port + "/a2a/")
-        .version("1.0.0")
-        .capabilities(new AgentCapabilities.Builder().streaming(false).build())
-        .skills(Collections.emptyList())
-        .defaultInputModes(List.of("text"))
-        .defaultOutputModes(List.of("text"))
-        .build();
-}
-
-@Bean
-AgentExecutor agentExecutor(ChatClient chatClient) {
-    return new DefaultAgentExecutor(chatClient, (chatClient, requestContext) -> {
-        String userMessage = DefaultAgentExecutor.extractTextFromMessage(requestContext.getMessage());
-        return chatClient.prompt().user(userMessage).call().content();
-    });
-}
-```
-
-The autoconfiguration does the rest. It publishes the card under `/.well-known/agent-card.json` for discovery, accepts the JSON-RPC messages of the protocol, and routes each of them through your `AgentExecutor`.
-
-On the client side there is no autoconfiguration, so you add the `a2a-java-sdk-client` artifact and work with the SDK directly. `A2A.getAgentCard` fetches the card of a remote agent from its well known URL, and `Client.builder(agentCard)` gives you the connection you send messages over. The trick is to wrap that call in an ordinary `@Tool` method, because then delegating to a remote agent looks like any other tool call and the model decides on its own which agent to route to.
-
-```java
-@Service
-public class RemoteAgentConnections {
-    @Tool(description = "Sends a task to a remote agent. Use this to delegate work to specialized agents.")
-    String sendMessage(@ToolParam(description = "The name of the agent") String agentName,
-                    @ToolParam(description = "The task description to send") String task) {
-        // build a Message, send it with the SDK Client, and return the answer
-    }
-}
-```
-
-```java
-ChatClient chatClient = builder
-    .defaultSystem(promptListingTheRemoteAgents)
-    .defaultTools(remoteAgentConnections)
-    .build();
-```
+Once your subagents no longer live in the same application, the Agent2Agent protocol lets them find and call each other across services, teams, and languages. It is a protocol of its own, just like MCP, so it has dedicated sections at the end of this module.
 
 The series has grown beyond this list as well, with long term memory through `AutoMemoryTools` and an event sourced Session API that is meant to replace `ChatMemory`.

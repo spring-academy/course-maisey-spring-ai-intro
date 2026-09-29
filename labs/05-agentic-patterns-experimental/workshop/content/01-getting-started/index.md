@@ -78,13 +78,6 @@ text: |2
   			</dependency>
 ```
 
-## Not Every Pattern Comes From This Dependency
-
-As the article already pointed out, this one dependency does not cover every experimental pattern. Two of them sit outside of it.
-
-- The **Agent-to-Agent** support ships as artifacts of its own. On the server side that is `spring-ai-a2a-server-autoconfigure`, and on the client side the `a2a-java-sdk-client`. Neither is managed by the BOM you just imported, so both need an explicit version.
-- The **evaluator optimizer** advisor of the next section is not part of the library at all. It is a sample implementation from the `spring-ai-examples` repository, built on the experimental recursive advisors of Spring AI itself, and you copy it into your own project.
-
 ## Start the Spring Releases MCP Server
 
 The support assistant is configured as an MCP client of the Spring Releases server, so start that server first.
