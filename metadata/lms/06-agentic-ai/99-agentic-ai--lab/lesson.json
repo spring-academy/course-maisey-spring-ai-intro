@@ -1,0 +1,14 @@
+{
+    "id": "spring-agentic-ai-module-lab",
+    "slug": "deprecated-mcp-lab",
+    "title": "DEPRECATED - Lab - Model Context Protocol (MCP)",
+    "status": "unlisted",
+    "type": "lab",
+    "entitlements": ["auth"],
+    "duration": 1800,
+    "order": 99,
+    "settings": {
+        "educates": "spring-maisey-mcp",
+        "manualCompletion": true
+    }
+}

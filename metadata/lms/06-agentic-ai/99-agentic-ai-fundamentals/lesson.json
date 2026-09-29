@@ -1,0 +1,12 @@
+{
+    "id": "spring-maisey-agentic-ai-module-mcp-fundamentals-article",
+    "slug": "deprecated-mcp-fundamentals",
+    "title": "DEPRECATED - Model Context Protocol (MCP)",
+    "status": "unlisted",
+    "type": "article",
+    "duration": 900,
+    "order": 99,
+    "settings": {
+        "manualCompletion": true
+    }
+}
