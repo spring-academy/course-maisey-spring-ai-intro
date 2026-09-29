@@ -1,1 +1,1 @@
-A future lab about the agentic patterns that Spring AI supports experimentally.
+You tried the experimental agentic patterns in the support assistant. You added a self refining evaluator optimizer advisor, an Agent Skill that looks up known vulnerabilities, the `TodoWriteTool` for plan and execute, and the `AskUserQuestionTool` with a custom advisor and REST endpoints, so a human in the loop can give the model missing information like the Spring Boot version.
