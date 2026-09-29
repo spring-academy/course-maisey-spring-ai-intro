@@ -1,0 +1,12 @@
+{
+    "id": "spring-maisey-agentic-ai-module-mcp-spring-ai-article",
+    "slug": "deprecated-mcp-spring-ai",
+    "title": "DEPRECATED - MCP With Spring AI",
+    "status": "unlisted",
+    "type": "article",
+    "duration": 1200,
+    "order": 99,
+    "settings": {
+        "manualCompletion": true
+    }
+}
