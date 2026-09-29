@@ -6,7 +6,7 @@
     "type": "lab",
     "entitlements": ["auth"],
     "duration": 1800,
-    "order": 8,
+    "order": 5,
     "settings": {
         "educates": "spring-maisey-agentic-patterns-experimental",
         "manualCompletion": true

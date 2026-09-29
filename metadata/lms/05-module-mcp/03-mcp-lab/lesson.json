@@ -6,7 +6,7 @@
     "type": "lab",
     "entitlements": ["auth"],
     "duration": 1800,
-    "order": 4,
+    "order": 3,
     "settings": {
         "educates": "spring-maisey-mcp",
         "manualCompletion": true

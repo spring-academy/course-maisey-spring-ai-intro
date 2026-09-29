@@ -1,1 +1,0 @@
-You now understand what makes an AI system agentic, where a workflow serves you better than a fully autonomous agent, and why the harness around a model call matters so much. The next sections cover its two biggest pieces, MCP and the agentic patterns.

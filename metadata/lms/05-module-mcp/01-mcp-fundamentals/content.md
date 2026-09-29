@@ -4,7 +4,7 @@ Think about how many AI applications exist today. There are chat assistants, cod
 
 This is the problem the **[Model Context Protocol (MCP)](https://modelcontextprotocol.io)** solves. It is an open-source protocol for connecting AI applications to external systems. A system exposes its capabilities once, and every MCP compatible AI application can use them without custom glue code. The official documentation compares MCP to a USB-C port. Just as USB-C gives you one connector that works with many devices, MCP gives you one way to connect AI applications to external systems.
 
-![MCP as a standardized protocol connecting AI applications on one side to data sources and tools on the other](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/05-agentic-ai/02-mcp-fundamentals/assets/mcp.svg)
+![MCP as a standardized protocol connecting AI applications on one side to data sources and tools on the other](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/05-module-mcp/01-mcp-fundamentals/assets/mcp.svg)
 
 The ecosystem behind it is already broad. Claude, ChatGPT, Visual Studio Code, Cursor and many other tools can act as MCP clients, and there is a growing collection of ready made servers for common systems. Because the protocol is language neutral, a server you write in Java with Spring AI can be used by a tool written in Python or TypeScript, and your Java assistant can use servers that somebody else wrote in another language.
 
@@ -12,7 +12,7 @@ MCP was originally created by Anthropic, but it no longer belongs to a single co
 
 ## Architecture
 
-![An MCP host containing several clients, each with its own dedicated connection to one server, where a remote server can still serve more than one client](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/05-agentic-ai/02-mcp-fundamentals/assets/mcp-architecture.svg)
+![An MCP host containing several clients, each with its own dedicated connection to one server, where a remote server can still serve more than one client](https://raw.githubusercontent.com/spring-academy/course-maisey-spring-ai-intro/refs/heads/main/metadata/lms/05-module-mcp/01-mcp-fundamentals/assets/mcp-architecture.svg)
 
 MCP uses a client and server architecture with three roles. The **host** is the AI application itself, for example Claude Desktop, Visual Studio Code, or the support assistant you are building. The **server** is a program that offers capabilities, such as a server that can read your ticket system. The **client** sits inside the host and keeps one dedicated connection to one server.
 

@@ -1,0 +1,9 @@
+{
+  "id": "spring-maisey-mcp-module",
+  "slug": "mcp-module",
+  "title": "Model Context Protocol (MCP)",
+  "status": "live",
+  "order": 5,
+  "settings": {
+  }
+}
