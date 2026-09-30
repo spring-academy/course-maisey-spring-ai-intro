@@ -2,6 +2,46 @@ You now know what A2A is and how agents use it to work together.
 
 The protocol itself is implemented by the official [A2A Java SDK](https://github.com/a2aproject/a2a-java), which covers the data model, the protocol bindings, and a client for calling remote agents. For the server side there is a deeper integration into Spring AI with the experimental [spring-ai-a2a](https://github.com/spring-ai-community/spring-ai-a2a) project. For the client side there is no dedicated Spring AI integration yet, so you work with the plain Java SDK.
 
+## Calling a Remote Agent as a Client
+
+For the client side you add the client module of the A2A Java SDK.
+
+```xml
+<dependency>
+    <groupId>org.a2aproject.sdk</groupId>
+    <artifactId>a2a-java-sdk-client</artifactId>
+    <version>${a2a-java-sdk.version}</version>
+</dependency>
+```
+
+The client artifact includes the JSON-RPC transport. For gRPC or REST, add the corresponding transport dependencies `org.a2aproject.sdk:a2a-java-sdk-client-transport-grpc` or `org.a2aproject.sdk:a2a-java-sdk-client-transport-rest`.
+
+Using the client takes three steps. You fetch the Agent Card of the remote agent, build a `Client` for it, and send a message.
+
+```java
+AgentCard agentCard = A2A.getAgentCard("https://support-agent.example.com");
+
+Client client = Client.builder(agentCard)
+        .withTransport(JSONRPCTransport.class, new JSONRPCTransportConfigBuilder())
+        .addConsumer((event, card) -> {
+            if (event instanceof TaskEvent taskEvent) {
+                System.out.println("Task " + taskEvent.getTask().status().state());
+                System.out.println("Artifacts " + taskEvent.getTask().artifacts());
+            } else if (event instanceof MessageEvent messageEvent) {
+                System.out.println("Message " + messageEvent.getMessage().parts());
+            }
+        })
+        .build();
+
+client.sendMessage(A2A.toUserMessage("Which Spring Boot versions are still supported?"));
+```
+
+`A2A.getAgentCard` reads the card from the well known path of the agent. The client then picks a transport that both sides support, here JSON-RPC. It does not return the answer of `sendMessage` directly. Instead it passes events to the consumers you register. A `TaskEvent` carries a task with its state and artifacts, and a `MessageEvent` carries a direct answer without a task.
+
+To use a remote agent from Spring AI, you put this code into an ordinary `@Tool` method, for example `askBillingAgent`, and register it like any other tool with `.defaultTools(...)`. A `CompletableFuture` that the consumer completes turns the events back into a normal return value for the tool. Delegating work to another agent then looks like any other tool call, and the model decides on its own when to do it. This is the Subagents pattern from the previous sections, with the subagents running as separate services.
+
+Two details matter in such a tool. Use a timeout when you wait for the answer, because the tool call blocks your model call until the remote agent answers. And react to more than the completed task, such as a failed task or a remote agent that needs more input.
+
 ## Exposing Your Agent as an A2A Server
 
 On the server side you add the autoconfiguration module of spring-ai-a2a. It is not managed by the Spring AI BOM, so you set the version yourself.
@@ -87,46 +127,6 @@ class CustomAgentExecutor implements AgentExecutor {
 The difference is the `DataPart`. The client receives the category and the answer as separate JSON fields and does not have to parse any text.
 
 The autoconfiguration does the rest. It serves the Agent Card at `/.well-known/agent-card.json` and accepts the JSON-RPC requests of the protocol at the root path, so it is common to give each agent its own context path, such as `server.servlet.context-path=/support`.
-
-## Calling a Remote Agent as a Client
-
-For the client side you add the client module of the A2A Java SDK.
-
-```xml
-<dependency>
-    <groupId>org.a2aproject.sdk</groupId>
-    <artifactId>a2a-java-sdk-client</artifactId>
-    <version>${a2a-java-sdk.version}</version>
-</dependency>
-```
-
-The client artifact includes the JSON-RPC transport. For gRPC or REST, add the corresponding transport dependencies `org.a2aproject.sdk:a2a-java-sdk-client-transport-grpc` or `org.a2aproject.sdk:a2a-java-sdk-client-transport-rest`.
-
-Using the client takes three steps. You fetch the Agent Card of the remote agent, build a `Client` for it, and send a message.
-
-```java
-AgentCard agentCard = A2A.getAgentCard("https://support-agent.example.com");
-
-Client client = Client.builder(agentCard)
-        .withTransport(JSONRPCTransport.class, new JSONRPCTransportConfigBuilder())
-        .addConsumer((event, card) -> {
-            if (event instanceof TaskEvent taskEvent) {
-                System.out.println("Task " + taskEvent.getTask().status().state());
-                System.out.println("Artifacts " + taskEvent.getTask().artifacts());
-            } else if (event instanceof MessageEvent messageEvent) {
-                System.out.println("Message " + messageEvent.getMessage().parts());
-            }
-        })
-        .build();
-
-client.sendMessage(A2A.toUserMessage("Which Spring Boot versions are still supported?"));
-```
-
-`A2A.getAgentCard` reads the card from the well known path of the agent. The client then picks a transport that both sides support, here JSON-RPC. It does not return the answer of `sendMessage` directly. Instead it passes events to the consumers you register. A `TaskEvent` carries a task with its state and artifacts, and a `MessageEvent` carries a direct answer without a task.
-
-To use a remote agent from Spring AI, you put this code into an ordinary `@Tool` method, for example `askBillingAgent`, and register it like any other tool with `.defaultTools(...)`. A `CompletableFuture` that the consumer completes turns the events back into a normal return value for the tool. Delegating work to another agent then looks like any other tool call, and the model decides on its own when to do it. This is the Subagents pattern from the previous sections, with the subagents running as separate services.
-
-Two details matter in such a tool. Use a timeout when you wait for the answer, because the tool call blocks your model call until the remote agent answers. And react to more than the completed task, such as a failed task or a remote agent that needs more input.
 
 ## What to Expect
 
