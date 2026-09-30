@@ -39,25 +39,6 @@ Here is an Agent Card that the support assistant from the labs could publish in 
     "streaming": false,
     "pushNotifications": false
   },
-  "securitySchemes": {
-    "oauth2": {
-      "type": "oauth2",
-      "description": "OAuth 2.0 access tokens issued by the Example Corp authorization server",
-      "flows": {
-        "authorizationCode": {
-          "authorizationUrl": "https://auth.example.com/oauth2/authorize",
-          "tokenUrl": "https://auth.example.com/oauth2/token",
-          "scopes": {
-            "support.read": "Ask questions and list support tickets",
-            "tickets.write": "Create support tickets"
-          }
-        }
-      }
-    }
-  },
-  "security": [
-    { "oauth2": ["support.read"] }
-  ],
   "defaultInputModes": ["text/plain"],
   "defaultOutputModes": ["application/json"],
   "skills": [
@@ -84,11 +65,30 @@ Here is an Agent Card that the support assistant from the labs could publish in 
         "Which support tickets are still open?"
       ]
     }
+  ],
+  "securitySchemes": {
+    "oauth2": {
+      "type": "oauth2",
+      "description": "OAuth 2.0 access tokens issued by the Example Corp authorization server",
+      "flows": {
+        "authorizationCode": {
+          "authorizationUrl": "https://auth.example.com/oauth2/authorize",
+          "tokenUrl": "https://auth.example.com/oauth2/token",
+          "scopes": {
+            "support.read": "Ask questions and list support tickets",
+            "tickets.write": "Create support tickets"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    { "oauth2": ["support.read"] }
   ]
 }
 ```
 
-The assistant accepts questions as plain text and answers with JSON, the same structured response with a category and an answer that its REST endpoint returns. Each skill maps to something the assistant already does. The first one comes from the RAG setup and the Spring Releases MCP server, the second one from the `cve-lookup` Agent Skill, and the third one from the ticket tools. A client agent never sees these tools, only the skills.
+The assistant accepts questions as plain text and answers with JSON, the same structured response with a category and an answer that its REST endpoint returns. Each skill maps to something the assistant already does. The first one comes from the RAG setup and the Spring Releases MCP server, the second one from the ticket tools. A client agent never sees these tools, only the skills.
 
 The rest of the card is about running the agent in production. The agent is only reachable over HTTPS, and the provider and documentation URL tell other teams who owns it and where to learn more. The `securitySchemes` section declares that callers need an OAuth 2.0 access token from the authorization server of the company, plus the supported flows. The `security` section requires the `support.read` scope for every call, and the ticket skill adds its own requirement for `tickets.write`, because creating tickets changes data. The card only describes these rules. The server still has to check the token on every request, for example with Spring Security as an OAuth 2.0 resource server.
 
