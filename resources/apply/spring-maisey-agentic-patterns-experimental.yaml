@@ -25,6 +25,8 @@ spec:
         token:
           enabled: false
     env:
+    - name: LAB_VERSION
+      value: "${VERSION}"
     - name: WEBSERVER
       value: "$(ingress_protocol)://$(workshop_namespace)-files.$(ingress_domain)"
     - name: BOOTSTRAP_COMMAND
