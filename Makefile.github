@@ -5,4 +5,4 @@ CONTAINER_REGISTRY    = ghcr.io/spring-academy/
 CONTAINER_REPOSITORY  = course-maisey
 version               = latest
 
-env                   = local
+env                   = github
